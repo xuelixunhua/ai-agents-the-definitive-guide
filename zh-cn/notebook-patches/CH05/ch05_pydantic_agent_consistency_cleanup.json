@@ -1,0 +1,12 @@
+{
+  "notebook": "CH05/ch05_pydantic_agent_consistency.ipynb",
+  "translation": "zh-CN",
+  "code_cleanup_replacements": {
+    "qAyGthrUfIzb": [
+      {
+        "old": "# LangChain / LangGraph 相关依赖 相关依赖",
+        "new": "# LangChain / LangGraph 相关依赖"
+      }
+    ]
+  }
+}
