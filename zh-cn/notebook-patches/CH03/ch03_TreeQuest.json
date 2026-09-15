@@ -1,0 +1,58 @@
+{
+  "notebook": "CH03/ch03_TreeQuest.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "-IbAQ_gP8MCF": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH03/ch03_TreeQuest.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"在 Colab 中打开\"/>\n</a>",
+    "x3QWkLfE_EYg": "# 关于本 Notebook\n\n本 Notebook 演示如何使用 [**TreeQuest**](https://github.com/SakanaAI/treequest) 配合 **AB-MCTS 风格搜索（AB-MCTS style search）**，迭代改进由 LLM 生成的答案。流程会先提出一个初始解，再对其进行改写优化，通过结构化评审器（structured judge）为每个候选答案打分，最后让蒙特卡洛树搜索（Monte Carlo Tree Search, MCTS）在有限搜索预算内保留目前找到的最佳结果。\n\n## 你将看到什么\n\n* **树引导优化（tree-guided refinement）**：使用一个只有两种动作的简单生成器——先生成初稿，再持续优化\n* **结构化评审（structured judging）**：让 LLM 以 JSON 输出 `[0, 1]` 区间内的数值质量分\n* **有状态搜索（stateful search）**：使用 `treequest.ABMCTSA`，定期跟踪当前最佳候选，并在最后执行 top-k 选择\n* **角色清晰分离**：生成器（generator）、优化器（refiner）、评审器（judge）和搜索控制器（search controller）彼此独立\n\n## 你将运行什么\n\n1. 安装 `treequest[abmcts-m]`，并配置一个兼容 OpenAI 接口的 `OpenAI` 客户端。\n2. 为 MCTS 节点定义最小化的 `State`：包含当前 `llm_answer` 及其 `score`。\n3. 实现：\n\n   * `initial_generation()`：生成第一版答案并打分\n   * `refine_answer()`：改进已有答案并重新打分\n   * `evaluate_answer()`：通过结构化响应评估答案质量\n   * `generate()`：作为 TreeQuest 用来扩展节点的动作\n4. 创建 `algo = tq.ABMCTSA()` 并运行一个短搜索循环，在过程中打印当前最佳候选。\n5. 使用 `tq.top_k` 选择并打印最终最佳答案。\n\n## 它如何工作\n\n* **状态（State）**\n  每个节点保存 `llm_answer` 和 `score`。MCTS 使用这个分数进行选择（selection）与反向传播（backpropagation）。\n\n* **初始生成与优化步骤（Initial and refine steps）**\n  `initial_generation()` 要求模型先为任务生成一个初始解。\n  `refine_answer()` 要求模型在保留任务目标的同时，提高答案的清晰度与准确性。\n\n* **评分（Scoring）**\n  `evaluate_answer()` 要求模型返回类似 `{\"score\": 0.92}` 的 JSON 对象，并用 Pydantic schema 解析。把评审与生成分离，通常能提升评估稳定性。\n\n* **TreeQuest**\n  `ABMCTSA` 负责节点选择、通过 `generate` 扩展节点、执行 rollout（若有定义）以及价值反向传播。`generate` 会返回新的 `State`，以及父边对应的数值。这里直接把父节点分数作为边值；对于只做迭代优化的简单流程而言，这是一种朴素但可用的做法。\n\n* **Top-k**\n  搜索过程中定期调用 `tq.top_k` 查看当前最佳候选，结束时再调用一次以得到最终胜出答案。\n\n## 如何扩展\n\n* 加入**自一致性评审器（self-consistency judge）**，结合测试用例或风格规范进行评估。\n* 使用**成对评审器（pairwise judge）**比较两个答案并返回偏好，再把偏好转换成供 MCTS 使用的分数。\n* 加入 **rollout 步骤**，在正式评分前连续执行多次小幅优化。\n* 在评审器里加入**领域测试（domain tests）**，例如实际运行代码并检查输出。\n* 通过简单存储层持久化搜索树与执行轨迹，便于后续分析。\n\n## 环境要求与说明\n\n* 在 `OpenAI(api_key=\"...\")` 中配置有效 API Key。\n* 评审模型必须支持结构化响应。本示例使用 `client.chat.completions.parse` 配合 Pydantic schema。\n* 生成阶段使用中等 temperature 以增加多样性；评审阶段使用较低 temperature 以提高稳定性。\n* 本示例的搜索深度和步数都很小。实际使用时应谨慎增加，因为 API 成本会随调用次数上升。",
+    "73Xednnz8kvP": "# 安装依赖",
+    "-OdUsLGj9Vr5": "# API 配置",
+    "fw6b4wMD9SUh": "# 导入依赖",
+    "0SL-M7XiAOwy": "# 类与数据\n\n搜索节点的载荷（payload）。\n- `llm_answer`：当前候选答案\n- `score`：由评审器（judge）给出的 `[0, 1]` 区间数值分数",
+    "pTw7oQKfAwQ2": "# 初始生成（Initial generation）\n\n创建第一份候选答案并为其评分。\n模型先从零开始生成一个初始解，再调用评审器得到分数。函数返回一个 `State`，MCTS 可以把它视作根节点的子节点。",
+    "g0Uum26IA99x": "# 优化（Refinement）\n\n改进已有答案并重新评分。优化提示词要求模型提升清晰度、准确性和完整性。函数返回一个新的 `State`，其中包含优化后的文本和最新分数。",
+    "ji6OxCimBIM0": "# 评审 Schema（Judge schema）\n\n结构化评审响应。\n- `score`：范围为 `[0, 1]` 的浮点数，越高越好。通过 Pydantic 强制约束，可尽早捕获解析失败。",
+    "n6C9SL0UBVTM": "# 评审函数（Judging function）\n\n要求 LLM 评审器返回只包含一个 `score` 键的 JSON 对象。这里使用 OpenAI 客户端把结构化结果解析为 `ScoreResponse`；发生异常时回退为 `0.5`，让搜索流程能够继续。",
+    "ZQcsIbCDBqOi": "# TreeQuest 生成器（Generator for TreeQuest）\n\n这是 TreeQuest 的节点扩展函数。若不存在 `parent_state`，就创建初始候选；否则继续优化父节点的答案。",
+    "frYG3gRtB3JW": "# 搜索循环（Search loop）"
+  },
+  "code_comment_replacements": {
+    "p5FiLJwVA9Um": [
+      {
+        "old": "# Must be a JSON-mode-supported model",
+        "new": "# 必须使用支持 JSON 模式的模型"
+      }
+    ],
+    "rSR0uhzcA_5h": [
+      {
+        "old": "# Must be a JSON-mode-supported model",
+        "new": "# 必须使用支持 JSON 模式的模型"
+      }
+    ],
+    "qFx86pJuhenj": [
+      {
+        "old": "# TreeQuest loop",
+        "new": "# TreeQuest 搜索循环"
+      },
+      {
+        "old": "# Run a small number of steps. Increase gradually in real use.",
+        "new": "# 先运行较少步数；真实场景中应逐步增加搜索预算"
+      },
+      {
+        "old": "# Inspect best-so-far periodically",
+        "new": "# 定期查看当前最佳候选"
+      },
+      {
+        "old": "# Final selection",
+        "new": "# 最终选择"
+      }
+    ]
+  }
+}
