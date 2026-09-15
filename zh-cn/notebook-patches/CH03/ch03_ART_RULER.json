@@ -109,6 +109,10 @@
         "new": "尝试使用 + - * / 构造一个合法表达式，并保证每个数字最多使用一次。\n    使用 Fraction 避免数值误差，并可要求所有中间结果为整数。\n    如果在搜索上限内找到解，则返回表达式字符串；否则返回 \"\"。"
       },
       {
+        "old": "# multiset of values, order free",
+        "new": "# 由数值构成的多重集合，不考虑顺序"
+      },
+      {
         "old": "# commutative first",
         "new": "# 优先处理满足交换律的运算"
       }
@@ -125,6 +129,32 @@
       {
         "old": "# rubric for RULER",
         "new": "# 提供给 RULER 的评分 rubric"
+      }
+    ],
+    "kGFExOgQja74": [
+      {
+        "old": "# Hard correctness gate already set reward and metrics[\"correct\"]",
+        "new": "# 硬正确性门控已经设置 reward 和 metrics[\"correct\"]"
+      },
+      {
+        "old": "# Ensure numeric only metrics exist",
+        "new": "# 确保 metrics 中只保留数值字段"
+      },
+      {
+        "old": "# Ask RULER to score each group. Guard on errors or availability.",
+        "new": "# 请求 RULER 为每个 group 评分，并对错误或不可用情况做保护"
+      },
+      {
+        "old": "# change to a model you have",
+        "new": "# 替换为你可用的模型"
+      },
+      {
+        "old": "# Combine: final = gate * (alpha + beta * ruler_norm)",
+        "new": "# 融合：final = gate * (alpha + beta * ruler_norm)"
+      },
+      {
+        "old": "# Inference on 10 held out tests",
+        "new": "# 在 10 个留出测试样本上进行推理"
       }
     ]
   }
