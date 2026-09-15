@@ -3,8 +3,10 @@
 
 The manifest is intentionally keyed by stable notebook cell IDs. Markdown cells are
 replaced as whole cells; code cells only allow exact comment-string replacements.
-Code logic, prompts, API/class/function names, execution counts, metadata, and saved
-outputs are otherwise left unchanged.
+Normal comment replacements are idempotent: if the translated text is already present,
+they are skipped. Optional cleanup replacements can repair a previously introduced
+exact string before future idempotent runs. Code logic, prompts, API/class/function
+names, execution counts, metadata, and saved outputs are otherwise left unchanged.
 """
 
 from __future__ import annotations
@@ -34,6 +36,15 @@ def _to_source_lines(text: str) -> list[str]:
     return text.splitlines(keepends=True) or [""]
 
 
+def _get_code_cell(by_id: dict[str, dict[str, Any]], cell_id: str) -> dict[str, Any]:
+    cell = by_id.get(cell_id)
+    if cell is None:
+        raise KeyError(f"Code cell not found: {cell_id}")
+    if cell.get("cell_type") != "code":
+        raise TypeError(f"Cell {cell_id} is not code.")
+    return cell
+
+
 def apply_patch(notebook: dict[str, Any], manifest: dict[str, Any]) -> dict[str, Any]:
     patched = copy.deepcopy(notebook)
     cells = patched.get("cells", [])
@@ -51,23 +62,39 @@ def apply_patch(notebook: dict[str, Any], manifest: dict[str, Any]) -> dict[str,
             raise TypeError(f"Cell {cell_id} is not markdown.")
         cell["source"] = _to_source_lines(translated_text)
 
+    # Normal replacements are idempotent. Check the translated text first because
+    # the original text can be a substring of the translation (for example when an
+    # English API/framework name is intentionally retained inside a Chinese comment).
     for cell_id, replacements in manifest.get("code_comment_replacements", {}).items():
-        cell = by_id.get(cell_id)
-        if cell is None:
-            raise KeyError(f"Code cell not found: {cell_id}")
-        if cell.get("cell_type") != "code":
-            raise TypeError(f"Cell {cell_id} is not code.")
-
+        cell = _get_code_cell(by_id, cell_id)
         source = _source_text(cell)
         for item in replacements:
             old = item["old"]
             new = item["new"]
-            if old not in source and new not in source:
+            if new in source:
+                continue
+            if old not in source:
                 raise ValueError(
                     f"Expected comment not found in {cell_id}: {old!r}"
                 )
+            source = source.replace(old, new)
+        cell["source"] = _to_source_lines(source)
+
+    # Cleanup replacements are intentionally old-first. They are only for repairing
+    # an exact previously introduced string; once repaired, the clean text is accepted
+    # on every later run without changing it again.
+    for cell_id, replacements in manifest.get("code_cleanup_replacements", {}).items():
+        cell = _get_code_cell(by_id, cell_id)
+        source = _source_text(cell)
+        for item in replacements:
+            old = item["old"]
+            new = item["new"]
             if old in source:
                 source = source.replace(old, new)
+            elif new not in source:
+                raise ValueError(
+                    f"Expected cleanup string not found in {cell_id}: {old!r}"
+                )
         cell["source"] = _to_source_lines(source)
 
     return patched
