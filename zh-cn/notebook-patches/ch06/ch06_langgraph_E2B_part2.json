@@ -1,0 +1,75 @@
+{
+  "notebook": "ch06/ch06_langgraph_E2B.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "A3RvsMF3ryPO": "# 两个编码智能体、两个隔离的 E2B sandbox（沙箱）与显式 handoff（交接）"
+  },
+  "code_comment_replacements": {
+    "Cgil4QSNIuun": [
+      {
+        "old": "# Small helpers",
+        "new": "# 小型辅助函数"
+      },
+      {
+        "old": "Print the most recent AI message content.",
+        "new": "打印最近一条 AI message（消息）的内容。"
+      },
+      {
+        "old": "# Stable A/B sandboxes (robust to timeouts)",
+        "new": "# 稳定的 A/B sandbox（沙箱），能够稳健处理超时"
+      },
+      {
+        "old": "Create an E2B tool bound to sandbox A or B with a small retry and (optional) plotting guard.",
+        "new": "创建绑定到 sandbox A 或 B 的 E2B 工具，并加入轻量重试与（可选的）绘图保护。"
+      },
+      {
+        "old": "# Prevent Coder A from plotting (keeps demo honest and deterministic)",
+        "new": "# 禁止 Coder A 绘图，以保证演示边界清晰且结果具有确定性（deterministic）"
+      },
+      {
+        "old": "# One retry if the sandbox vanished",
+        "new": "# 如果 sandbox 已失效，则重试一次"
+      },
+      {
+        "old": "# Explicit artifact handoff (no shared state)",
+        "new": "# 显式 artifact handoff（产物交接），不共享状态"
+      },
+      {
+        "old": "Publish a JSON payload to the artifact store and return an artifact_id.",
+        "new": "将 JSON payload（载荷）发布到 artifact store（产物存储），并返回 artifact_id。"
+      },
+      {
+        "old": "# Optional: uncomment if you want the notebook to show handoff details",
+        "new": "# 可选：若希望 Notebook 展示 handoff（交接）细节，可取消以下注释"
+      },
+      {
+        "old": "Fetch a previously published JSON artifact by artifact_id.",
+        "new": "通过 artifact_id 获取此前发布的 JSON artifact（产物）。"
+      },
+      {
+        "old": "# LangGraph: coder A -> coder B, deterministic stop",
+        "new": "# LangGraph：coder A -> coder B，并采用 deterministic stop（确定性停止）"
+      },
+      {
+        "old": "# ordering nudges fetch before run",
+        "new": "# 工具顺序会引导模型先 fetch，再 run"
+      },
+      {
+        "old": "# After B executed its sandbox once, force a pure-text finish",
+        "new": "# B 的 sandbox 执行一次后，强制以纯文本结束"
+      },
+      {
+        "old": "# Mark done once sandbox B has executed at least once",
+        "new": "# sandbox B 至少执行一次后，将任务标记为完成"
+      }
+    ]
+  }
+}
