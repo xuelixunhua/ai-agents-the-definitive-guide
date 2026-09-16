@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 144,
+  "candidate_entry_count": 136,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -53,79 +53,24 @@
       "notebook": "CH02/ch02_HITL.ipynb",
       "entries": [
         {
-          "cell_index": 1,
-          "cell_id": "iND9cS50E4A2",
-          "cell_type": "markdown",
-          "source": "# About this notebook\n\nThis notebook is a hands-on tour of Human-in-the-Loop patterns for LangGraph. It shows how to add precise human control to agent workflows, from lightweight approval gates to full interactive editing, while keeping the code compact and production minded.\n\n## What you will learn\n\n1. How to wire LangGraph interrupts to pause a run, collect human input, and resume deterministically.\n2. How to checkpoint state with `InMemorySaver` so a run can stop and continue without losing context.\n3. How to wrap tools so a human can accept, edit, or override a call before it executes.\n4. How to drive simple ReAct style loops that honor human review of tool calls.\n5. How to implement parallel interrupts and resume them with a single map.\n\n## Models and configuration\n\nThe notebook uses a provider switch set at startup.\n\n* `LLM_PROVIDER=openai` uses OpenAI via `langchain_openai`.\n* `LLM_PROVIDER=openrouter` uses OpenRouter via `ChatOpenAI` and a custom `base_url`.\n\nEnvironment variables are loaded from `.env` via `python-dotenv`:\n\n* `LLM_PROVIDER` (`openai` or `openrouter`)\n* `OPENAI_API_KEY` when provider is OpenAI\n* `OPENROUTER_API_KEY` when provider is OpenRouter\n* Optional model overrides:\n  * `OPENAI_MODEL` (default `gpt-5.4-nano`)\n  * `OPENROUTER_MODEL` (default `openai/gpt-5.4-nano`)\n\n## The patterns showcased\n\n**Pattern A — Human feedback loop on content generation**\nA simple write–review loop for LinkedIn posts. The model drafts. The human provides iterative feedback via `interrupt`. The graph loops until the human types done. Useful for any short form content workflow that benefits from iterative refinement.\n\n**Pattern B — HITL checkpoint before a sensitive call**\nThe model proposes an HTTP request as JSON. A human can approve, revise, request more context, or reject before the code performs the external call. This is a minimal but powerful safety interlock for network or finance critical actions.\n\n**Pattern C — Review and edit state**\nThe model writes a short summary. The human edits the text in place. The edited text becomes the new state. This pattern is ideal for compliance or brand voice checks.\n\n**Pattern D — Parallel interrupts with a single resume map**\nTwo independent interrupts fire at once. The runner prints both payloads and collects a resume value for each, then resumes the graph in one step. This is a template for multi item review tasks.\n\n**Pattern E — Tool call review inside a tiny ReAct loop**\nA tool is wrapped with `add_hitl`. Before execution, a human can accept, edit arguments, or respond with a stub result. The loop continues until the model no longer requests tools. This is the smallest possible example of supervised tool use.\n\n**Pattern F — Static interrupts for debugging**\nGraph level interrupts are registered before and after specific nodes to create deterministic breakpoints. This is useful for stepwise debugging and unit style tests.\n\n## How the interactive runner works\n\n* Each demo builds a compiled graph and starts a new thread id for clean state.\n* When an interrupt occurs, the terminal prints the payload and waits for input.\n* You can paste raw strings or JSON. For the tool wrapper in Pattern E you can provide:\n\n  * `{\"type\": \"accept\"}`\n  * `{\"type\": \"edit\", \"args\": {\"args\": {\"query\": \"weather in Zurich\"}}}`\n  * `{\"type\": \"response\", \"args\": \"Skip for now\"}`\n\nFor parallel interrupts the runner prints a numbered list and collects a resume value per interrupt id, then resumes once with a single `Command(resume=...)`.\n\n## Dependencies\n\n* `langgraph` for graphs, interrupts, checkpoints, and tasks\n* `langchain_openai` for LLM bindings\n* `python-dotenv` for environment loading\n* `requests` used in Pattern B for a real HTTP GET\n\n## How to run\n\n1. Create a `.env` file with your keys and provider choice. Set `LLM_PROVIDER` to `openai` or `openrouter`, then provide the matching API key (`OPENAI_API_KEY` or `OPENROUTER_API_KEY`).\n2. Run the notebook and choose a demo from the menu printed by `main()`.\n3. Follow the terminal prompts to provide feedback or approvals.\n\n## Why this matters\n\nReal systems in finance, research, and operations often need both autonomy and control. These patterns show how to add precise human control without fighting the agent architecture. Each pattern composes cleanly, so you can start small, measure impact, and expand to richer supervision where it adds the most value.\n"
-        },
-        {
           "cell_index": 3,
           "cell_id": "jVb7DLioAGyC",
           "cell_type": "code_comments",
           "comments": [
-            "# --- Provider + API key setup ---",
-            "# Option 1 (preferred): create a `.env` file in your project folder with e.g.",
+            "# --- Provider 与 API Key 配置 ---",
             "# LLM_PROVIDER=openai",
             "# OPENAI_API_KEY=your_openai_key_here",
             "# OPENAI_MODEL=gpt-4o-mini",
             "# LLM_PROVIDER=openrouter",
             "# OPENROUTER_API_KEY=your_openrouter_key_here",
-            "# OPENROUTER_MODEL=openai/gpt-4o-mini",
-            "# Option 2: set directly in the notebook with `%env`.",
-            "# Load from .env if available",
-            "# Fallback: ask only for the selected provider key"
+            "# OPENROUTER_MODEL=openai/gpt-4o-mini"
           ]
         },
         {
           "cell_index": 6,
           "cell_id": "0zg6Xfk_RSJk",
           "cell_type": "markdown",
-          "source": "# LLM setup (OpenAI or OpenRouter via provider switch)"
-        },
-        {
-          "cell_index": 8,
-          "cell_id": "Wi7zoCHtRVVE",
-          "cell_type": "markdown",
-          "source": "# Pattern A: Human feedback loop on content generation"
-        },
-        {
-          "cell_index": 10,
-          "cell_id": "tsZls1FpRZgY",
-          "cell_type": "markdown",
-          "source": "# Pattern B: HITL checkpoint before sensitive call"
-        },
-        {
-          "cell_index": 12,
-          "cell_id": "knjNOUZtReCM",
-          "cell_type": "markdown",
-          "source": "# Pattern C: Review and edit state"
-        },
-        {
-          "cell_index": 14,
-          "cell_id": "VJnheKx_Ri-h",
-          "cell_type": "markdown",
-          "source": "# Pattern D: Parallel interrupts with single resume map"
-        },
-        {
-          "cell_index": 16,
-          "cell_id": "P-Y-oQEZRnI9",
-          "cell_type": "markdown",
-          "source": "# Pattern E: Tool call review in a tiny ReAct loop"
-        },
-        {
-          "cell_index": 18,
-          "cell_id": "ri4q8t4HRtLb",
-          "cell_type": "markdown",
-          "source": "# Pattern F: Static interrupts for debugging"
-        },
-        {
-          "cell_index": 21,
-          "cell_id": "e7RnB-3hEMlM",
-          "cell_type": "code_comments",
-          "comments": [
-            "                # Try JSON, else raw string",
-            "    # Single interrupt path"
-          ]
+          "source": "# LLM 配置（通过 provider switch 在 OpenAI 与 OpenRouter 之间切换）"
         }
       ]
     },
