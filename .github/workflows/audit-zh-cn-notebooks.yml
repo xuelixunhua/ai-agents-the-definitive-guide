@@ -38,4 +38,9 @@ jobs:
             exit 0
           fi
           git commit -m "i18n: refresh notebook English residue audit"
+          # Notebook backfill may advance the branch while this audit is running.
+          # Rebase the generated inventory commit before pushing to avoid a
+          # non-fast-forward race between the two translation workflows.
+          git fetch origin zh-cn-translation
+          git pull --rebase origin zh-cn-translation
           git push origin HEAD:zh-cn-translation
