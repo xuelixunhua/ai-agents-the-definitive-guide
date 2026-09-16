@@ -1,0 +1,83 @@
+{
+  "notebook": "ch07/ch07_model_fallback.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "7ATcrp-tzIOh": "## 并排对比：每个模型到底产出了什么？\n\n这里开始进入真正影响生产行为的部分。重点关注：\n- **Tier（回退层级）**：每个模型最终落在哪一级——它直接告诉你前面的哪一层失效了\n- **Priority（优先级）**：`p0` 还是 `p1`——这可能决定凌晨 2 点是否需要立刻呼叫值班人员，还是工单可以等到早晨\n- **Sentiment（情绪）**：`angry` 还是 `frustrated`——它会改变自动回复语气和升级路径\n- **Repro steps count（复现步骤数量）**：模型从同一条消息里提取出了多少细节\n- **Latency（延迟）**：一路下落到更低回退层级时，真实需要付出的时间成本",
+    "eds9BzDrzIOh": "## 原始输出样例（Raw Output Samples）\n\n下面直接看看模型实际返回了什么。这样可以把 drift（漂移）从抽象概念变成具体差异：你能清楚看到不同模型如何用不同方式组织同一份信息，以及最终由哪一级 fallback（回退）接住它们。",
+    "mNU7zSMKzIOh": "## 量化漂移分析（Quantified Drift Analysis）\n\n接下来把模型漂移真正量化。这里的 **drift score（漂移分数）** 由三部分组成：\n- **Priority drift（优先级漂移）**：同一模型在两次试验中给出不同 priority 时记 1 分\n- **Steps drift（步骤漂移）**：复现步骤数量变化的归一化幅度\n- **Tier penalty（层级惩罚）**：Tier 1 为 0.0，Tier 2 为 0.25，Tier 3 为 0.5\n\n漂移分数为 0，表示模型在 Tier 1 上完全稳定；分数越高，说明它的行为越难预测。"
+  },
+  "code_comment_replacements": {
+    "gp_LCo4ZzIOh": [
+      {
+        "old": "# ── Per-run detail table ──────────────────────────────────────────────",
+        "new": "# ── 单次运行明细表 ──────────────────────────────────────────────────"
+      },
+      {
+        "old": "# ── Highlight cross-model disagreements ───────────────────────────────",
+        "new": "# ── 突出不同模型之间的判断分歧 ──────────────────────────────────────"
+      },
+      {
+        "old": "# ── Strict + Instructor failures ─────────────────────────────────────",
+        "new": "# ── Strict + Instructor 失败情况 ────────────────────────────────────"
+      },
+      {
+        "old": "# ── Latency comparison by tier ────────────────────────────────────────",
+        "new": "# ── 按回退层级比较延迟 ──────────────────────────────────────────────"
+      }
+    ],
+    "WKT5cw2czIOh": [
+      {
+        "old": "# Show key fields from the raw output",
+        "new": "# 展示原始输出中的关键字段"
+      },
+      {
+        "old": "# Try to parse (close truncated JSON if needed)",
+        "new": "# 尝试解析；必要时补齐被截断的 JSON 结束括号"
+      },
+      {
+        "old": "# Show if the two trials agreed",
+        "new": "# 检查两次试验的结果是否一致"
+      }
+    ],
+    "7Q-tyOJbzIOh": [
+      {
+        "old": "# Add trial index per model",
+        "new": "# 为每个模型添加试验序号"
+      },
+      {
+        "old": "# ── Per-run summary table ────────────────────────────────────────────",
+        "new": "# ── 单次运行汇总表 ──────────────────────────────────────────────────"
+      },
+      {
+        "old": "# ── Per-model delta: what changed between trials? ─────────────────────",
+        "new": "# ── 模型级差异：两次试验之间发生了哪些变化？────────────────────────"
+      },
+      {
+        "old": "# ── Drift scoring (updated for three tiers) ──────────────────────────",
+        "new": "# ── 漂移评分（适配三级回退）────────────────────────────────────────"
+      },
+      {
+        "old": "# Tier penalty: worst tier used across trials",
+        "new": "# 层级惩罚：取多次试验中使用过的最差回退层级"
+      }
+    ],
+    "RLeBwheCzIOh": [
+      {
+        "old": "# ── Overall summary ──────────────────────────────────────────────────",
+        "new": "# ── 总体汇总 ────────────────────────────────────────────────────────"
+      },
+      {
+        "old": "# Highlight the key finding",
+        "new": "# 突出展示最关键的发现"
+      }
+    ]
+  }
+}
