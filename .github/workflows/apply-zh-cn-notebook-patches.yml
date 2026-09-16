@@ -76,4 +76,9 @@ jobs:
             exit 0
           fi
           git commit -m "i18n: apply zh-CN notebook translation manifests"
+          # Another translation workflow may have advanced the branch while this job
+          # was running. Rebase the generated notebook commit before pushing so the
+          # two automation jobs do not fail each other with a non-fast-forward race.
+          git fetch origin zh-cn-translation
+          git pull --rebase origin zh-cn-translation
           git push origin HEAD:zh-cn-translation
