@@ -1,0 +1,117 @@
+{
+  "notebook": "CH02/ch02_ToT.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "Y85ppexW8M_O": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH02/ch02_ToT.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>",
+    "Lbydfhci2xWT": "\n# 关于这个 Notebook\n\n这个 Notebook 演示一个小型但完整的 multi-agent writing workflow（多智能体写作工作流）：它先规划，再研究，最后起草一篇面向开发者的博客文章。整个流程把 structured outputs（结构化输出）、tool-using research（工具辅助研究）和带 checkpoint（检查点）的简单 LangGraph pipeline（流水线）组合在一起。\n\n## 它展示了什么\n\n* **一个四阶段图（four-stage graph）**\n\n  1. **propose**：通过结构化输出生成三个有创意的候选方案\n  2. **reflect**：使用更强的 judge（评审模型）批判性比较并选出最佳方案\n  3. **research**：使用 SerpAPI 搜索收集资料，并综合为 JSON\n  4. **draft**：基于选中的方案生成最终大纲和引言\n* **角色与模型分离**\n\n  * 一个小型创意生成器\n  * 一个更严格的评审模型\n  * 一个绑定工具的研究员\n  * 一个用于最终起草的小型写作模型\n* **Typed state（类型化状态）**：保存累积消息、候选方案与选择结果 JSON、综合后的资料，以及最终草稿\n* **In-memory checkpoints（内存检查点）**：通过 `MemorySaver` 保存\n* **可读的 streaming trace（流式执行轨迹）**：运行时打印每个节点的更新\n* **图预览**：通过 Mermaid PNG 展示\n\n## 你将运行什么\n\n1. 从 `.env` 加载 `OPENAI_API_KEY` 和 `SERPAPI_API_KEY`。\n2. 定义 `internet_search` 工具，让它通过 SerpAPI 返回紧凑的 JSON 搜索结果。\n3. 为候选方案、选择结果和搜索查询建立 Pydantic schema（模式），保证输出结构化。\n4. 串联一个包含四个节点的 **线性 LangGraph**，并使用 checkpointer（检查点保存器）完成编译。\n5. 用一个主题 Prompt 启动运行，并观察系统从每个节点流式输出更新。\n6. 检查最终草稿并渲染图结构。\n\n## 它如何工作\n\n* **提出候选方案（Propose options）**：使用 `with_structured_output(OptionsPayload)` 强制生成三个字段一致的候选方案。\n* **反思并选择（Reflect and select）**：使用更强的模型和 `ChoicePayload`，按索引选择最佳方案并给出理由。代码还会防御性地限制索引范围。\n* **使用工具研究（Research with tools）**\n\n  * 研究员先通过结构化 schema 提出 3～5 个精确查询\n  * Notebook 对每个查询调用 `internet_search`，收集原始发现\n  * 一个紧凑的综合步骤把搜索结果整理成干净的 `sources_json`，并附带建议引用\n* **起草大纲与引言（Draft outline and intro）**：把选中的方案和资料转换为标题、受众说明、五部分大纲以及一段简短引言。\n\n## 为什么采用这种模式\n\n* 清晰的 role separation（角色分离）能提高质量和透明度。生成、评估、研究和写作由不同 Prompt，甚至不同模型负责。\n* Structured outputs（结构化输出）减少歧义，让 routing（路由）更直接。\n* 工具调用是显式且可观察的，因此整个过程更容易审计。\n* LangGraph 让控制流保持清晰，同时几乎不增加样板代码就能提供 thread-scoped memory（线程范围内存）。\n\n## 如何扩展与调整\n\n* 把 SerpAPI 替换为你偏好的搜索服务，或加入文档仓库检索工具。\n* 在研究和起草之间增加 factuality checker（事实性检查器）或 citation verifier（引用验证器）。\n* 把 checkpoint 持久化到数据库，以支持长时间运行的项目。\n* 增加最终 formatter node（格式化节点），把草稿转换成 Markdown 或 HTML。\n\n## 运行要求与说明\n\n* 必须提供 `OPENAI_API_KEY`；实时搜索还需要 `SERPAPI_API_KEY`。\n* 互联网搜索结果会随时间变化，因此不同运行得到的来源可能不同。\n* 创意模型设置了略高的 temperature（温度）；评审模型的温度接近 0，以提高稳定性。\n* 多阶段流式执行会累计 Token 和 API 成本。\n\n## 适合谁\n\n适合希望获得实用模板的工程师、技术写作者和研究人员：用一个小型、角色分工明确的 writing agent（写作智能体），在简单 LangGraph 工作流中组合结构化规划、工具辅助研究和内容起草。\n",
+    "qOqKZljFGX1u": "# 依赖项",
+    "wQzGGCbj2sJn": "# API 配置",
+    "hBC6syOkkwxO": "# 导入依赖",
+    "9P7J6FUYjoAI": "# 工具：`internet_search`",
+    "I876lAF6juBu": "# 模型：小型生成器、更强的评审模型、绑定工具的研究模型",
+    "mg-D8Vsdj17I": "# 结构化 payload（Pydantic v2）",
+    "kWWLCEhtj8ow": "# State（状态）",
+    "4EPMoHuykKO5": "# Nodes（节点）",
+    "JGDGvq9lkOZV": "# 图结构连接（Graph wiring）",
+    "g7xf94E6klNe": "# 运行",
+    "ucQYuEfFkK8": "# 显示图结构"
+  },
+  "code_comment_replacements": {
+    "tMGB6TAqAVwv": [
+      {
+        "old": "# --- API Key Setup ---",
+        "new": "# --- API Key 配置 ---"
+      },
+      {
+        "old": "# Option 1 (preferred): create a `.env` file in your project folder with:",
+        "new": "# 方案 1（推荐）：在项目目录中创建 `.env` 文件，并写入："
+      },
+      {
+        "old": "# Option 2: set it directly in the notebook with magic:",
+        "new": "# 方案 2：直接通过 Notebook magic 命令设置："
+      },
+      {
+        "old": "# Load from .env if available",
+        "new": "# 如果存在 `.env`，则从中加载。"
+      },
+      {
+        "old": "# Fallback: ask if still missing",
+        "new": "# Fallback（回退方案）：如果仍缺少密钥，则交互式询问。"
+      }
+    ],
+    "vJRENQaEjxf7": [
+      {
+        "old": "# creative, cheaper",
+        "new": "# 更偏创意，成本更低"
+      },
+      {
+        "old": "# stricter judge",
+        "new": "# 更严格的评审模型"
+      },
+      {
+        "old": "# reuse small model for drafting",
+        "new": "# 起草阶段复用小模型"
+      }
+    ],
+    "FW_ftJzKkClp": [
+      {
+        "old": "\"\"\"Generator (small): propose 3 creative approaches (ToT-style branching).\"\"\"",
+        "new": "\"\"\"小型生成器：提出 3 个有创意的方案（ToT 风格分支）。\"\"\""
+      },
+      {
+        "old": "\"\"\"Judge (stronger): critique options and select best one.\"\"\"",
+        "new": "\"\"\"更强的评审模型：批判性比较候选方案，并选出最佳方案。\"\"\""
+      },
+      {
+        "old": "# Defensive clamp",
+        "new": "# 防御性限制索引范围，避免越界。"
+      },
+      {
+        "old": "\"\"\"Researcher (tool-using): propose queries, call search tool(s), synthesize sources JSON.\"\"\"",
+        "new": "\"\"\"工具型研究员：提出查询、调用搜索工具，并综合得到 sources JSON。\"\"\""
+      },
+      {
+        "old": "# 1) Ask for tight queries (structured)",
+        "new": "# 1）请求精确查询（结构化输出）"
+      },
+      {
+        "old": "# 2) Call tool(s) explicitly (deterministic, observable)",
+        "new": "# 2）显式调用工具（确定、可观察）"
+      },
+      {
+        "old": "# 3) Synthesize to a clean JSON list of sources",
+        "new": "# 3）综合为干净的 JSON 来源列表"
+      },
+      {
+        "old": "\"\"\"Writer (small): outline + intro from chosen plan and sources.\"\"\"",
+        "new": "\"\"\"小型写作模型：基于选中的方案与资料生成大纲和引言。\"\"\""
+      }
+    ],
+    "wRL_LV2hkkeh": [
+      {
+        "old": "# small creative generator",
+        "new": "# 小型创意生成器"
+      },
+      {
+        "old": "# stronger judge/reflector",
+        "new": "# 更强的评审/反思模型"
+      },
+      {
+        "old": "# tool-using researcher",
+        "new": "# 使用工具的研究员"
+      },
+      {
+        "old": "# small writer",
+        "new": "# 小型写作模型"
+      }
+    ]
+  }
+}
