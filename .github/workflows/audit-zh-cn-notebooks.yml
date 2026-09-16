@@ -1,0 +1,41 @@
+name: Audit zh-CN notebook translation coverage
+
+on:
+  push:
+    branches:
+      - zh-cn-translation
+    paths:
+      - "**/*.ipynb"
+      - "zh-cn/notebook-patches/**"
+      - "scripts/audit_zh_cn_notebooks.py"
+      - ".github/workflows/audit-zh-cn-notebooks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit-notebook-translations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out translation branch
+        uses: actions/checkout@v4
+        with:
+          ref: zh-cn-translation
+          fetch-depth: 0
+
+      - name: Scan notebooks for reader-facing English residue
+        run: python scripts/audit_zh_cn_notebooks.py
+
+      - name: Commit audit inventory
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add zh-cn/audit/english_notebook_inventory.json
+          if git diff --cached --quiet; then
+            echo "Audit inventory unchanged"
+            exit 0
+          fi
+          git commit -m "i18n: refresh notebook English residue audit"
+          git push origin HEAD:zh-cn-translation
