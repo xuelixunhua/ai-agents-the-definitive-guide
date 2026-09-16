@@ -1,0 +1,78 @@
+{
+  "notebook": "ch07/ch07_model_fallback.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "m3TVgTKezIOc": "# 跨模型结构化输出：回退（Fallback）、漂移（Drift）与 Schema 保险\n\n无论你的主模型有多优秀，它都**一定会失败**。有时是超时，有时是幻觉，有时输出在语法上看似正确，但语义却错了。在生产环境里，你不能假装这些情况不会发生。\n\n**每一个智能体系统都需要回退机制（fallback）。** 但问题在于：模型一旦变化，智能体的整体行为也会随之变化。因此，这件事必须在系统设计阶段就考虑，而不是等凌晨两点第一次线上故障时再补救。你不仅要测试主模型，也要测试你的“第二选择”。\n\n本 Notebook 演示一套**三级回退策略（three-tier fallback strategy）**，并说明每一级为什么都重要：\n\n1. **Tier 1 — 严格 JSON Schema 模式（Strict JSON Schema mode）**：由提供商约束 token 生成，使输出匹配 schema。这是最理想的情况，但并非所有模型都支持，而且它只能约束输出的*形状*，不能约束模型的*判断*。\n2. **Tier 2 — Instructor + Pydantic validators**：我们通过校验、归一化和自动重试自行执行 schema。只要模型能够生成 JSON，这条路径通常就能工作。\n3. **Tier 3 — 仅 Prompt + 规范化（Prompt-only + canonicalization）**：最后的兜底。我们把 schema 写进 prompt，期望模型配合，然后对返回结果做统一规范化。\n\n我们会通过 OpenRouter 测试四个模型，让它们把同一条客户消息分诊为结构化支持工单，并展示：即使有了这三级保障，不同模型对于 priority、sentiment 这类主观字段仍然可能得出不同结论。",
+    "AgrUhMsqzIOh": "### 1. 严格 JSON Schema 模式约束的是形状，不是判断\n\n所有支持 strict mode 的模型都生成了合法 JSON，但它们对**字段值本身存在分歧**。Priority 是 `p0` 还是 `p1`，可能决定是否需要立即呼叫值班人员；Sentiment 是 `angry` 还是 `frustrated`，也会改变升级路径。Schema 保证的是结构，而不是解释。在真实智能体里还有工具调用和多轮 handoff（交接），这种结构保证也只作用于单次调用，不能自动覆盖整条流水线。\n\n### 2. 并非所有模型都支持 strict mode，因此需要 Tier 2\n\n当主模型不可用并路由到回退模型时，回退模型未必支持 `response_format=json_schema`。如果没有 Instructor + Pydantic validators 作为第二道防线，整条流水线可能直接崩溃。Instructor 不仅提供校验，还能基于校验错误自动重试——模型会明确收到“哪里出错了”的反馈，并获得再次生成的机会。\n\n### 3. 归一化应放在 Pydantic validators 中\n\n把归一化映射放进 Pydantic 模型的 `field_validator`，意味着 strict、Instructor 和 degraded 三条路径都能共享同一套归一化规则。例如：`\"High\"` → `\"p1\"`、`\"authentication\"` → `\"login\"`、`\"anxious\"` → `\"frustrated\"`。这不是可有可无的补丁，而是 schema insurance（Schema 保险）。\n\n### 4. 要用完整流水线测试回退模型\n\n不要只测试“这个模型能不能生成文本”。真正要验证的是：它的输出能否完整通过三级回退 → 解析 → 归一化 → 校验 → handoff 这一整条链路？只要其中任何一步失败，这个回退模型就没有实际价值。\n\n### 5. 回退层级越深，延迟通常越高\n\nTier 1（strict）通常最快：一次 API 调用，不需要重试。Tier 2（Instructor）在校验失败时可能发生重试。Tier 3（degraded + canonicalize）需要额外 API 调用和后处理。因此，这些成本必须计入 SLA 与 timeout budget（超时预算）。\n\n### 6. 不同模型拥有不同的“判断尺度”\n\n这一点很细，但非常关键：面对同一个愤怒客户，两个模型可能分别判定为 `p0/angry` 和 `p1/frustrated`。如果你的路由逻辑、SLA 计时器或升级规则依赖这些字段，**你就必须知道回退链中的每个模型会怎样给这些字段打标签**，并判断这种差异是否能被业务接受。这也是为什么回退模型应当在 Hardening（加固）阶段就纳入测试，而不是等第一次生产故障之后再看。",
+    "kStkHV3IzIOe": "## 归一化映射（Normalization Maps）\n\n这些映射是我们抵御 model drift（模型漂移）的核心防线。不同模型可能会用不同的值表达同一个语义概念——例如用 `\"High\"` 代替 `\"p1\"`，用 `\"authentication\"` 代替 `\"login\"`，用 `\"anxious\"` 代替 `\"frustrated\"`。\n\n我们在前面就定义这些映射，是因为 Pydantic validators（Tier 2 中由 Instructor 使用）和最后兜底的 `canonicalize()` 函数（Tier 3）都依赖它们。",
+    "Qy7Enmx8zIOe": "## 目标 Schema 与 Pydantic 模型\n\n这里有两个不同的东西，它们分别承担不同职责：\n\n1. **JSON Schema** 会在严格模式（Tier 1）下发送给 API 提供商。提供商利用它在 token 层执行 constrained decoding（约束解码）。\n2. 带有 `Literal` 类型和 `field_validator` 的 **Pydantic 模型** 是我们的*本地执行层*。它利用上面的映射表归一化输入值，并拒绝无法映射的内容。Instructor（Tier 2）使用这个模型校验响应，并在失败时重试。\n\n注意这些 `field_validator`：当模型返回 `\"priority\": \"High\"` 时，validator 会通过 `PRIORITY_MAP` 将其映射为 `\"p1\"`。如果某个值完全无法映射，validator 会抛出 `ValueError`；Instructor 会捕获这个错误，把错误信息注入 prompt，并明确告诉模型哪里出了问题，让它再尝试一次。",
+    "EByCAHwgzIOf": "## Instructor Client 配置\n\n我们使用 [Instructor](https://github.com/instructor-ai/instructor) 包装 OpenAI client，从而获得经过 Pydantic 校验的 structured output（结构化输出）以及自动重试能力。当模型返回 validator 无法归一化的值（例如 `\"priority\": \"ASAP\"`）时，validator 会抛错，Instructor 会把错误注入 prompt，并让模型在明确知道问题所在的情况下再尝试一次。\n\n这就是 **Tier 2**：它比 prompt engineering（Tier 3）更强制，又比 strict schema mode（Tier 1）更通用。只要模型能够生成类似 JSON 的输出，这一层通常都能工作。",
+    "T9LBP_0XzIOf": "## 客户消息（The Customer Message）\n\n我们使用一张任何模型都应该能够完成分诊的支持工单。客户明显感到沮丧，同时有很紧急的截止时间（一小时后要做 demo），而且已经尝试过自助解决（两次重置密码）。接下来看看不同模型如何解读完全相同的情境。",
+    "Yb8XOus5zIOf": "## API 辅助函数（API Helper）\n\n`call_openrouter` 会在遇到 5xx 错误时使用带 jitter（抖动）的 backoff（退避）策略进行重试；对于 4xx（错误请求、认证失败）则立即抛出异常。Tier 1 的 strict mode 和 Tier 3 的 degraded mode 会使用它，而 Tier 2 使用 Instructor client。",
+    "J2txDYyWzIOg": "## 三级回退策略（Three-Tier Fallback Strategy）\n\n### Tier 1：严格 JSON Schema 模式（`response_format=json_schema`）\n\n这是当前可用的最强方案。我们把完整 JSON schema 直接发送给 API，并设置 `\"strict\": True`，让提供商在 token 生成层执行约束。\n\n但要注意，strict mode 只能约束**单次 LLM completion 调用**——它会迫使模型这一轮直接生成符合 schema 的 token。在生产级 agentic system（智能体系统）中，下面几类场景仍可能让保证失效：\n\n- **中间存在 tool call（工具调用）。** 模型先生成工具调用，拿到结果，再生成最终结构化输出。工具结果可能注入意外内容，从而改变模型对 schema 字段值的“理解”。\n- **多轮 handoff（交接）。** 如果 Model A 的结构化输出进入 Model B 的 prompt（甚至只是进入 Model A 的下一轮），schema enforcement 只作用于每一次单独的生成边界，而不会自动贯穿整条链路。\n- **Provider-level quirks（提供商层差异）。** OpenRouter 实际代理到底层提供商。所谓 `strict` 是否真正有效，取决于底层提供商是否真的实现 constrained decoding，而不只是声称支持。\n- **字段值仍会漂移。** 即便 strict mode 工作正常，回退模型仍可能对同一工单做出不同判断——给出不同优先级、识别出不同情绪。\n\n因此，strict mode 能保证一次调用得到格式良好的 JSON，却**不能**保证不同模型、不同轮次以及整条流水线上的*判断一致性*。\n\n### Tier 2：Instructor + Pydantic Validators\n\n当 strict mode 失败时，我们改用 Instructor 配合 Pydantic 模型。Instructor 要求模型返回 JSON，再用 `SupportTicket` 校验响应（其中包括负责归一化的 `field_validator`）；如果任一步失败，它会**把校验错误注入 prompt 并自动重试**。这比单纯 prompt engineering 更强，因为模型能够得到明确的错误反馈。\n\n### Tier 3：仅 Prompt + Canonicalization（最后兜底）\n\n如果连 Instructor 都拿不到合法输出——比如模型完全不支持 JSON mode，或者所有重试都失败——就退回普通 prompt engineering。我们在 system message 里描述 schema 约束，解析模型返回的任何内容，然后由 `canonicalize()` 统一 key、映射值并补充默认字段。这条路径最弱，但至少比直接崩溃更好。",
+    "5QqOV7ZszIOg": "### Tier 2：由 Instructor 驱动的结构化输出\n\n这里我们从“希望模型配合”升级为真正的**强制执行**。Instructor 会把 Pydantic schema 作为请求的一部分发送出去，解析响应，执行 `field_validator`（利用我们的映射表归一化字段值）；如果任一步失败，就把校验错误注入对话并重试。\n\n`max_retries=2` 表示最多 3 次尝试（首次 + 2 次重试）。如果模型持续失败，就继续下落到 Tier 3。",
+    "HvYqf-7GzIOg": "### Tier 3：仅 Prompt 的 JSON（最后兜底）\n\n如果连 Instructor 都无法得到合法输出——比如模型完全不支持 JSON mode，或者耗尽全部重试——我们就退回 **prompt engineering（提示工程）**。在 system message 中描述 schema 约束，并要求模型返回纯 JSON。\n\n这天然是最不可靠的一条路径。模型可能会：\n- 把 JSON 包在 ```json code fence（代码围栏）里\n- 返回嵌套对象，而不是扁平结构\n- 使用不同 key 名（例如 `subject` 而不是 `summary`）\n- 选择允许枚举之外的值（例如 `\"High\"` 而不是 `\"p1\"`）\n\n因此，这条路径最终会进入 `canonicalize()`——也就是紧急归一化器。",
+    "h__hF72LzIOg": "## 健壮的 JSON 解析（Tier 3）\n\n处于 degraded mode（降级模式）时，模型经常会把 JSON 包在 ```json code fence 中，在 JSON 前后添加说明文字，或者返回嵌套对象。我们必须优雅处理这些情况——因为在生产环境里，你不能假设每次失败后都有机会重新 prompt。",
+    "s6uMaJdMzIOg": "## 最后的规范化兜底（Last-Resort Canonicalization，Tier 3）\n\n`canonicalize()` 是模型输出的“急诊室”。只有 Tier 1（strict）和 Tier 2（Instructor）都失败时才会进入这里，这意味着当前输出大概率已经很混乱。它会：\n\n- 接受替代 key 名（`subject` → `summary`、`steps_taken` → `repro_steps`）\n- 使用归一化映射处理非标准值\n- 当前面方法都无效时，根据上下文推断 priority\n- 为缺失字段提供合理默认值\n\n注意，上面的归一化映射不仅供这里使用，Tier 2 的 Pydantic validators 也共享同一套规则。这个函数是 validators 也帮不上忙时的最后 backstop（兜底层）——通常意味着模型返回的内容已经严重偏离 schema，连 Instructor 的重试都无法修复。",
+    "49br8ZcrzIOg": "## 完整的三级回退流水线\n\n`run_model()` 实现完整策略：\n\n1. **Tier 1 — 尝试 strict mode** → 解析 → 用 Pydantic 校验（validators 同时归一化）\n2. **Tier 2 — 尝试 Instructor** → Pydantic 校验 + 归一化 → 失败时自动重试\n3. **Tier 3 — 仅 Prompt** → 健壮解析 → `canonicalize()` → 再用 Pydantic 校验\n\n层级越往后，可靠性越弱，但兼容性越广。在生产环境中，大多数调用理应在 Tier 1 成功。如果主模型宕机，而回退模型不支持 strict mode，Tier 2 会接住；如果连这一层也失败，Tier 3 就是紧急通道。\n\n问题从来不是主模型*会不会*失败，而是它*什么时候*失败，以及系统在那时能够优雅降级（graceful degradation）还是直接崩溃。",
+    "B04TGB3MzIOg": "## 运行全部 4 个模型 × 2 次试验\n\n我们让每个模型针对同一输入运行**两次**，检查三个方面：\n- **跨模型漂移（Cross-model drift）**：不同模型是否会给出不同的 priority / sentiment？\n- **逐次运行稳定性（Run-to-run stability）**：同一个模型连续两次是否给出相同答案？\n- **层级分布（Tier distribution）**：哪些模型能在 Tier 1 成功，哪些必须落到 Tier 2 或 Tier 3？"
+  },
+  "code_comment_replacements": {
+    "-0kMd8kazIOf": [
+      {
+        "old": "# works with any model that can produce JSON",
+        "new": "# 适用于任何能够生成 JSON 的模型"
+      }
+    ],
+    "YZ4PS1SfzIOg": [
+      {
+        "old": "\"\"\"Tier 1: Strict JSON Schema mode via the provider.\"\"\"",
+        "new": "\"\"\"Tier 1：通过提供商执行严格 JSON Schema 模式。\"\"\""
+      }
+    ],
+    "3c2iOS9bzIOg": [
+      {
+        "old": "\"\"\"Tier 2: Instructor + Pydantic validation with automatic retries.\"\"\"",
+        "new": "\"\"\"Tier 2：Instructor + Pydantic 校验，并在失败时自动重试。\"\"\""
+      }
+    ],
+    "5PyHvcHCzIOg": [
+      {
+        "old": "\"\"\"Tier 3: Prompt-only JSON — last resort.\"\"\"",
+        "new": "\"\"\"Tier 3：仅靠 Prompt 生成 JSON——最后的兜底路径。\"\"\""
+      }
+    ],
+    "PJVBARnQzIOg": [
+      {
+        "old": "\"\"\"Heuristic priority when the model gave us nothing usable.\"\"\"",
+        "new": "\"\"\"当模型没有给出可用结果时，用启发式规则推断 priority。\"\"\""
+      },
+      {
+        "old": "\"\"\"Emergency normalizer for Tier 3 output. Maps alternate keys and values.\"\"\"",
+        "new": "\"\"\"Tier 3 输出的紧急归一化器：映射替代 key 与非标准值。\"\"\""
+      }
+    ],
+    "KcO34gmBzIOg": [
+      {
+        "old": "# ── Tier 1: Strict JSON Schema mode ──────────────────────────────",
+        "new": "# ── Tier 1：严格 JSON Schema 模式 ───────────────────────────────"
+      },
+      {
+        "old": "# ── Tier 2: Instructor + Pydantic validation ─────────────────────",
+        "new": "# ── Tier 2：Instructor + Pydantic 校验 ────────────────────────────"
+      },
+      {
+        "old": "# ── Tier 3: Prompt-only + canonicalize ───────────────────────────",
+        "new": "# ── Tier 3：仅 Prompt + canonicalize ──────────────────────────────"
+      }
+    ]
+  }
+}
