@@ -1,0 +1,16 @@
+{
+  "notebook": "ch11/ch11_memoizing_swarm_research_engine.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "yKGmCqt5VrqA": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH11/ch11_memoizing_swarm_research_engine.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>",
+    "cAco9La64r_d": "\n## Swarm Research Engine（群体研究引擎）——Progress-Aware（进度感知）+ Synthesis（综合）\n\n这是一个能够产出明确结论的 multi-agent research system（多智能体研究系统）。\n\n我们做了以下设计：\n\n  1. **PROGRESS GUARD（进度守卫）**。图会跟踪每次工具调用前后的 facts（事实）集合。如果一次工具调用没有增加任何新事实，系统会降低该 Agent 再次选择同一工具的倾向；如果连续 2 步都没有进展，则强制转入 `DONE` 或 `SYNTHESIZE`。\n\n  2. **SYNTHESIS NODE（综合节点）**。当 planner（规划器）选择 `DONE`，或被系统强制结束时，会额外调用一次 LLM，生成最终威胁评估，其中包括：\n       - verdict（结论等级：low / medium / high / critical）\n       - confidence score（置信度分数）\n       - supporting evidence（支持性证据，引用已收集事实）\n       - gaps（仍然未知的信息缺口）\n     这样，系统就不只是一个 navigation loop（导航循环），而是真正的 research engine（研究引擎）。\n\n  3. **CONTENT-HASHED SEARCH FACTS（基于内容哈希的搜索事实）**。搜索结果通过内容 hash（哈希）作为键，而不是依赖结果位置标签，例如 `Fact(\"search_<hash8>\", snippet, ...)`。这样，无论排序如何变化，相同搜索结果都能去重；不同结果也不会发生键冲突。\n\n  4. **HONEST METRICS（真实反映效率的指标）**。Cache hit（缓存命中）被进一步区分为：\n       - `productive_hits`：命中了缓存，而且当前状态与上一步不同，说明 Agent 确实已经获得了新信息；\n       - `stale_hits`：命中了缓存，但状态与上一步完全相同，说明 Agent 正在循环——这是浪费，而不是节省；\n       - `no_progress_steps`：工具调用没有增加任何新事实。\n     报告会把这些指标分开呈现，从而区分真正的效率提升，与“循环导致的表面高缓存命中率”。\n\n  5. **STATE-CHANGE-AWARE ROUTING（状态变化感知路由）**。如果 facts 集合与上一步相比没有变化，图会强制改用其他工具，或者直接终止流程。"
+  }
+}
