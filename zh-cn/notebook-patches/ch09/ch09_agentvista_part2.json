@@ -10,10 +10,10 @@
     "first_term_occurrence_bilingual": true
   },
   "code_comment_replacements": {
-    "7wwFRAPbwmI5": [
+    "Qg64ZvnT9ITQ": [
       {
-        "old": "# @title Download the latest AgentVista dataset from Hugging Face { display-mode: \"form\" }",
-        "new": "# @title 从 Hugging Face 下载最新 AgentVista 数据集 { display-mode: \"form\" }"
+        "old": "# @title Download AgentVista dataset from Hugging Face",
+        "new": "# @title 从 Hugging Face 下载 AgentVista 数据集"
       }
     ]
   }
