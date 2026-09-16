@@ -1,0 +1,243 @@
+{
+  "notebook": "ch06/ch06_A2A_MCP_Governed.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "Aar1PZXsWXzl": "# 带工具分类的策略定义（Policy Definition with Tool Categorization）\n\n定义治理策略与工具类别，用于执行 connection separation（连接隔离）规则。",
+    "mIvtjEOtWXzl": "# 参数校验（Argument Validation）\n\n在真正执行工具之前校验参数，防止失控行为。",
+    "CPRHwh5gWXzm": "# 审批工作流（Approval Workflow）\n\n使用 LangGraph interrupt（中断）处理受限工具的审批请求，并与 A2A events（事件）和 checkpointing（检查点）集成。",
+    "y5RKSdNlWXzm": "# MCP 会话管理器（MCP Session Manager）\n\n以正确的生命周期管理 MCP client session（客户端会话）。",
+    "fbezn6CPWXzm": "# `governed_call`——中央强制执行点（Central Enforcement Point）\n\n这一单一函数负责执行全部策略，并调用具有特权的工具（MCP 或直接调用）。它是系统中唯一能够执行外部动作的位置。"
+  },
+  "code_comment_replacements": {
+    "nWnDkUlLWXzl": [
+      {
+        "old": "Serialize to JSON for artifacts.",
+        "new": "序列化为用于制品记录的 JSON。"
+      },
+      {
+        "old": "Terminal response from agent.",
+        "new": "智能体返回的终止响应。"
+      }
+    ],
+    "5xVwPcz1WXzl": [
+      {
+        "old": "# Registry for MCP tool categories discovered at runtime",
+        "new": "# 运行时发现的 MCP 工具类别注册表"
+      },
+      {
+        "old": "Categorize tools using registry first, then safe defaults.",
+        "new": "优先使用注册表对工具分类，否则采用安全的默认分类。"
+      },
+      {
+        "old": "Register MCP tool categories based on a curated allowlist.",
+        "new": "基于人工维护的允许列表注册 MCP 工具类别。"
+      },
+      {
+        "old": "Access levels for tools.",
+        "new": "工具访问级别。"
+      },
+      {
+        "old": "Policy for a specific tool or tool category.",
+        "new": "针对特定工具或工具类别的策略。"
+      },
+      {
+        "old": "Complete governance policy for A2A-MCP access.",
+        "new": "A2A-MCP 访问的完整治理策略。"
+      },
+      {
+        "old": "# Global budgets",
+        "new": "# 全局预算"
+      },
+      {
+        "old": "# Connection management",
+        "new": "# 连接管理"
+      },
+      {
+        "old": "# Artifact filtering",
+        "new": "# 制品过滤"
+      },
+      {
+        "old": "Check if a tool is allowed by this policy.",
+        "new": "检查该策略是否允许调用指定工具。"
+      },
+      {
+        "old": "# Policy 1: Discovery only (Exa + SerpApi tool listing)",
+        "new": "# 策略 1：仅允许发现（Exa + SerpApi 工具列表）"
+      },
+      {
+        "old": "# Policy 2: Restricted SerpApi execution (approval required)",
+        "new": "# 策略 2：受限的 SerpApi 执行（需要审批）"
+      },
+      {
+        "old": "# Policy 3: Budget exhaustion test",
+        "new": "# 策略 3：预算耗尽测试"
+      },
+      {
+        "old": "# Policy 4: Separation demo (connection then execution blocked)",
+        "new": "# 策略 4：隔离演示（先连接后执行会被阻止）"
+      },
+      {
+        "old": "# Policy 5: HITL approval demo (code search allowed only with approval)",
+        "new": "# 策略 5：HITL 审批演示（代码搜索仅在获批后允许）"
+      }
+    ],
+    "lw34We5xWXzl": [
+      {
+        "old": "Tracks resource usage and enforces connection separation.",
+        "new": "跟踪资源使用情况，并强制执行连接隔离。"
+      },
+      {
+        "old": "Pause runtime budget (e.g., while waiting for human input).",
+        "new": "暂停运行时预算计时（例如等待人工输入期间）。"
+      },
+      {
+        "old": "Resume runtime budget after a pause.",
+        "new": "暂停结束后恢复运行时预算计时。"
+      },
+      {
+        "old": "Elapsed seconds excluding pauses.",
+        "new": "计算扣除暂停时间后的已用秒数。"
+      },
+      {
+        "old": "Check if a tool call is allowed given current budget and separation rules.",
+        "new": "根据当前预算与隔离规则检查是否允许此次工具调用。"
+      },
+      {
+        "old": "# Check runtime",
+        "new": "# 检查运行时预算"
+      },
+      {
+        "old": "# Check total calls",
+        "new": "# 检查总调用次数"
+      },
+      {
+        "old": "# Check parallel calls",
+        "new": "# 检查并行调用数"
+      },
+      {
+        "old": "# Check tool-specific policy",
+        "new": "# 检查工具专属策略"
+      },
+      {
+        "old": "# Check connection/execution separation",
+        "new": "# 检查连接/执行隔离"
+      },
+      {
+        "old": "Record the start of a tool call.",
+        "new": "记录一次工具调用的开始。"
+      },
+      {
+        "old": "Record the end of a tool call.",
+        "new": "记录一次工具调用的结束。"
+      },
+      {
+        "old": "Get current budget statistics.",
+        "new": "获取当前预算统计信息。"
+      }
+    ],
+    "4oHaQm7kWXzl": [
+      {
+        "old": "Validates tool arguments against gates.",
+        "new": "根据参数门禁规则校验工具参数。"
+      },
+      {
+        "old": "Validate Exa search arguments.",
+        "new": "校验 Exa 搜索参数。"
+      },
+      {
+        "old": "No args expected for connection.",
+        "new": "连接操作不应携带参数。"
+      },
+      {
+        "old": "No args expected for tool listing.",
+        "new": "列出工具时不应携带参数。"
+      },
+      {
+        "old": "Validate SerpApi search arguments.",
+        "new": "校验 SerpApi 搜索参数。"
+      },
+      {
+        "old": "Validate arguments for a specific tool.",
+        "new": "校验指定工具的参数。"
+      }
+    ],
+    "wf3PKRXfWXzm": [
+      {
+        "old": "# Approval is handled via LangGraph interrupts in check_approval_node.",
+        "new": "# 审批由 check_approval_node 中的 LangGraph interrupt 处理。"
+      },
+      {
+        "old": "# No standalone ApprovalWorkflow class is used in this notebook.",
+        "new": "# 本 Notebook 不使用独立的 ApprovalWorkflow 类。"
+      }
+    ],
+    "cWaSoESPWXzm": [
+      {
+        "old": "Manages MCP client sessions.",
+        "new": "管理 MCP 客户端会话。"
+      },
+      {
+        "old": "Check if MCP session is connected.",
+        "new": "检查 MCP 会话是否已经连接。"
+      },
+      {
+        "old": "Establish MCP connection (idempotent).",
+        "new": "建立 MCP 连接（幂等操作）。"
+      },
+      {
+        "old": "Connect on demand if needed.",
+        "new": "在需要时按需建立连接。"
+      },
+      {
+        "old": "Close MCP connection.",
+        "new": "关闭 MCP 连接。"
+      },
+      {
+        "old": "Call an MCP tool.",
+        "new": "调用一个 MCP 工具。"
+      },
+      {
+        "old": "List available MCP tools.",
+        "new": "列出可用的 MCP 工具。"
+      }
+    ],
+    "jqYb-IYVWXzm": [
+      {
+        "old": "Normalize MCP tool names for SerpApi discovery.",
+        "new": "规范化用于 SerpApi discovery（发现）的 MCP 工具名称。"
+      },
+      {
+        "old": "Execute governed MCP tool call with full enforcement.",
+        "new": "在完整强制执行机制下执行受治理的 MCP 工具调用。"
+      },
+      {
+        "old": "# Step 1: Policy match",
+        "new": "# 第 1 步：策略匹配"
+      },
+      {
+        "old": "# Budget and separation checks",
+        "new": "# 预算与隔离检查"
+      },
+      {
+        "old": "# Argument validation",
+        "new": "# 参数校验"
+      },
+      {
+        "old": "# Approval is handled by LangGraph checkpointing (no-op here)",
+        "new": "# 审批由 LangGraph checkpointing（检查点机制）处理（此处不执行操作）"
+      },
+      {
+        "old": "# Execute tool",
+        "new": "# 执行工具"
+      }
+    ]
+  }
+}
