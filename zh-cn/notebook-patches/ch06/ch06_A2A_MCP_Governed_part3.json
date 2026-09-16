@@ -1,0 +1,254 @@
+{
+  "notebook": "ch06/ch06_A2A_MCP_Governed.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "eQon-2hQWXzn": "# 实用函数（Utility Functions）\n\n为 A2A Server 与 Client 提供辅助函数。",
+    "w-zHY4_tWXzn": "# 演示 1：仅发现策略（Discovery Only Policy）\n\n智能体尝试执行外部动作，但会被策略阻止。",
+    "PYkDXXSzWXzn": "# 演示 2：阻止代码搜索（Code Search Blocked）\n\n智能体尝试执行 StackOverflow / 代码类查询，但会被策略阻止。",
+    "ZMlPL-TsWXzn": "# 演示 3：预算耗尽（Budget Exhaustion）\n\n智能体循环执行搜索，直到可用预算被耗尽。",
+    "i3OXeIS4WXzn": "# 演示 5：HITL 代码搜索审批（HITL Code Search Approval）\n\n通过 LangGraph interrupt（中断）触发 Human-in-the-loop（HITL，人在回路）审批，然后在获批后恢复执行。",
+    "G4rwPZBMWXzn": "# 审计报告生成器（Audit Report Generator）\n\n根据 A2A artifacts（制品）生成综合报告，汇总所有工具调用、策略决策与预算使用情况。"
+  },
+  "code_comment_replacements": {
+    "jqYb-IYVWXzm": [
+      {
+        "old": "# Emit tool_call_log",
+        "new": "# 生成 tool_call_log 制品"
+      }
+    ],
+    "X0iVlPChWXzm": [
+      {
+        "old": "State for the LangGraph agent.",
+        "new": "LangGraph 智能体的状态定义。"
+      },
+      {
+        "old": "# Set by interrupt resume",
+        "new": "# 由 interrupt 恢复时设置"
+      },
+      {
+        "old": "Create LangGraph agent with checkpointing for approval workflows.",
+        "new": "创建带 checkpointing（检查点）的 LangGraph 智能体，用于审批工作流。"
+      },
+      {
+        "old": "Agent proposes next ToolRequest or FinalAnswer.",
+        "new": "智能体提出下一步 ToolRequest，或直接给出 FinalAnswer。"
+      },
+      {
+        "old": "# First call: LLM proposes ToolRequest if enabled",
+        "new": "# 第一次调用：若已启用，则由 LLM 提出 ToolRequest"
+      },
+      {
+        "old": "# If code search was blocked, fall back to web search once",
+        "new": "# 如果代码搜索被阻止，则回退到一次网页搜索"
+      },
+      {
+        "old": "# Separation demo: after discovery, try execution",
+        "new": "# 隔离演示：完成 discovery（发现）后尝试 execution（执行）"
+      },
+      {
+        "old": "# After Exa web search, continue budget loop or optionally list SerpApi tools",
+        "new": "# Exa 网页搜索后，继续预算循环，或按需列出 SerpApi 工具"
+      },
+      {
+        "old": "# After listing SerpApi tools, attempt a concrete SerpApi tool",
+        "new": "# 列出 SerpApi 工具后，尝试调用一个具体的 SerpApi 工具"
+      },
+      {
+        "old": "# Budget demo: keep searching until budget is exhausted",
+        "new": "# 预算演示：持续搜索直到预算耗尽"
+      },
+      {
+        "old": "# After tool execution, provide summary and terminate",
+        "new": "# 工具执行后生成摘要并终止"
+      },
+      {
+        "old": "Pause for approval using LangGraph interrupts when needed.",
+        "new": "需要审批时，通过 LangGraph interrupt 暂停执行。"
+      },
+      {
+        "old": "Execute governed_call with pending request.",
+        "new": "使用待处理请求执行 governed_call。"
+      },
+      {
+        "old": "# Check if approval was required and granted",
+        "new": "# 检查是否需要审批，以及审批是否已通过"
+      },
+      {
+        "old": "# Approval was denied or not provided",
+        "new": "# 审批被拒绝或尚未提供"
+      },
+      {
+        "old": "Check if we should terminate early.",
+        "new": "检查是否应提前终止。"
+      },
+      {
+        "old": "# If blocked by budget, terminate immediately",
+        "new": "# 如果因预算限制被阻止，则立即终止"
+      },
+      {
+        "old": "# If policy blocked, terminate immediately",
+        "new": "# 如果被策略阻止，则立即终止"
+      },
+      {
+        "old": "# Otherwise continue to summarize",
+        "new": "# 否则继续进入汇总阶段"
+      },
+      {
+        "old": "Disconnect MCP session in the graph task.",
+        "new": "在 graph task 中断开 MCP 会话。"
+      },
+      {
+        "old": "Route based on state.",
+        "new": "根据当前状态进行路由。"
+      },
+      {
+        "old": "# Build graph with checkpointer",
+        "new": "# 使用 checkpointer 构建图"
+      },
+      {
+        "old": "# Add checkpointer for state persistence",
+        "new": "# 添加 checkpointer 以持久化状态"
+      }
+    ],
+    "mGG7QrC4WXzn": [
+      {
+        "old": "A2A Agent Executor with governed MCP access and checkpointing.",
+        "new": "带受治理 MCP 访问与 checkpointing（检查点）的 A2A Agent Executor。"
+      },
+      {
+        "old": "# Track thread for checkpointing",
+        "new": "# 跟踪 thread，用于 checkpointing"
+      },
+      {
+        "old": "Execute governed MCP workflow with checkpointing support.",
+        "new": "执行支持 checkpointing 的受治理 MCP 工作流。"
+      },
+      {
+        "old": "# Initialize components",
+        "new": "# 初始化组件"
+      },
+      {
+        "old": "# Connect to MCP",
+        "new": "# MCP 连接按需建立"
+      },
+      {
+        "old": "# Create LangGraph agent with checkpointing",
+        "new": "# 创建带 checkpointing 的 LangGraph 智能体"
+      },
+      {
+        "old": "# Run agent with checkpointing",
+        "new": "# 使用 checkpointing 运行智能体"
+      },
+      {
+        "old": "# Handle LangGraph interrupt for approval",
+        "new": "# 处理用于审批的 LangGraph interrupt"
+      },
+      {
+        "old": "# MCP disconnect handled in graph cleanup node",
+        "new": "# MCP 断开连接由 graph cleanup node 负责"
+      },
+      {
+        "old": "Cancel execution.",
+        "new": "取消执行。"
+      }
+    ],
+    "s7Nf0cfQWXzn": [
+      {
+        "old": "Extract text from A2A message.",
+        "new": "从 A2A 消息中提取文本。"
+      },
+      {
+        "old": "Pretty print A2A events.",
+        "new": "以易读形式打印 A2A events（事件）。"
+      },
+      {
+        "old": "# Try to pretty-print JSON artifacts",
+        "new": "# 尝试以易读形式打印 JSON artifacts（制品）"
+      },
+      {
+        "old": "Run A2A server in background thread.",
+        "new": "在后台线程中运行 A2A Server。"
+      },
+      {
+        "old": "# Give server time to cleanup gracefully",
+        "new": "# 给 Server 留出时间进行优雅清理"
+      },
+      {
+        "old": "Call A2A agent.",
+        "new": "调用 A2A 智能体。"
+      },
+      {
+        "old": "# Allow SSE streams to close cleanly before server shutdown",
+        "new": "# Server 关闭前留出时间让 SSE stream 正常结束"
+      }
+    ],
+    "7tqwLxgKWXzn": [
+      {
+        "old": "# Setup",
+        "new": "# 初始化演示环境"
+      }
+    ],
+    "-dq8Ex11WXzn": [
+      {
+        "old": "Generate audit reports from A2A artifacts.",
+        "new": "根据 A2A artifacts（制品）生成审计报告。"
+      },
+      {
+        "old": "Add an artifact to the report.",
+        "new": "向报告中加入一条制品记录。"
+      },
+      {
+        "old": "# Skip non-JSON artifacts",
+        "new": "# 跳过非 JSON 制品"
+      },
+      {
+        "old": "Generate a comprehensive audit report.",
+        "new": "生成综合审计报告。"
+      },
+      {
+        "old": "# Summary statistics",
+        "new": "# 汇总统计"
+      },
+      {
+        "old": "# Approval statistics",
+        "new": "# 审批统计"
+      },
+      {
+        "old": "# Budget usage",
+        "new": "# 预算使用情况"
+      },
+      {
+        "old": "# Detailed tool call log",
+        "new": "# 详细工具调用日志"
+      },
+      {
+        "old": "# Policy decision log",
+        "new": "# 策略决策日志"
+      },
+      {
+        "old": "# Approval log",
+        "new": "# 审批日志"
+      },
+      {
+        "old": "# Enforcement insights",
+        "new": "# 强制执行洞察"
+      },
+      {
+        "old": "# Identify denial reasons",
+        "new": "# 识别拒绝原因"
+      },
+      {
+        "old": "# Recommendations",
+        "new": "# 建议"
+      }
+    ]
+  }
+}
