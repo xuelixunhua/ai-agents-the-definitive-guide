@@ -1,0 +1,81 @@
+{
+  "notebook": "ch06/ch06_langgraph_E2B.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "txODtTTTEOsT": "# 关于本 Notebook\n\n本 Notebook 展示：\n- 一个能够抓取网页数据（Tavily / Exa / SerpAPI）并绘图的单智能体（single-agent）编码流程\n- 一个由 researcher（研究员）与 coder（编码员）协作完成任务的多智能体工作流（multi-agent workflow）\n- **多个并行运行的 sandbox（沙箱）**——每个用户会话或 agent context（智能体上下文）使用一个独立沙箱，这是生产环境常见模式\n\nE2B 的 Code Interpreter SDK 可以创建带有 Jupyter runtime（运行时）的安全云端沙箱，供智能体执行 Python 与生成图表。多个沙箱能够并行运行，从而实现不同用户或会话之间的隔离。",
+    "BRhNFrHhEOsT": "# 安装依赖（Install Dependencies）\n\n这里安装 LangGraph + LangChain、E2B Code Interpreter SDK，以及网页研究工具 Tavily；Exa / SerpAPI 为可选项。",
+    "hF-LLJPBEOsU": "# 配置 API Key（Define API Keys）\n\n配置 OpenAI、E2B，以及至少一个网页研究服务商（Tavily / Exa / SerpAPI）的 API Key。",
+    "-BJq6t-qEOsU": "# 定义工具：E2B Code Interpreter + Web Search\n\n这里把一个持久化的 **E2B sandbox（E2B 沙箱）**封装成工具，同时加入网页搜索工具；本例使用 Tavily。",
+    "8C_6-P-TEOsV": "# 示例：单智能体与多智能体（Single-Agent + Multi-Agent）"
+  },
+  "code_comment_replacements": {
+    "Fmv6P25tEOsU": [
+      {
+        "old": "# Optional providers:",
+        "new": "# 可选的网页研究服务商："
+      }
+    ],
+    "tJklMTNOEOsV": [
+      {
+        "old": "# Long-lived sandbox that stays alive while the notebook runs",
+        "new": "# 长生命周期 sandbox：Notebook 运行期间持续保持活动"
+      },
+      {
+        "old": "# Note: E2B SDK requires using Sandbox.create()",
+        "new": "# 注意：E2B SDK 要求使用 Sandbox.create()"
+      },
+      {
+        "old": "Execute Python code in the E2B sandbox and return a JSON summary.",
+        "new": "在 E2B sandbox（沙箱）中执行 Python 代码，并返回 JSON 摘要。"
+      },
+      {
+        "old": "Render rich outputs (plots, tables) from the most recent execution.",
+        "new": "渲染最近一次执行产生的 rich outputs（富输出），例如图表与表格。"
+      },
+      {
+        "old": "# Tavily web search tool (swap in Exa/SerpAPI if you prefer)",
+        "new": "# Tavily 网页搜索工具；也可以替换为 Exa / SerpAPI"
+      }
+    ],
+    "mbc4Av-dEOsV": [
+      {
+        "old": "Print the most recent AI message content.",
+        "new": "打印最近一条 AI message（消息）的内容。"
+      }
+    ],
+    "XRJ4Q4i1thWc": [
+      {
+        "old": "Execute Python code in the E2B sandbox and return a JSON summary.",
+        "new": "在 E2B sandbox（沙箱）中执行 Python 代码，并返回 JSON 摘要。"
+      },
+      {
+        "old": "Render rich outputs (plots, tables) from the most recent execution.",
+        "new": "渲染最近一次执行产生的 rich outputs（富输出），例如图表与表格。"
+      },
+      {
+        "old": "Pause sandbox, persisting filesystem and memory state.",
+        "new": "暂停 sandbox，并持久化文件系统与内存状态。"
+      },
+      {
+        "old": "Reconnect to sandbox, resuming if paused.",
+        "new": "重新连接 sandbox；如果其处于暂停状态，则恢复运行。"
+      },
+      {
+        "old": "# Persist to filesystem so the demo works even if memory does not persist",
+        "new": "# 持久化到文件系统，即使内存状态未保留，演示仍可继续"
+      },
+      {
+        "old": "# Prefer memory variables if they exist, else load from disk",
+        "new": "# 优先使用仍存在于内存中的变量，否则从磁盘加载"
+      }
+    ]
+  }
+}
