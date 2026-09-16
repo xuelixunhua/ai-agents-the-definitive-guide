@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 136,
+  "candidate_entry_count": 134,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -78,12 +78,6 @@
       "notebook": "CH02/ch02_ToT.ipynb",
       "entries": [
         {
-          "cell_index": 1,
-          "cell_id": "Lbydfhci2xWT",
-          "cell_type": "markdown",
-          "source": "\n# About this notebook\n\nThis notebook walks through a small but complete multi agent writing workflow that plans, researches, and drafts a developer focused blog post. It combines structured outputs, a tool using research step, and a simple LangGraph pipeline with checkpoints.\n\n## What it shows\n\n* **A four stage graph**\n\n  1. **propose** generates three creative options with structured output\n  2. **reflect** critiques and selects the best option with a stronger judge\n  3. **research** uses SerpAPI search to collect sources and synthesize JSON\n  4. **draft** produces a final outline and intro for the chosen plan\n* **Separation of roles and models**\n\n  * a small creative generator\n  * a stricter judge\n  * a tool bound researcher\n  * a small writer for the final draft\n* **Typed state** with accumulated messages, option and choice JSON, synthesized sources, and the final draft\n* **In memory checkpoints** with `MemorySaver`\n* **Readable streaming trace** that prints per node updates during execution\n* **Graph preview** via Mermaid PNG\n\n## What you will run\n\n1. Load `OPENAI_API_KEY` and `SERPAPI_API_KEY` from `.env`.\n2. Define an `internet_search` tool that returns compact JSON results from SerpAPI.\n3. Create Pydantic schemas for options, choice, and queries to keep outputs structured.\n4. Wire a **linear LangGraph** with four nodes and compile it with a checkpointer.\n5. Start a run with a topic prompt and watch the system stream updates from each node.\n6. Inspect the final draft and render the graph image.\n\n## How it works\n\n* **Propose options** uses `with_structured_output(OptionsPayload)` to force three options with consistent fields.\n* **Reflect and select** uses a stronger model with `ChoicePayload` to pick the best option by index with a rationale. The code clamps the index defensively.\n* **Research with tools**\n\n  * the researcher proposes 3 to 5 precise queries with a structured schema\n  * the notebook calls `internet_search` for each query and collects raw findings\n  * a compact synthesis step turns findings into a clean `sources_json` payload with suggested citations\n* **Draft outline and intro** converts the chosen plan and sources into a title, audience sentence, a five section outline, and a short intro.\n\n## Why this pattern\n\n* Clear role separation improves quality and transparency. Generation, evaluation, research, and writing are handled by different prompts and sometimes different models.\n* Structured outputs reduce ambiguity and make routing trivial.\n* Tool use is explicit and observable which makes the process auditable.\n* LangGraph keeps control flow readable and provides thread scoped memory with almost no boilerplate.\n\n## Extend and adapt\n\n* Swap SerpAPI with your preferred search or add a docs repository tool.\n* Add a factuality checker or citation verifier between research and drafting.\n* Persist checkpoints to a database for long running projects.\n* Add a final formatter node that turns the draft into Markdown or HTML.\n\n## Requirements and notes\n\n* `OPENAI_API_KEY` is required. Live search needs `SERPAPI_API_KEY`.\n* Internet results change over time. Expect different sources on different runs.\n* The creative model is set slightly higher temperature. The judge is near zero for stability.\n* Token and API costs can add up when streaming multiple stages.\n\n## Intended audience\n\nEngineers, technical writers, and researchers who want a practical template for a small, role based writing agent that mixes structured planning, tool assisted research, and drafting inside a simple LangGraph workflow.\n"
-        },
-        {
           "cell_index": 5,
           "cell_id": "tMGB6TAqAVwv",
           "cell_type": "code_comments",
@@ -97,12 +91,6 @@
             "# Load from .env if available",
             "# Fallback: ask if still missing"
           ]
-        },
-        {
-          "cell_index": 10,
-          "cell_id": "I876lAF6juBu",
-          "cell_type": "markdown",
-          "source": "# Models: small generator, stronger judge, tool-bound researcher"
         },
         {
           "cell_index": 17,
