@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 152,
+  "candidate_entry_count": 144,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -33,73 +33,19 @@
       "notebook": "CH02/ch02_CoT.ipynb",
       "entries": [
         {
-          "cell_index": 0,
-          "cell_id": "Ua40MLAv8LTX",
-          "cell_type": "markdown",
-          "source": "# Open Notebook\n\n# Open in Colab\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH02/ch02_CoT.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>\n\n<a target=\"_blank\" href=\"https://learning.oreilly.com/library/view/ai-agents-the/0642572247775/\">\n  <img src=\"https://img.shields.io/badge/AI%20Agents%20Book-Read%20on%20O'Reilly-d40101?style=flat\" alt=\"AI Agents Book – Read on O'Reilly\"/>\n</a>\n\n"
-        },
-        {
-          "cell_index": 1,
-          "cell_id": "C_i2EBcC15v-",
-          "cell_type": "markdown",
-          "source": "# About this notebook\n\nThis notebook is a hands-on template for data analysis agents that pair a **LangChain/LangGraph tool-calling (ReAct) agent** with a tiny **LangGraph** wrapper. It shows how to drive a sandboxed **Python REPL** tool from a CoT-style prompt to load a CSV, compute stats, and produce a simple chart, while returning the final answer, the recovered chart, and the intermediate tool steps.\n\n## What it shows\n\n* **API setup** through `.env`/environment with `OPENAI_API_KEY`, or entered interactively as a fallback.\n* **A sandboxed Python REPL tool** (`PyodideSandboxTool`) that runs the model's code in an isolated Pyodide/WASM environment, prints results to stdout, and surfaces errors as tracebacks.\n* **CoT-style system instructions** that lead with the reasoning structure (describe → patterns → summary) and keep the sandbox/execution mechanics in separate blocks.\n* **A tool-calling ReAct agent** created with `create_react_agent` (LangGraph prebuilt; in LangChain v1 this is `create_agent`).\n* **A minimal LangGraph** with one node that runs the agent and exposes\n\n  * `messages` history\n  * `output` (final answer)\n  * `chart_path` / `chart_svg` (the recovered chart)\n  * `intermediate_steps` (tool calls and observations).\n* **A demo CSV** created on the fly to make the run reproducible.\n* **Mermaid graph render** of the one-node graph.\n\n## What you will run\n\n1. Load `OPENAI_API_KEY` from `.env`/environment, or enter it interactively.\n2. Define a **sandboxed Python REPL tool**. Because the sandbox filesystem is not visible to the host, the prompt has it emit charts as base64-encoded SVG over stdout rather than saving files.\n3. Build a **tool-calling (ReAct) agent** with a prompt that\n\n   * describes the dataset\n   * highlights patterns\n   * concludes with a short summary\n   * calls the REPL for metrics and one bar chart when a target column is present.\n4. Wrap the agent in a **one-node LangGraph** and invoke it with a user message that provides the CSV data and the target column.\n5. Inspect the **final agent output** and the **intermediate tool steps** for transparency.\n6. View the **recovered bar chart**, rendered inline in the cell as SVG.\n7. Optionally view a **PNG/Mermaid render** of the graph structure.\n\n## How it works\n\n* The **REPL tool** runs the model's Python inside an isolated Pyodide/WASM sandbox and returns the captured stdout (or a traceback on error). That sandbox has its own throwaway filesystem, so anything written there with `open(...)` is invisible to the notebook — which is why the chart is sent back as **base64-encoded SVG printed between marker lines**, then decoded on the host.\n* The **agent** decides when to call the tool and with what code, based on the system instructions and the chat history.\n* The **graph node** invokes the agent, captures `output` and `intermediate_steps`, recovers the SVG chart from the tool output, and writes everything back into state so you can chain further steps.\n* The host then **renders the SVG inline** via `IPython.display` (and also saves it to disk).\n\n## Why this pattern\n\n* Tool-calling agents are strong for structured tool use: the model emits structured tool-call arguments instead of free-form text.\n* LangGraph gives you a light state wrapper that makes it easy to stitch this into larger workflows.\n* The sandboxed REPL makes the analysis verifiable — every stat and chart is produced by code you can read — while keeping execution isolated from your machine.\n\n## Extend and adapt\n\n* Add tools for file upload, SQL, or web fetching.\n* Enforce stricter templates in the system prompt for consistent reports.\n* Swap the Pyodide sandbox for a containerized/remote sandbox in production.\n* Add nodes for validation or report formatting before returning the final answer.\n\n## Requirements and notes\n\n* You need a valid `OPENAI_API_KEY`.\n* The REPL already runs code in an isolated **Pyodide** sandbox; for production, consider a hardened/containerized sandbox with resource limits.\n* **No matplotlib and no saved figures inside the sandbox**: charts are hand-built SVG strings emitted over stdout and recovered on the host. Inline rendering uses `IPython.display`, so the chart appears when you run the cells in a notebook (not when running the file via `!python script.py`).\n* `create_react_agent` is deprecated in LangGraph v1 in favor of `from langchain.agents import create_agent`; the current code still uses the former (it only emits a warning)."
-        },
-        {
-          "cell_index": 3,
-          "cell_id": "SMRU4iXkbA59",
-          "cell_type": "markdown",
-          "source": "De-install some dependencies because of conflicts"
-        },
-        {
           "cell_index": 8,
           "cell_id": "tMGB6TAqAVwv",
           "cell_type": "code_comments",
           "comments": [
-            "# Option 1 (preferred): create a `.env` file in your project folder with:",
             "# OPENAI_API_KEY=your_openai_key_here",
-            "# Option 2: set it directly in the notebook with magic:",
             "# %env OPENAI_API_KEY=your_openai_key_here"
-          ]
-        },
-        {
-          "cell_index": 11,
-          "cell_id": "04Pad4dmmlb3",
-          "cell_type": "markdown",
-          "source": "# Host-side recovery of the chart"
-        },
-        {
-          "cell_index": 12,
-          "cell_id": "TfqNgpZ4miTN",
-          "cell_type": "code_comments",
-          "comments": [
-            "# Markers used to get the chart out of the sandbox via stdout, plus the host path.",
-            "        # In a notebook this draws the chart directly in the cell output.",
-            "    # Non-notebook fallback: report the file and optionally export a PNG."
           ]
         },
         {
           "cell_index": 15,
           "cell_id": "ww67PFKWlM3a",
           "cell_type": "markdown",
-          "source": "# CoT style system prompt"
-        },
-        {
-          "cell_index": 17,
-          "cell_id": "aG-8S3bzlWSY",
-          "cell_type": "markdown",
-          "source": "# LangGraph state and node"
-        },
-        {
-          "cell_index": 19,
-          "cell_id": "Yzf1yB5Ple07",
-          "cell_type": "markdown",
-          "source": "# Build a tiny one-node graph"
-        },
-        {
-          "cell_index": 23,
-          "cell_id": "BlKIOtxNnYOG",
-          "cell_type": "markdown",
-          "source": "# Show the chart that actually made it back to the host\nIn a notebook this renders inline; otherwise it reports the saved file."
+          "source": "# CoT（Chain of Thought，思维链）风格的 system prompt"
         }
       ]
     },
