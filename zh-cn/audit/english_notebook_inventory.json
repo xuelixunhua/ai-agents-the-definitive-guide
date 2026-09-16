@@ -1435,20 +1435,11 @@
           "cell_id": "w3hK0ffKkxCO",
           "cell_type": "code_comments",
           "comments": [
-            "# COST - translate memory + throughput into $/1M output tokens.",
-            "# Simplified memory-bandwidth-bound model (matches the rest of the notebook):",
-            "#   per-sequence tok/s = 1000 / TPOT_ms          (decode-phase throughput)",
-            "#   workload tok/s     = batch * per-sequence    (valid in mem-BW-bound regime)",
+            "#   per-sequence tok/s = 1000 / TPOT_ms          （decode 阶段单序列吞吐量）",
+            "#   workload tok/s     = batch * per-sequence    （在显存带宽受限区间成立）",
             "#   batch              = min(n_concurrent_req, max_concurrent_at_ctx)",
             "#   raw $/1M tok       = (N_gpu * $/hr * 1e6) / (workload tok/s * 3600)",
-            "#   effective $/1M     = raw / CONCURRENT_USAGE_FACTOR",
-            "# Why price at the target workload batch, not max-concurrent: max-concurrent gives",
-            "# optimistic aggregate throughput that real servers rarely sustain (compute and",
-            "# attention KV-read costs dominate long before you saturate memory capacity). The",
-            "# workload-batch number is what you actually pay to serve the target n_concurrent_req.",
-            "# \"Effective\" = raw / utilization: you pay the hourly rate continuously, but only",
-            "# CONCURRENT_USAGE_FACTOR of provisioned capacity is typically active. This is the",
-            "# unit-economics number, not the raw GPU hourly rate."
+            "#   effective $/1M     = raw / CONCURRENT_USAGE_FACTOR"
           ]
         }
       ]
