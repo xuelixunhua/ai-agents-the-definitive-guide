@@ -1,0 +1,17 @@
+{
+  "notebook": "ch09/ch09_example_external_evaluation_pipelines_Langfuse.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "2sjSyiALDiLi": "把评估逻辑封装成函数，可以让这条 pipeline（流水线）更容易测试和版本化。每个函数接收一份 trace payload（轨迹载荷），返回布尔值、类别结果或数值分数；如果需要，之后还可以把这些结果作为自定义 score（评分）写回 Langfuse。",
+    "nyFYhUrrEEdz": "# 在外部对轨迹进行评分（external scoring）",
+    "087asyXqENrp": "可以使用 external judge（外部评审器）逻辑、hard checks（硬检查），或者两者结合。关键在于：评分逻辑存在于 tracing system（链路追踪系统）之外，因此可以随着应用本身持续演进。Langfuse 可以保存 trace，并可选地保存这些评分，但什么才算良好行为，应由你的 evaluator（评估器）定义。\n\n你可以使用任意评估库。这里用 `deepeval` 做独立检查已经足够；当你需要显式比较整条 trajectory（轨迹）时，RULER 风格的 trajectory judging（轨迹评审）会是很自然的下一步。"
+  }
+}
