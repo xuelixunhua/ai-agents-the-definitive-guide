@@ -1,0 +1,130 @@
+{
+  "notebook": "ch11/ch11_memory_footprint_throughput_and_GPU_requirements.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "LCM1ypVBCEFo": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH11/ch11_memory_footprint_throughput_and_GPU_requirements.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>",
+    "8X2bOO2GLbl5": "# 关于本 Notebook\n\n### 计算每个模型的单 Token KV Cache（键值缓存）大小\n\n每个 LLM 的核心都是 Transformer 引擎，其推理过程可以分为两个不同阶段：prefill（预填充）和 autoregressive sampling（自回归采样）。\n\n- 在 prefill 阶段，模型会并行处理输入 Prompt 中的 Token，并填充 key-value cache（KV Cache，键值缓存）。KV Cache 相当于模型在注意力计算中的状态；这一阶段不会生成新 Token。\n- 在 autoregressive sampling 阶段，模型利用 KV Cache 中保存的当前状态，对下一个 Token 进行采样和解码。复用 KV Cache 后，就不必为每个新 Token 重新计算此前所有 Token 的缓存，因此能够显著降低重复计算开销并提升采样速度。\n\n### Hybrid attention（混合注意力）和 MoE 会改变成本计算方式\n\n本 Notebook 中的模型（Qwen3.5-4B、Gemma-4-26B-A4B-it、Qwen3.6-35B-A3B）都采用 **hybrid attention（混合注意力）**：只有一部分层带有会随上下文增长的传统 KV Cache，其余层要么采用 **linear attention（线性注意力）**（状态大小固定，下面的计算中忽略），要么采用 **sliding-window attention（滑动窗口注意力）**（KV 最多只保留 `sliding_window` 个 Token）。其中两个模型同时还是 **Mixture-of-Experts（MoE，混合专家模型）**：总参数量决定权重驻留所需的内存下限，但每个 Token 的计算量与显存带宽需求主要由*激活参数量*决定。\n\n因此，下面的公式会把传统 `4 · n_layers · d_model` 规则混在一起的两个问题拆开：\n\n- **Memory footprint（内存占用）** 使用 `total_params_billion`；只有 full-attention（全注意力）层，以及受窗口上限约束的 sliding-attention（滑动注意力）层，会贡献随上下文变化的 KV Cache。\n- **Throughput and latency（吞吐量与延迟）** 使用 `active_params_billion`，因为真正需要在 GPU 上参与每个 Token 计算和数据搬运的是激活参数。\n\n### 计算特定模型的 Memory Footprint（内存占用）\n\n利用考虑 hybrid attention 的 `kv_cache_gib_for_context` 辅助函数，可以估算在给定上下文长度下，同时支持 `n_concurrent_request` 条序列需要多少内存；该估算同时考虑 sliding-window 上限以及 MoE 全部模型权重驻留所需的内存。\n\n### 估算 Capacity（容量）\n\n当前主流 LLM 的推理通常受到 memory bandwidth（显存带宽）而不是纯计算能力的限制，也就是常说的 memory-bound（内存带宽受限）。把多个 Prompt 批量放入 KV Cache，是提升吞吐量的标准方法。一旦知道一张或多张 GPU 最多能容纳多少 KV Cache Token，就可以进一步估算最大并发请求数。真实业务中的 Prompt 往往短于 `max_context_window`，因此实际可支持的并发通常会高于这里给出的最坏情况上界。\n\n### 估算 Cost（成本）\n\n最后一个 Cell 会把内存和吞吐量换算成 **每 100 万输出 Token 的美元成本（$/1M output tokens）**，并应用 `CONCURRENT_USAGE_FACTOR`，进一步展示每个*活跃用户*的有效成本。对 unit economics（单位经济模型）而言，这个数字往往比 GPU 的原始小时价格更有意义。"
+  },
+  "code_comment_replacements": {
+    "vibZwsp5UMzL": [
+      {
+        "old": "# CONFIG - edit values here; downstream cells read these globals",
+        "new": "# CONFIG（配置）——在此修改参数；后续 Cell 会读取这些全局变量"
+      },
+      {
+        "old": "# Bytes per GiB (binary). KV-cache math below is in bytes; outputs are labeled \"GiB\".",
+        "new": "# 每 GiB 对应的字节数（二进制）。下面的 KV Cache 计算以字节为单位，输出统一标记为 \"GiB\"。"
+      },
+      {
+        "old": "# GPU lineup: planning estimates (TFLOPS, bandwidth, and $/hr vary by vendor, region,",
+        "new": "# GPU 列表：以下为规划估算值（TFLOPS、带宽与每小时价格会因供应商、地区和"
+      },
+      {
+        "old": "# and commitment). $/hr values are indicative on-demand rates as of early 2026 -",
+        "new": "# 购买承诺不同而变化）。每小时价格为 2026 年初的参考按需价格——"
+      },
+      {
+        "old": "# verify against your actual cloud provider pricing before quoting to stakeholders.",
+        "new": "# 在向相关方引用这些数字前，请务必对照实际云服务商价格进行核验。"
+      },
+      {
+        "old": "# Sanity-check defaults.",
+        "new": "# Sanity Check（冒烟验证）的默认参数。"
+      },
+      {
+        "old": "# Fraction of provisioned capacity assumed concurrently active.",
+        "new": "# 假设已配置容量中同时处于活跃状态的比例。"
+      },
+      {
+        "old": "# Used in the cost cell to translate raw $/GPU-hr into effective $/active-user.",
+        "new": "# 成本 Cell 使用该比例，把原始 $/GPU-hour 换算为每个活跃用户的有效成本。"
+      }
+    ],
+    "zdIH4qRxcI6J": [
+      {
+        "old": "# Architecture verified against each model's config.json on Hugging Face.",
+        "new": "# 模型架构参数已对照 Hugging Face 上各模型的 config.json 进行核验。"
+      },
+      {
+        "old": "# Two fields break from the classical schema and drive the 2026 cost story:",
+        "new": "# 下列两个字段不同于经典模型结构，也是理解 2026 年推理成本的关键："
+      },
+      {
+        "old": "#   active_params_billion (!= total for MoE): drives compute/TPOT, not memory.",
+        "new": "#   active_params_billion（MoE 中不等于总参数量）：决定计算量/TPOT，而不是模型权重内存。"
+      },
+      {
+        "old": "#   n_full_attention_layers (!= n_layers for hybrids): only these grow KV with context.",
+        "new": "#   n_full_attention_layers（混合注意力模型中不等于 n_layers）：只有这些层的 KV 会随上下文增长。"
+      },
+      {
+        "old": "#     Other layers are either linear-attention (fixed state, ~0 KV) or",
+        "new": "#     其他层要么是 linear attention（固定状态，KV 近似为 0），要么是"
+      },
+      {
+        "old": "#     sliding-attention (KV capped at sliding_window tokens).",
+        "new": "#     sliding attention（KV 最多保留 sliding_window 个 Token）。"
+      },
+      {
+        "old": "#   Gemma-4 only: full-attn layers use a different KV geometry than sliding layers,",
+        "new": "#   仅 Gemma-4：full-attention 层与 sliding 层使用不同的 KV 几何结构，"
+      },
+      {
+        "old": "#     so n_global_kv_heads / global_d_head override the defaults for those layers.",
+        "new": "#     因此这些层会用 n_global_kv_heads / global_d_head 覆盖默认值。"
+      },
+      {
+        "old": "# dense",
+        "new": "# dense（稠密模型）"
+      },
+      {
+        "old": "# every 4th layer; rest are linear-attn",
+        "new": "# 每第 4 层为 full attention；其余为 linear attention"
+      },
+      {
+        "old": "# encoder-only baseline",
+        "new": "# encoder-only（仅编码器）基线"
+      },
+      {
+        "old": "# full bidirectional attn on every layer",
+        "new": "# 每一层都使用 full bidirectional attention（全双向注意力）"
+      },
+      {
+        "old": "# MHA",
+        "new": "# MHA（Multi-Head Attention，多头注意力）"
+      },
+      {
+        "old": "# 128 experts, top-8",
+        "new": "# 128 个 experts（专家），Top-8 激活"
+      },
+      {
+        "old": "# 1-in-6 pattern; other 25 are sliding_attention",
+        "new": "# 每 6 层中 1 层为 full attention；其余 25 层为 sliding_attention"
+      },
+      {
+        "old": "# sliding layers: GQA 2:1",
+        "new": "# sliding 层：GQA 2:1"
+      },
+      {
+        "old": "# full-attn layers use a different KV geometry",
+        "new": "# full-attention 层使用不同的 KV 几何结构"
+      },
+      {
+        "old": "# 256 experts, top-8",
+        "new": "# 256 个 experts（专家），Top-8 激活"
+      },
+      {
+        "old": "# GQA 8:1",
+        "new": "# GQA（Grouped-Query Attention，分组查询注意力）8:1"
+      }
+    ]
+  }
+}
