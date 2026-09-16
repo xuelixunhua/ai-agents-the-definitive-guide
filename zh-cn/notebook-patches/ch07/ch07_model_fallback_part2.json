@@ -17,20 +17,20 @@
   "code_comment_replacements": {
     "gp_LCo4ZzIOh": [
       {
-        "old": "# ── Per-run detail table ──────────────────────────────────────────────",
-        "new": "# ── 单次运行明细表 ──────────────────────────────────────────────────"
+        "old": "# ── Per-run detail table",
+        "new": "# ── 单次运行明细表"
       },
       {
-        "old": "# ── Highlight cross-model disagreements ───────────────────────────────",
-        "new": "# ── 突出不同模型之间的判断分歧 ──────────────────────────────────────"
+        "old": "# ── Highlight cross-model disagreements",
+        "new": "# ── 突出不同模型之间的判断分歧"
       },
       {
-        "old": "# ── Strict + Instructor failures ─────────────────────────────────────",
-        "new": "# ── Strict + Instructor 失败情况 ────────────────────────────────────"
+        "old": "# ── Strict + Instructor failures",
+        "new": "# ── Strict + Instructor 失败情况"
       },
       {
-        "old": "# ── Latency comparison by tier ────────────────────────────────────────",
-        "new": "# ── 按回退层级比较延迟 ──────────────────────────────────────────────"
+        "old": "# ── Latency comparison by tier",
+        "new": "# ── 按回退层级比较延迟"
       }
     ],
     "WKT5cw2czIOh": [
@@ -53,16 +53,16 @@
         "new": "# 为每个模型添加试验序号"
       },
       {
-        "old": "# ── Per-run summary table ────────────────────────────────────────────",
-        "new": "# ── 单次运行汇总表 ──────────────────────────────────────────────────"
+        "old": "# ── Per-run summary table",
+        "new": "# ── 单次运行汇总表"
       },
       {
-        "old": "# ── Per-model delta: what changed between trials? ─────────────────────",
-        "new": "# ── 模型级差异：两次试验之间发生了哪些变化？────────────────────────"
+        "old": "# ── Per-model delta: what changed between trials?",
+        "new": "# ── 模型级差异：两次试验之间发生了哪些变化？"
       },
       {
-        "old": "# ── Drift scoring (updated for three tiers) ──────────────────────────",
-        "new": "# ── 漂移评分（适配三级回退）────────────────────────────────────────"
+        "old": "# ── Drift scoring (updated for three tiers)",
+        "new": "# ── 漂移评分（适配三级回退）"
       },
       {
         "old": "# Tier penalty: worst tier used across trials",
@@ -71,8 +71,8 @@
     ],
     "RLeBwheCzIOh": [
       {
-        "old": "# ── Overall summary ──────────────────────────────────────────────────",
-        "new": "# ── 总体汇总 ────────────────────────────────────────────────────────"
+        "old": "# ── Overall summary",
+        "new": "# ── 总体汇总"
       },
       {
         "old": "# Highlight the key finding",
