@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 134,
+  "candidate_entry_count": 133,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -82,24 +82,10 @@
           "cell_id": "tMGB6TAqAVwv",
           "cell_type": "code_comments",
           "comments": [
-            "# Option 1 (preferred): create a `.env` file in your project folder with:",
             "# OPENAI_API_KEY=your_openai_key_here",
             "# SERPAPI_API_KEY=your_serpapi_key_here",
-            "# Option 2: set it directly in the notebook with magic:",
             "# %env OPENAI_API_KEY=your_openai_key_here",
-            "# %env SERPAPI_API_KEY=your_serpapi_key_here",
-            "# Load from .env if available",
-            "# Fallback: ask if still missing"
-          ]
-        },
-        {
-          "cell_index": 17,
-          "cell_id": "FW_ftJzKkClp",
-          "cell_type": "code_comments",
-          "comments": [
-            "    # 1) Ask for tight queries (structured)",
-            "    # 2) Call tool(s) explicitly (deterministic, observable)",
-            "    # 3) Synthesize to a clean JSON list of sources"
+            "# %env SERPAPI_API_KEY=your_serpapi_key_here"
           ]
         }
       ]
