@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 156,
+  "candidate_entry_count": 155,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -1265,8 +1265,7 @@
           "cell_id": "5tnQzj7Ql6l0",
           "cell_type": "code_comments",
           "comments": [
-            "# Plot 1: Token multiplier by architecture (deployment-independent —",
-            "# tokens are a property of the topology, not the model mix)."
+            "# 图 1：按 architecture（架构）比较 Token 倍数（与 deployment 无关——"
           ]
         },
         {
@@ -1274,21 +1273,7 @@
           "cell_id": "D6qem67HmCBD",
           "cell_type": "code_comments",
           "comments": [
-            "# Plot 2: Cost per request — grouped by deployment, error bars show the",
-            "# low/high band from calls_per_request uncertainty. The \"same topology,",
-            "# different deployment\" comparison is the whole reason we split behavior",
-            "#             \"(error bars = low/high band on calls_per_request)\")"
-          ]
-        },
-        {
-          "cell_index": 5,
-          "cell_id": "jlF96giJmFu6",
-          "cell_type": "code_comments",
-          "comments": [
-            "# Plot 3: Token growth vs cost growth, colored by deployment. Each",
-            "# architecture shows up twice — once per deployment. A line connects the",
-            "# two deployment points per architecture: the slope tells you how much",
-            "# moving the heavy role from gpt-5.4 → gpt-5.4-mini actually bought you."
+            "#             \"（误差棒 = calls_per_request 的 low/high 区间）\")"
           ]
         }
       ]
