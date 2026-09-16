@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 158,
+  "candidate_entry_count": 156,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -1400,39 +1400,13 @@
       "notebook": "ch11/ch11_memory_footprint_throughput_and_GPU_requirements.ipynb",
       "entries": [
         {
-          "cell_index": 1,
-          "cell_id": "8X2bOO2GLbl5",
-          "cell_type": "markdown",
-          "source": "# About the Notebook\n\n### Calculating KV Cache Size per Token for Each Model\n\nAt the core of every LLM lies the transformer engine, which consists of two distinct phases: prefill and autoregressive sampling.\n\n- In the prefill phase, the model processes the input prompt tokens in parallel, populating the key-value (KV) cache. The KV cache serves as the model's state, embedded within the attention operation. During this phase, no tokens are generated.\n- In the autoregressive sampling phase, the model leverages the current state stored in the KV cache to sample and decode the next token. By reusing the KV cache, the computational overhead of recalculating the cache for every new token is avoided. This approach enables faster sampling, as all previously seen tokens do not need to be processed again through the model.\n\n### Hybrid attention and MoE change the cost math\n\nThe models in this notebook (Qwen3.5-4B, Gemma-4-26B-A4B-it, Qwen3.6-35B-A3B) are **hybrid-attention** — only a subset of layers carries a traditional KV cache that grows with context. The remaining layers are either **linear-attention** (fixed-size state, ignored below) or **sliding-window attention** (KV capped at `sliding_window` tokens). Two of them are also **Mixture-of-Experts (MoE)**: total parameters set the memory floor, but only the *active* parameters drive compute and memory bandwidth per token.\n\nThe formulas below therefore split two concerns that the classical `4 · n_layers · d_model` rule conflates:\n\n- **Memory footprint** uses `total_params_billion` and only the full-attention (plus sliding) layers contribute growing KV cache.\n- **Throughput and latency** use `active_params_billion` — what actually moves through the GPU per token.\n\n### Calculating the Memory Footprint for a Specific Model\n\nUsing the hybrid-aware `kv_cache_gib_for_context` helper, it is possible to estimate the memory required to support `n_concurrent_request` sequences at a given context length, accounting for sliding-window caps and MoE total-weight residency.\n\n### Estimating Capacity\n\nState-of-the-art LLM models are memory-bound: performance is limited by memory access bandwidth rather than compute. Batching multiple prompts into the KV cache is the standard technique to improve throughput. Once the maximum number of KV-cache tokens that fit on one or more GPUs is known, the number of concurrent requests follows. Real-world prompts tend to be shorter than `max_context_window`, so actual concurrency is typically higher than the worst-case bound shown.\n\n### Estimating Cost\n\nThe final cell translates memory and throughput into **$/1M output tokens** and applies a `CONCURRENT_USAGE_FACTOR` to show the effective cost per *active* user — the number that usually governs unit economics, not the raw GPU hourly rate."
-        },
-        {
-          "cell_index": 2,
-          "cell_id": "vibZwsp5UMzL",
-          "cell_type": "code_comments",
-          "comments": [
-            "# CONFIG - edit values here; downstream cells read these globals",
-            "# Bytes per GiB (binary). KV-cache math below is in bytes; outputs are labeled \"GiB\".",
-            "# GPU lineup: planning estimates (TFLOPS, bandwidth, and $/hr vary by vendor, region,",
-            "# and commitment). $/hr values are indicative on-demand rates as of early 2026 -",
-            "# verify against your actual cloud provider pricing before quoting to stakeholders.",
-            "# Sanity-check defaults.",
-            "# Fraction of provisioned capacity assumed concurrently active.",
-            "# Used in the cost cell to translate raw $/GPU-hr into effective $/active-user."
-          ]
-        },
-        {
           "cell_index": 3,
           "cell_id": "zdIH4qRxcI6J",
           "cell_type": "code_comments",
           "comments": [
-            "# Architecture verified against each model's config.json on Hugging Face.",
-            "# Two fields break from the classical schema and drive the 2026 cost story:",
-            "#   active_params_billion (!= total for MoE): drives compute/TPOT, not memory.",
-            "#   n_full_attention_layers (!= n_layers for hybrids): only these grow KV with context.",
-            "#     Other layers are either linear-attention (fixed state, ~0 KV) or",
-            "#     sliding-attention (KV capped at sliding_window tokens).",
-            "#   Gemma-4 only: full-attn layers use a different KV geometry than sliding layers,",
-            "#     so n_global_kv_heads / global_d_head override the defaults for those layers."
+            "#     sliding attention（KV 最多保留 sliding_window 个 Token）。",
+            "#   仅 Gemma-4：full-attention 层与 sliding 层使用不同的 KV 几何结构，",
+            "#     因此这些层会用 n_global_kv_heads / global_d_head 覆盖默认值。"
           ]
         },
         {
