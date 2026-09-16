@@ -1,0 +1,23 @@
+{
+  "notebook": "ch09/ch09_agentvista.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "MYPHTX05TeNf": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH09/ch09_agentvista.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"在 Colab 中打开\"/>\n</a>"
+  },
+  "code_comment_replacements": {
+    "x9O8fJB-8wy4": [
+      {
+        "old": "#@title  Clone AgentVista and install dependencies",
+        "new": "#@title  克隆 AgentVista 并安装依赖"
+      }
+    ]
+  }
+}
