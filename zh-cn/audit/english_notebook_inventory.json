@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 155,
+  "candidate_entry_count": 152,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -1282,12 +1282,6 @@
       "notebook": "ch11/ch11_memoizing_swarm_research_engine.ipynb",
       "entries": [
         {
-          "cell_index": 1,
-          "cell_id": "cAco9La64r_d",
-          "cell_type": "markdown",
-          "source": "\n## Swarm Research Engine  — Progress-Aware + Synthesis\n\nA multi-agent research system that produces conclusions.\n\nWhat we do:\n\n  1. PROGRESS GUARD. The graph tracks facts-before and facts-after each\n     tool call. If a tool added 0 new facts, the agent is penalized from\n     choosing the same tool again, and after 2 consecutive no-progress\n     steps it is forced to DONE or SYNTHESIZE.\n\n  2. SYNTHESIS NODE. When the planner chooses DONE (or is forced there),\n     a separate LLM call produces a final threat assessment with:\n       - verdict (low / medium / high / critical)\n       - confidence score\n       - supporting evidence (cited facts)\n       - gaps (what's still unknown)\n     This makes the system a research engine, not just a navigation loop.\n\n  3. CONTENT-HASHED SEARCH FACTS. Search results are keyed by a content\n     hash, not positional labels. Fact(\"search_<hash8>\", snippet, ...).\n     This means identical search results deduplicate regardless of order,\n     and different results never collide.\n\n  4. HONEST METRICS. Cache hits are classified as:\n       - productive_hits: cache hit on a state that differs from the\n         previous step (the agent had genuinely new information)\n       - stale_hits: cache hit on the same state as last step\n         (the agent is looping — this is waste, not savings)\n       - no_progress_steps: tool calls that added 0 new facts\n     The report shows these separately so you can see real efficiency\n     vs. looping-that-looks-like-efficiency.\n\n  5. STATE-CHANGE-AWARE ROUTING. If the fact set hasn't changed since\n     the prior step, the graph forces a different tool or terminates."
-        },
-        {
           "cell_index": 4,
           "cell_id": "fje5Y-yoaPTU",
           "cell_type": "code_comments",
@@ -1324,25 +1318,6 @@
             "        # Tool + fact store",
             "    # Tool + fact store",
             "        # Print synthesis if present"
-          ]
-        },
-        {
-          "cell_index": 5,
-          "cell_id": "uv9mcGj3373_",
-          "cell_type": "markdown",
-          "source": "## Caching trade-offs to keep in mind\n\nTiered caching looks like a free win on paper. The cost shows up under load and over time. Things to internalize before you ship something like this:\n\n1. **Similarity threshold is a precision/recall knob.** Below ~0.85 the planner starts getting handed cached decisions made for *different* fact sets. Above ~0.95 you miss legitimate paraphrases and the cache stops earning its keep. The sweep below makes this concrete.\n\n2. **Linear scan is fine here, not in production.** `TieredCache.lookup` does `for entry in self._entries` for every comparison. Past ~10K cached entries that dominates latency — swap in FAISS / hnswlib / pgvector when you scale.\n\n3. **No TTL on cached decisions.** A cached \"DONE\" assumes the world hasn't moved. Sentiment, pricing, and supply-chain facts go stale. Real systems wire TTLs per fact source or invalidate the cache when a relevant fact gets written.\n\n4. **Cache poisoning is structural, not just semantic.** A hallucinated tool name or missing required kwarg gets parsed as valid JSON, cached, and replayed instantly on every cache-similar context — so one bad LLM output compounds. The fix is `_validate_planner_decision()` gating every `cache.store()`. Transient-error fallbacks (timeout → synthesized `DONE`) must not be cached either, or you teach the cache to give up forever.\n\n5. **Embeddings aren't free, just cheap.** `text-embedding-3-small` is ~$0.02 / 1M tokens, so each lookup is ~$2e-5. Per call it's noise; at million-request scale it shows up. The cache only pays back if `hit_rate × avoided_LLM_cost > embedding_cost`.\n\n6. **Cross-tenant leakage.** The key is `(task, facts)`. If multiple users share a cache, one user's facts can leak into another's plan via a semantic hit. Shard by tenant.\n\n7. **Cache key must cover the planner's full conditioning context.** The LLM sees `(task, facts, tools_available, stale_tools)`. If you key only on `(task, facts)`, a cached `DONE` made under stale-tool pressure can be replayed by a fresh agent that has no stale tools — bypassing the very anti-looping signal you built. The fix is to bundle everything the LLM sees into a `PlannerContext` and use that as the key, with stale/tools required to match exactly even at the semantic tier (cosine similarity over facts can't prove the constraint sets are equivalent).\n"
-        },
-        {
-          "cell_index": 6,
-          "cell_id": "zw_7k1mz374A",
-          "cell_type": "code_comments",
-          "comments": [
-            "# Run the swarm and visualize the cache win.",
-            "# This makes live LLM + Tavily calls — make sure your .env keys are set.",
-            "# 1. Per-agent decision breakdown (stacked bar) — shows the cache warming up.",
-            "# 2. Cumulative LLM calls vs cumulative steps — the savings curve.",
-            "# 3. Honest metrics — useful work vs looping.",
-            "# 4. Cache tier composition — where do the hits actually come from?"
           ]
         },
         {
