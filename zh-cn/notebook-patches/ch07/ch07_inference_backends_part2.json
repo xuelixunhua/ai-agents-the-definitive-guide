@@ -1,0 +1,24 @@
+{
+  "notebook": "ch07/ch07_inference_backends.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "I27vouzgwADM": "# 上下文长度与 KV Cache 显存压力（Context Length and KV Cache Pressure）\n\n> **说明：** 本节专门讨论 **decoder-only（仅解码器、自回归）**模型，例如 GPT、LLaMA、Qwen、Mistral 等——这也是 vLLM、TGI 和 SGLang 主要服务的模型类型。Encoder-decoder（编码器-解码器）架构，例如 T5、BART，会先计算一次 encoder KV cache，并在后续所有解码步骤中复用，因此 Prompt 长度对其单 token 生成延迟的影响要小得多。\n\n对于 decoder-only 模型，Prompt 中的每个 token 都会生成一组 KV pair（键值对），这些数据既需要保存在 GPU 显存里，又会在后续每一步生成时被 attention 访问。随着智能体的对话历史越来越长，会出现三件事：\n\n1. **TTFT（Time to First Token，首 token 延迟）上升** —— prefill（预填充）阶段必须对完整 Prompt 计算 attention，其计算成本会随序列长度近似二次增长。\n2. **显存压力上升** —— KV cache 会随上下文长度线性增长，从而压缩同时批处理其他请求的空间。\n3. **单 token 解码变慢** —— 每生成一个新 token，都需要访问此前全部 KV pair；上下文越长，每一步需要读取的显存数据就越多。\n\n因此，前一个 Notebook 讨论的 context pruning（上下文裁剪）并不只是为了省钱，它同样是在维持推理后端的响应能力。",
+    "ub4sz-TAwADN": "# 前缀缓存（Prefix Caching）：A/B 对比\n\n大多数智能体在每次请求中都会使用**相同的 system prompt**。如果没有 prefix caching，服务器会在每一次调用时重新计算这段 system prompt 的 KV cache——这完全是重复开销。\n\nvLLM 的 `--enable-prefix-caching`（APC，Automatic Prefix Caching，自动前缀缓存）会检测多个请求是否共享相同前缀，并复用已经缓存的 KV blocks：\n\n```\n请求 1： [SYSTEM: \"You are a support agent...\"] + [USER: \"My order is late\"]\n                    ↑ 计算 KV，并写入缓存\n\n请求 2： [SYSTEM: \"You are a support agent...\"] + [USER: \"Refund policy?\"]\n                    ↑ cache HIT（缓存命中）→ 跳过这一前缀的 KV 计算\n```\n\n为了观察真实差异，我们会把**完全相同的 5 个问题**各跑一遍：\n1. **关闭** prefix caching（当前服务器）\n2. **开启** `--enable-prefix-caching`（重启服务器）\n\n然后把两组结果并排比较。"
+  },
+  "code_comment_replacements": {
+    "nmUSCg_3wADN": [
+      {"old": "# ── Build prompts of increasing context length ───────────────────────", "new": "# ── 构造上下文长度逐步增加的 Prompt ──────────────────────────────────"},
+      {"old": "\"\"\"Build a conversation with N filler turns + the real question.\"\"\"", "new": "\"\"\"构造包含 N 轮填充对话，再追加真实问题的会话。\"\"\""},
+      {"old": "# ── Measure latency vs context size ──────────────────────────────────", "new": "# ── 测量不同上下文长度下的延迟 ───────────────────────────────────────"},
+      {"old": "# ── Compute scaling factor ────────────────────────────────────────────", "new": "# ── 计算延迟放大倍数 ──────────────────────────────────────────────────"}
+    ]
+  }
+}
