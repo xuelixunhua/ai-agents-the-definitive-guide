@@ -1414,17 +1414,12 @@
           "cell_id": "LYCOGGGNWhqG",
           "cell_type": "code_comments",
           "comments": [
-            "# Core formulas (hybrid-attention + MoE aware). Reused by run_llm_analysis and the",
-            "# cost cell below.",
-            "    # Gemma-4's full-attn layers use n_global_kv_heads/global_d_head if present;",
-            "    # otherwise the full-attn layers use the same geometry as the rest.",
-            "    # GiB added to KV cache per token once past any sliding window.",
-            "    # FP16 (2 bytes) * 2 tensors (K, V) * n_full_attention_layers * KV channels.",
-            "    # Full-attention layers grow linearly; sliding layers saturate at sliding_window;",
-            "    # linear-attention layers carry fixed state (approximated as 0 for sizing).",
-            "    # MoE: weights use total (all experts resident); KV scales with concurrency.",
-            "    # (2 * P_B * 1e9 FLOPs) / (TFLOPS * 1e12) = (2 * P_B / TFLOPS) milliseconds.",
-            "    # (2 * P_B GB) / (bw GB/s) = seconds; *1000 -> ms."
+            "# Core formulas（核心公式，兼顾 hybrid attention 与 MoE）。供 run_llm_analysis 和下面的",
+            "    # 如果配置中提供 n_global_kv_heads/global_d_head，Gemma-4 的 full-attention 层会优先使用它们；",
+            "    # 超过 sliding window 后，每新增一个 Token 给 KV Cache 增加的 GiB。",
+            "    # FP16（2 bytes）× 2 个张量（K、V）× n_full_attention_layers × KV channels。",
+            "    # full-attention 层随上下文线性增长；sliding 层增长到 sliding_window 后饱和；",
+            "    # 单 Token prefill 时间：(2 * P_B * 1e9 FLOPs) / (TFLOPS * 1e12) = (2 * P_B / TFLOPS) 毫秒。"
           ]
         },
         {
