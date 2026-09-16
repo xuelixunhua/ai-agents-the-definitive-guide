@@ -1,0 +1,37 @@
+{
+  "notebook": "ch09/ch09_ruler_trace_answer_ranking_langsmith.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "sa6AN-hhThoJ": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH09/ch09_ruler_trace_answer_ranking_langsmith.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"在 Colab 中打开\"/>\n</a>",
+    "aMxcjOegOQvP": "# RULER 轨迹答案排序（trace answer ranking，LangSmith）\n\n本 Notebook 会拉取与 `ch09_example_external_evaluation_pipelines_langsmith.ipynb` **完全相同的 LangSmith 根运行（root runs）**：使用相同的**项目（project）**、**标签（tag）**（`ext_eval_pipelines`）、**过滤条件（filters）**以及**载荷解析（payload parsing）**。\n\n**注意：** `ch09_example_external_evaluation_pipelines_new_.ipynb` 是 **Langfuse** 的 cookbook。本 Notebook 中的 RULER 只能看到 **LangSmith** 里的运行记录。请使用 LangSmith 外部评估 Notebook（或同时把日志写入 LangSmith），确保 trace 落入同一个项目。",
+    "pzB5uD2eOQvS": "## 在基准集整理（benchmark curation）中使用 RULER 输出\n\n- 将 `weak_answer_flag=True` 的记录作为基准集的额外候选样本。\n- 将 DeepEval / 硬检查（hard-check）失败与 RULER 的弱答案标记视为彼此独立的信号。\n- 使用 `trace_id` / `case_id` 合并记录，并标注来源（`deterministic`、`llm_judge`、`comparative_ruler`）。"
+  },
+  "code_comment_replacements": {
+    "PXVCE--MOQvR": [
+      {
+        "old": "# US-hosted LangSmith (default). For EU, set LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com",
+        "new": "# LangSmith 默认托管在美国区域。如使用 EU 区域，请设置 LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com"
+      },
+      {
+        "old": "# LangSmith project for this cookbook — set here (same as LangSmith external-eval notebook).",
+        "new": "# 设置本 cookbook 使用的 LangSmith 项目（与 LangSmith 外部评估 Notebook 保持一致）。"
+      },
+      {
+        "old": "# Use \"default\" unless you created a dedicated project in the UI first.",
+        "new": "# 除非已在 UI 中创建专用项目，否则使用 \"default\"。"
+      },
+      {
+        "old": "# Enable tracing for @traceable (mirrors LangSmith external-eval notebook)",
+        "new": "# 为 @traceable 启用 tracing（与 LangSmith 外部评估 Notebook 保持一致）"
+      }
+    ]
+  }
+}
