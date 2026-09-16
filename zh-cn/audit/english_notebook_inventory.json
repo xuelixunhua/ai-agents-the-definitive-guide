@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 169,
+  "candidate_entry_count": 158,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -942,29 +942,11 @@
           "cell_id": "hYmSqtWI9KRy",
           "cell_type": "code_comments",
           "comments": [
-            "# Harness LLM judge (AgentVista accuracy_score): after inference, compares model output to ground truth.",
-            "# Required env vars (see AgentVista-main/utils/general_qa_tool.py):",
-            "#   VERIFIER_API_KEY   — same OpenRouter key is fine (set below).",
-            "#   VERIFIER_END_POINT — OpenRouter chat-completions URL (set below; also set again in the next cell).",
-            "#   VERIFIER_MODEL_NAME — optional; defaults to gpt-4o in the harness if unset; we set an OpenRouter slug below.",
-            "# Cheap, text-only judge on OpenRouter (change if you prefer e.g. openai/gpt-4.1)"
-          ]
-        },
-        {
-          "cell_index": 5,
-          "cell_id": "BCl7sgKm9M5N",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Configure OpenRouter for multi model evaluation",
-            "# If you skipped cell 3, still pick a judge model for OpenRouter (text-only scoring)."
-          ]
-        },
-        {
-          "cell_index": 6,
-          "cell_id": "dnM4bEqM9O_3",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Load parquet dataset and export embedded images safely"
+            "# Harness LLM Judge（评测框架中的 LLM 裁判，AgentVista accuracy_score）：推理完成后，将模型输出与 ground truth（标准答案）比较。",
+            "# 必需的环境变量（参见 AgentVista-main/utils/general_qa_tool.py）：",
+            "#   VERIFIER_API_KEY   — 可以直接使用同一个 OpenRouter key（下方设置）。",
+            "#   VERIFIER_END_POINT — OpenRouter chat-completions URL（下方设置；下一 Cell 还会再次设置）。",
+            "#   VERIFIER_MODEL_NAME — 可选；未设置时 Harness 默认使用 gpt-4o；下方会设置一个 OpenRouter 模型 slug。"
           ]
         },
         {
@@ -972,56 +954,7 @@
           "cell_id": "adHnUFsC9Sjp",
           "cell_type": "code_comments",
           "comments": [
-            "# @title Create a stratified AgentVista subset for side by side model comparison"
-          ]
-        },
-        {
-          "cell_index": 8,
-          "cell_id": "KcMb8-jOnB5-",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Validate subset structure and exported images",
-            "# Show a few examples visually"
-          ]
-        },
-        {
-          "cell_index": 9,
-          "cell_id": "KZm6BQjjnWWM",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Tiny sanity check on 2 samples with one model before the full run"
-          ]
-        },
-        {
-          "cell_index": 10,
-          "cell_id": "_W4V7QrNngpA",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Inspect sanity check predictions before full evaluation"
-          ]
-        },
-        {
-          "cell_index": 11,
-          "cell_id": "5kiY00kHo1xv",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Inspect sanity predictions in detail"
-          ]
-        },
-        {
-          "cell_index": 12,
-          "cell_id": "TcmCZz4H9U0r",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Run AgentVista on the same subset for all selected models"
-          ]
-        },
-        {
-          "cell_index": 13,
-          "cell_id": "eKlYRES89XvN",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Load and merge outputs from all models"
+            "# @title 创建 stratified subset（分层子集），用于 AgentVista 模型横向比较"
           ]
         },
         {
@@ -1029,12 +962,10 @@
           "cell_id": "CX7_4ttbFtqt",
           "cell_type": "code_comments",
           "comments": [
-            "# @title Standardize result fields, recover domain, and compute correctness",
-            "# Harness column names that may hold LLM-judge scores (AgentVista: accuracy_score).",
-            "# Populated only when VERIFIER_API_KEY and VERIFIER_END_POINT are set (VERIFIER_MODEL_NAME",
-            "# selects the judge on OpenRouter; see cells 3–4). See AgentVista-main/README.md.",
-            "# Without API key + endpoint, harness accuracy_score stays 0 for every row.",
-            "# Optional relaxed diagnostic metric"
+            "# Harness 中可能保存 LLM Judge 评分的列名（AgentVista 使用 accuracy_score）。",
+            "# 只有设置 VERIFIER_API_KEY 和 VERIFIER_END_POINT 后才会写入该评分（VERIFIER_MODEL_NAME",
+            "# 用于选择 OpenRouter 上的 Judge；参见 Cells 3–4）。另见 AgentVista-main/README.md。",
+            "# 如果没有 API key + endpoint，Harness 的 accuracy_score 会在所有记录中保持为 0。"
           ]
         },
         {
@@ -1042,31 +973,7 @@
           "cell_id": "GeK3agSDPENK",
           "cell_type": "code_comments",
           "comments": [
-            "# @title Build a side by side comparison table"
-          ]
-        },
-        {
-          "cell_index": 16,
-          "cell_id": "6kKgtCC9PGCC",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Plot per domain accuracy by model"
-          ]
-        },
-        {
-          "cell_index": 17,
-          "cell_id": "DnGVuME1PHt_",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Plot overall accuracy by model"
-          ]
-        },
-        {
-          "cell_index": 18,
-          "cell_id": "6gvnc1YQPJo7",
-          "cell_type": "code_comments",
-          "comments": [
-            "# @title Show how to extend the schema with your own use case data"
+            "# @title 构建 side-by-side（并排）比较表"
           ]
         }
       ]
