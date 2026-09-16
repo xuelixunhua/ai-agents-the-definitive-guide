@@ -1,0 +1,16 @@
+{
+  "notebook": "ch08/ch08_OWASP_ASI_2026.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "OIk1E4h9E80K": "# 关于本 Notebook\n\n本 Notebook 展示如何在**对抗性条件下构建并评估可调用工具的智能体（tool-using agent）**。\n\n你将实现一个**基于 LangGraph 的客户支持智能体**，它具有两个工具：\n\n* `search_kb`：用于检索内部知识库\n* `send_email`：一个需要用户明确批准才能执行的**受限操作（restricted action）**\n\n智能体会在运行时强制执行**硬约束（hard constraints）**：\n\n* 限制工具调用预算（tool budget）\n* 对敏感操作执行批准检查（approval checks）\n* 明确阻止违规操作并解释原因\n\n---\n\n### 评估设置（Evaluation Setup）\n\n随后，你将使用 DeepTeam 和 OWASP **ASI 2026 框架**测试该智能体，重点关注：\n\n* **ASI-02：工具误用与利用（Tool Misuse and Exploitation）**\n\n每次运行都会记录：\n\n* 最终响应\n* 已执行的工具\n* 被阻止的工具\n\n---\n\n### 为什么这很重要\n\n本 Notebook 强调一个核心观点：\n\n> **智能体可靠性取决于编排与约束，而不只是模型质量。**\n\n评估对象不只是最终输出，还包括智能体在**压力条件下的行为（behavior under pressure）**，这对于生产系统至关重要。"
+  },
+  "code_comment_replacements": {}
+}
