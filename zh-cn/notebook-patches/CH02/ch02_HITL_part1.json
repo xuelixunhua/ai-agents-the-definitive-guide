@@ -1,0 +1,63 @@
+{
+  "notebook": "CH02/ch02_HITL.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "pWwE02-c7-ON": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH02/ch02_HITL.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>\n\n<a target=\"_blank\" href=\"https://learning.oreilly.com/library/view/ai-agents-the/0642572247775/\">\n  <img src=\"https://img.shields.io/badge/AI%20Agents%20Book-Read%20on%20O'Reilly-d40101?style=flat\" alt=\"AI Agents Book – Read on O'Reilly\"/>\n</a>\n\n",
+    "iND9cS50E4A2": "# 关于这个 Notebook\n\n这个 Notebook 是一次 LangGraph Human-in-the-Loop（HITL，人类参与回路）模式的动手实践。它展示如何在保持代码紧凑、面向生产的同时，为 Agent 工作流加入精确的人类控制：从轻量审批门，到完整的交互式编辑。\n\n## 你将学到什么\n\n1. 如何接入 LangGraph interrupts（中断），暂停一次运行、收集人工输入，再以确定性的方式恢复执行。\n2. 如何使用 `InMemorySaver` 对 state（状态）做 checkpoint（检查点），让运行可以暂停后继续，而不会丢失上下文。\n3. 如何包装工具，使人工可以在工具执行前接受、编辑或覆盖一次调用。\n4. 如何驱动简单的 ReAct 风格循环，并让工具调用真正经过人工审核。\n5. 如何实现 parallel interrupts（并行中断），并通过一个 resume map（恢复映射）统一恢复。\n\n## 模型与配置\n\nNotebook 在启动时通过 provider switch（提供商开关）选择模型提供商。\n\n* `LLM_PROVIDER=openai`：通过 `langchain_openai` 使用 OpenAI。\n* `LLM_PROVIDER=openrouter`：通过 `ChatOpenAI` 配合自定义 `base_url` 使用 OpenRouter。\n\n环境变量通过 `python-dotenv` 从 `.env` 加载：\n\n* `LLM_PROVIDER`（`openai` 或 `openrouter`）\n* 使用 OpenAI 时的 `OPENAI_API_KEY`\n* 使用 OpenRouter 时的 `OPENROUTER_API_KEY`\n* 可选的模型覆盖项：\n  * `OPENAI_MODEL`（默认 `gpt-5.4-nano`）\n  * `OPENROUTER_MODEL`（默认 `openai/gpt-5.4-nano`）\n\n## 本 Notebook 展示的模式\n\n**模式 A — 内容生成中的人工反馈循环（Human feedback loop）**\n这是一个用于 LinkedIn 帖子的简单“写作—审核”循环。模型先起草，人类通过 `interrupt` 反复给出反馈，图会持续循环，直到人类输入 done。它适合任何能从迭代式修改中获益的短内容工作流。\n\n**模式 B — 敏感调用前的 HITL checkpoint（人工检查点）**\n模型先以 JSON 形式提出 HTTP 请求。在代码真正执行外部调用之前，人类可以批准、修改、要求更多上下文或拒绝。这是面向网络操作、金融操作等关键动作的一种极简但有效的 safety interlock（安全联锁）。\n\n**模式 C — 审核并编辑 state（状态）**\n模型生成一段简短摘要，人类可以直接修改文本，修改后的内容成为新的 state。这种模式非常适合合规检查或品牌语调审核。\n\n**模式 D — 通过单个 resume map 恢复多个并行中断**\n两个相互独立的 interrupt 同时触发。runner（运行器）会打印两份 payload（载荷），分别收集恢复值，然后一步恢复整个图。这可以作为多项并行审核任务的模板。\n\n**模式 E — 微型 ReAct 循环中的工具调用审核**\n工具通过 `add_hitl` 包装。执行前，人类可以接受调用、编辑参数，或直接返回一个 stub result（桩结果）。循环会持续到模型不再请求工具。这是 supervised tool use（受监督工具使用）的最小化示例。\n\n**模式 F — 用于调试的静态中断（Static interrupts）**\n在指定节点前后注册图级 interrupt，可以建立确定性的 breakpoint（断点）。这适合逐步调试和类似单元测试的验证。\n\n## 交互式 runner 如何工作\n\n* 每个 demo 都会构建一个 compiled graph（已编译图），并使用新的 thread id（线程 ID）启动，从而得到干净的状态。\n* interrupt 发生时，终端会打印 payload 并等待输入。\n* 你可以粘贴原始字符串或 JSON。对于模式 E 中的工具包装器，可以输入：\n\n  * `{\"type\": \"accept\"}`\n  * `{\"type\": \"edit\", \"args\": {\"args\": {\"query\": \"weather in Zurich\"}}}`\n  * `{\"type\": \"response\", \"args\": \"Skip for now\"}`\n\n对于 parallel interrupts，runner 会打印编号列表，为每个 interrupt id 收集一个恢复值，然后只通过一次 `Command(resume=...)` 统一恢复。\n\n## 依赖项\n\n* `langgraph`：图、interrupt、checkpoint 和 task\n* `langchain_openai`：LLM 绑定\n* `python-dotenv`：加载环境变量\n* `requests`：模式 B 中用于真正执行 HTTP GET\n\n## 如何运行\n\n1. 创建 `.env` 文件，写入密钥和 provider 选择。将 `LLM_PROVIDER` 设置为 `openai` 或 `openrouter`，然后提供对应的 API Key（`OPENAI_API_KEY` 或 `OPENROUTER_API_KEY`）。\n2. 运行 Notebook，并从 `main()` 打印的菜单中选择一个 demo。\n3. 按照终端提示提供反馈或审批结果。\n\n## 为什么这很重要\n\n金融、研究和运营等真实系统往往同时需要 autonomy（自主性）与 control（控制）。这些模式展示了如何在不破坏 Agent 架构的前提下加入精确的人类控制。各模式可以自然组合，因此可以先从小范围开始，衡量效果，再在真正有价值的位置逐步增加更丰富的人工监督。\n",
+    "4MMDGc0vRLBu": "# 导入依赖",
+    "0zg6Xfk_RSJk": "# LLM 配置（通过 provider switch 在 OpenAI 与 OpenRouter 之间切换）",
+    "Wi7zoCHtRVVE": "# 模式 A：内容生成中的人工反馈循环",
+    "tsZls1FpRZgY": "# 模式 B：敏感调用前的 HITL checkpoint（人工检查点）",
+    "knjNOUZtReCM": "# 模式 C：审核并编辑 state（状态）",
+    "VJnheKx_Ri-h": "# 模式 D：通过单个 resume map 恢复并行中断",
+    "P-Y-oQEZRnI9": "# 模式 E：微型 ReAct 循环中的工具调用审核",
+    "ri4q8t4HRtLb": "# 模式 F：用于调试的静态中断",
+    "eUc2NGNvRxwi": "# 交互式 runner（运行器）"
+  },
+  "code_comment_replacements": {
+    "jVb7DLioAGyC": [
+      {
+        "old": "# --- Provider + API key setup ---",
+        "new": "# --- Provider 与 API Key 配置 ---"
+      },
+      {
+        "old": "# Option 1 (preferred): create a `.env` file in your project folder with e.g.",
+        "new": "# 方案 1（推荐）：在项目目录中创建 `.env` 文件，例如："
+      },
+      {
+        "old": "# or:",
+        "new": "# 或者："
+      },
+      {
+        "old": "# Option 2: set directly in the notebook with `%env`.",
+        "new": "# 方案 2：直接在 Notebook 中通过 `%env` 设置。"
+      },
+      {
+        "old": "# Load from .env if available",
+        "new": "# 如果存在 `.env`，则从中加载。"
+      },
+      {
+        "old": "# Fallback: ask only for the selected provider key",
+        "new": "# Fallback（回退方案）：只询问当前所选 provider 对应的密钥。"
+      }
+    ],
+    "e7RnB-3hEMlM": [
+      {
+        "old": "                # Try JSON, else raw string",
+        "new": "                # 优先尝试按 JSON 解析，否则保留为原始字符串。"
+      },
+      {
+        "old": "    # Single interrupt path",
+        "new": "    # 单 interrupt（中断）路径。"
+      }
+    ]
+  }
+}
