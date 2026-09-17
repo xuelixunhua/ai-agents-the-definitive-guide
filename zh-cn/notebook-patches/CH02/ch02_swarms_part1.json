@@ -1,0 +1,56 @@
+{
+  "notebook": "CH02/ch02_swarms.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "xfm8IIWfNYQt": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH02/ch02_swarms.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>",
+    "PVMVZqCyNbx3": "# 关于这个 Notebook\n\n这个 Notebook 演示如何使用 [LangGraph Multi-Agent Swarm library](https://github.com/langchain-ai/langgraph-swarm-py) 提供的 `create_swarm` 构建并编译一个 **multi-agent swarm（多智能体群）**。Swarm（群）是一种简单的 orchestration construct（编排结构）：多个智能体可以协作，其中一个智能体默认处于激活状态，其他智能体则可以在需要时接管任务。\n\n## 它展示了什么\n\n* **Agent collaboration（智能体协作）**：用 `research_assistant` 和 `writer_assistant` 两个智能体组成一个 swarm。\n* **Default active agent（默认活跃智能体）**：由 `research_assistant` 发起对话。\n* **Compilation step（编译步骤）**：调用 `.compile()` 把 swarm 固化为可执行 app/graph（应用/图），从而处理输入并在智能体之间路由。\n\n## 它如何工作\n\n1. **定义智能体**：代码中分别定义 `research_assistant` 和 `writer_assistant`，每个智能体都有自己的工具、Prompt 或角色。\n2. **创建 swarm**：`create_swarm()` 接收这些智能体对象，构建协作结构。\n3. **默认激活**：`default_active_agent=\"research_assistant\"` 确保先启动研究；只有在需要时，控制权才转交 `writer_assistant`。\n4. **编译**：`.compile()` 返回 runnable object（可运行对象，通常是 LangGraph app），负责跨智能体管理 state（状态）、routing（路由）和 message passing（消息传递）。\n\n## 为什么采用这种模式\n\n* 角色保持 **modular（模块化）**：每个智能体拥有独立的工具和职责。\n* 提供明确的 **coordination（协调）**：swarm 负责管理智能体之间的轮换。\n* 易于 **扩展**：可以增加编辑、审校、验证等智能体，而不必重写编排逻辑。\n\n## 如何扩展与调整\n\n* 增加 **validator agent（验证智能体）**，在写作智能体定稿前检查事实准确性。\n* 如果希望先起草后研究，可以更改 **default active agent（默认活跃智能体）**。\n* 增加 **routing rules（路由规则）** 或评分函数，决定下一步应该 hand off（移交）给哪个智能体。\n* 使用 checkpointer（检查点保存器）持久化 swarm 状态，使多轮任务可以跨会话继续。\n\n## 运行要求与说明\n\n* 需要安装 `langgraph_swarm` 或等价工具。\n* 传给 `create_swarm` 的智能体必须已经定义并绑定工具。\n* Swarm 的行为取决于智能体 Prompt；清晰的角色定义通常能改善协作质量。",
+    "9018tEpWMAtS": "# API Key 配置",
+    "nOPfrcENMO1x": "# 导入依赖",
+    "qjEW5ZllMYoC": "# 工具",
+    "b-vxhAb0MbCY": "# Handoff tools（移交工具）",
+    "8840hIz6MtRH": "# LLM 配置",
+    "L1_3IY9PMzF1": "# Agents（智能体）",
+    "raqkP3KqM38s": "# Swarm（智能体群）",
+    "kMCeFJ5CM8mA": "# 运行"
+  },
+  "code_comment_replacements": {
+    "2yTNkp-F8KZx": [
+      {
+        "old": "# Option 1 (preferred): create a `.env` file in your project folder with:",
+        "new": "# 方案 1（推荐）：在项目目录中创建 `.env` 文件，并写入："
+      },
+      {
+        "old": "# Option 2: set it directly in the notebook with magic:",
+        "new": "# 方案 2：直接通过 Notebook magic 命令设置："
+      },
+      {
+        "old": "# Load from .env if available",
+        "new": "# 如果存在 `.env`，则从中加载。"
+      },
+      {
+        "old": "# Fallback: ask if still missing",
+        "new": "# Fallback（回退方案）：如果仍缺少密钥，则交互式询问。"
+      }
+    ],
+    "fxF0enRdMXdZ": [
+      {
+        "old": "# Tavily web search",
+        "new": "# Tavily 网页搜索"
+      }
+    ],
+    "TE1J2uBbMwdJ": [
+      {
+        "old": "# Uses OpenAI through LangChain. Set OPENAI_API_KEY in your environment.",
+        "new": "# 通过 LangChain 使用 OpenAI；请在环境变量中设置 OPENAI_API_KEY。"
+      }
+    ]
+  }
+}
