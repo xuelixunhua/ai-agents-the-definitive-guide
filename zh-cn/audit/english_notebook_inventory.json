@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 120,
+  "candidate_entry_count": 116,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -115,20 +115,6 @@
           "comments": [
             "# 从 LangChain 加载 Tavily Search Wrapper"
           ]
-        },
-        {
-          "cell_index": 22,
-          "cell_id": "63ee8f2c-fbde-427b-ba54-ae0c7ce5fbfb",
-          "cell_type": "markdown",
-          "source": "We can give this team work directly. Try it out below."
-        },
-        {
-          "cell_index": 34,
-          "cell_id": "6b8badbf-d728-44bd-a2a7-5b4e587c92fe",
-          "cell_type": "code_comments",
-          "comments": [
-            "# Tell the agents exactly what to do, including file name for persistence"
-          ]
         }
       ]
     },
@@ -136,24 +122,14 @@
       "notebook": "CH02/ch02_react.ipynb",
       "entries": [
         {
-          "cell_index": 1,
-          "cell_id": "R3pwlizxPcVf",
-          "cell_type": "markdown",
-          "source": "# About this notebook\n\nThis notebook is a focused walkthrough of building a minimal ReAct-style agent with **LangGraph** and **LangChain OpenAI**, including a compact internet search tool and a readable execution trace. You will see how to bind tools to a model, route between the model and tools, and print a clear transcript that mirrors ReAct action-observation-final answer patterns.\n\n## What it shows\n\n* **Typed agent state** that accumulates `messages` using the `add_messages` reducer.\n* **Tool binding** to `gpt-4o-mini` with a single `internet_search` tool backed by SerpAPI that returns compact JSON.\n* **Two node graph**\n\n  1. `agent` node that calls the model with a system prompt\n  2. `tools` node that executes any pending tool calls and returns `ToolMessage` outputs.\n* **Conditional routing** that loops model → tools → model until no tool calls remain, then ends.\n* **ReAct style tracing** with `print_react_trace(question)` that prints a short reasoning summary, the tool action, the observation, and the final answer.\n* **Optional graph preview** using Mermaid PNG rendering.\n\n## What you will run\n\n1. Install a small stack: `langgraph`, `langchain-openai`, `python-dotenv`, and `google-search-results`.\n2. Load environment keys from `.env` and validate `OPENAI_API_KEY`. Use `SERPAPI_API_KEY` for live search.\n3. Define the `internet_search` tool that queries Google through SerpAPI and returns top results as JSON.\n4. Build and compile a **StateGraph** with the `agent` and `tools` nodes and an `END` condition.\n5. Call `print_react_trace(\"What is the weather in Zurich today?\")` to see the full loop and the final reply.\n6. Optionally render the graph image with Mermaid.\n\n## How it works\n\n* The **system prompt** instructs the assistant to keep tool calls terse and to finish with a clear final answer.\n* The **agent node** invokes the model on `[SYSTEM_PROMPT] + state[\"messages\"]`.\n* The **tools node** inspects `last.tool_calls`, executes each tool by name, and emits `ToolMessage` objects with the JSON payload.\n* The **router** function `should_continue` returns `\"continue\"` if there are tool calls, otherwise `\"end\"`.\n\n## Why this pattern\n\n* ReAct style agents are easy to reason about. The notebook prints a human legible trace without leaking chain of thought.\n* LangGraph keeps control flow explicit and makes the transition function trivial to read and test.\n* Tool outputs are normalized to JSON so the model can parse consistent observations.\n\n## Extend and adapt\n\n* Add more tools and include them in `TOOLS` and `TOOLS_BY_NAME`.\n* Swap SerpAPI with another search backend that returns JSON.\n* Persist memory by replacing the default in memory behavior with a checkpointer.\n* Add validation or summarization nodes before the final answer if you need grounded outputs.\n\n## Requirements and notes\n\n* You need `OPENAI_API_KEY`. Live search requires `SERPAPI_API_KEY`.\n* Internet results change over time. Expect different snippets and answers on different days.\n* Mermaid rendering may require extra packages. The graph preview is optional.\n"
-        },
-        {
           "cell_index": 7,
           "cell_id": "lUIyjhSCn3wN",
           "cell_type": "code_comments",
           "comments": [
-            "# Option 1 (preferred): create a `.env` file in your project folder with:",
             "# OPENAI_API_KEY=your_openai_key_here",
             "# SERPAPI_API_KEY=your_serpapi_key_here",
-            "# Option 2: set it directly in the notebook with magic:",
             "# %env OPENAI_API_KEY=your_openai_key_here",
-            "# %env SERPAPI_API_KEY=your_serpapi_key_here",
-            "# Load from .env if available",
-            "# Fallback: ask if still missing"
+            "# %env SERPAPI_API_KEY=your_serpapi_key_here"
           ]
         },
         {
@@ -161,33 +137,21 @@
           "cell_id": "7fx-7jsznK_l",
           "cell_type": "code_comments",
           "comments": [
-            "    # add_messages is a reducer",
-            "    # See https://langchain-ai.github.io/langgraph/concepts/low_level/#reducers"
+            "    # `add_messages` 是一个 reducer（归约器）",
+            "    # 详见：https://langchain-ai.github.io/langgraph/concepts/low_level/#reducers"
           ]
         },
         {
-          "cell_index": 19,
-          "cell_id": "PHRXRXvXS17J",
-          "cell_type": "code_comments",
-          "comments": [
-            "        # AI proposes one or more tool calls",
-            "        # Final AI reply: a genuine AIMessage with no pending tool calls.",
-            "        # Anything else (the initial HumanMessage that values-mode emits first) is skipped."
-          ]
-        },
-        {
-          "cell_index": 23,
-          "cell_id": "ItqtXE88tdOk",
-          "cell_type": "code_comments",
-          "comments": [
-            "    # This requires some extra dependencies and is optional"
-          ]
+          "cell_index": 18,
+          "cell_id": "mVtE4r3bSy6l",
+          "cell_type": "markdown",
+          "source": "# ReAct-style trace（ReAct 风格执行轨迹）"
         },
         {
           "cell_index": 24,
           "cell_id": "wyyot7TITJqj",
           "cell_type": "markdown",
-          "source": "### NOTE: Sometimes Mermaid doesn't work online\n\n> Add blockquote\n\n\n\nIn that case you can do: `print(hier.get_graph().draw_ascii())`\nor: `print(hier.get_graph().draw_mermaid())`\n\nand then go to [Mermaid Live Editor](https://mermaid.live/edit#pako:eNp1kmFrgzAQhv9KuMFoQZ3a1bRp6Zf1J-zTliGpJiqkicS4rSv974ux2PXDEOLd8d77HJecodAlBwJhGFJVaCWailCFkJD6q6iZsT5DqOjNJydINoozQ5WXV4a1NXrdb6iiNs876-R5Pnvftrsp2z61u485IUQ0prOD8NCfuJn5cz7kHZfSFcafr7gxrNG-egvnI4SrckL4eAJINvpPaBSGO-Q5m4nrayNqc49CYYQe1aFrN6VWfIxQ5NRXzr9yqXX7R34DjhhPvPWNNm7Wbs8FKrlgvbRINFKSB5GKWIhg2HFY86aqLUmi9K7Bb9HLQ92yorEnEt8Jhi1c7Q7ikImCKgigMk0JRDDZ8QCO3BzZkMN5uFsKtuZHToG48DoQBaourq9l6k3rIxBretdpdF_Vk0_flszyfcPcO7hJ3LK4edG9skCS2FsAOcO3yxY4wqslXiySZJk9JzgL4AQkfY6jeJllGcZr963SSwA_HhpH2TJJsjRe4XWCFyleX34BzNfoqQ) to past this in to plot the Graph."
+          "source": "### 注意：有时 Mermaid 在线渲染不可用\n\n这种情况下可以运行：`print(hier.get_graph().draw_ascii())`\n或：`print(hier.get_graph().draw_mermaid())`\n然后前往 [Mermaid Live Editor](https://mermaid.live/edit#pako:eNp1kmFrgzAQhv9KuMFoQZ3a1bRp6Zf1J-zTliGpJiqkicS4rSv974ux2PXDEOLd8d77HJecodAlBwJhGFJVaCWailCFkJD6q6iZsT5DqOjNJydINoozQ5WXV4a1NXrdb6iiNs876-R5Pnvftrsp2z61u485IUQ0prOD8NCfuJn5cz7kHZfSFcafr7gxrNG-egvnI4SrckL4eAJINvpPaBSGO-Q5m4nrayNqc49CYYQe1aFrN6VWfIxQ5NRXzr9yqXX7R34DjhhPvPWNNm7Wbs8FKrlgvbRINFKSB5GKWIhg2HFY86aqLUmi9K7Bb9HLQ92yorEnEt8Jhi1c7Q7ikImCKgigMk0JRDDZ8QCO3BzZkMN5uFsKtuZHToG48DoQBaourq9l6k3rIxBretdpdF_Vk0_flszyfcPcO7hJ3LK4edG9skCS2FsAOcO3yxY4wqslXiySZJk9JzgL4AQkfY6jeJllGcZr963SSwA_HhpH2TJJsjRe4XWCFyleX34BzNfoqQ)，粘贴 Mermaid 源码以生成图结构。"
         }
       ]
     },
