@@ -1,0 +1,52 @@
+{
+  "notebook": "CH02/ch02_hierarchical_agent_teams.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "5uPL_nS_8Ka1": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH02/ch02_hierarchical_agent_teams.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>",
+    "Vcf3Y5Q43OHt": "# 关于这个 Notebook\n\n这个 Notebook 使用 **LangGraph** 和 **LangChain** 构建一个 hierarchical agent system（分层智能体系统）：它能够进行网页研究、抓取页面、搜索专利、运行代码，并让多个智能体协作撰写报告并持久化到磁盘。核心示范是：如何在一个 top-level supervisor（顶层监督者）之下组合多个 subgraph（子图），同时让工具、角色和状态保持显式。\n\n## 它展示了什么\n\n* **两个由 supervisor（监督者）协调的专业团队**\n\n  1. **Research team（研究团队）**：包含搜索、网页抓取、Exa 语义搜索和 Google Patents\n  2. **Document writing team（文档写作团队）**：包含大纲创建、文档读写、编辑，以及用于简单图表的 Python REPL\n* **Top-level orchestrator（顶层编排器）**：在两个团队之间路由任务并汇总结果\n* **工具组合**：Tavily、SerpAPI、Exa、WebBaseLoader 抓取和 Python REPL\n* **File persistence（文件持久化）**：把大纲和最终报告写入工作目录\n* **Streaming runs（流式运行）**：逐步打印执行更新，并为各团队及 supervisor graph（监督图）展示 Mermaid PNG 图预览\n\n## 你将运行什么\n\n1. 定义研究工具\n\n   * `tavily_tool`：获取搜索结果\n   * `scrape_webpages`：抓取并拼接网页内容\n   * `patent_search`：通过 SerpAPI Google Patents 搜索专利\n   * `exa_search_tool`：执行 neural search（神经搜索）并返回高亮片段\n2. 定义文档工具\n\n   * `create_outline`、`read_document`、`write_document`、`edit_document`：在沙箱化工作目录中操作\n   * `python_repl_tool`：进行快速计算，或生成并输出简单图表\n3. 使用 `create_react_agent` 构建 **worker nodes（工作节点）**，并创建通过 structured routing（结构化路由）选择下一位 worker 或结束流程的 **LLM supervisors**。\n4. 编译三个图\n\n   * `research_graph`：负责网页研究和专利检索\n   * `paper_writing_graph`：负责大纲和写作，可选生成图表\n   * `super_graph`：端到端编排两个团队\n5. 执行示例\n\n   * 让研究团队研究 AI agents 与专利\n   * 让写作团队把一首诗写入磁盘\n   * 运行完整任务，生成一篇约 800 词的半导体白皮书，包含专利链接与来源，并保存为 `semiconductor_whitepaper.txt`\n\n## 它如何工作\n\n* **Supervisors（监督者）**：小型 LLM router（路由器）通过结构化输出，从固定 worker 集合中选择下一位执行者，或返回 `FINISH`。\n* **Workers（工作智能体）**：绑定特定工具集和 Prompt 的 ReAct 风格智能体。每个 worker 返回一条简洁消息，再交还 supervisor。\n* **State（状态）**：使用 `MessagesState` 加一个简单的 `next` 字段。消息可以跨团队流动，让顶层 supervisor 协调任务。\n* **Routing（路由）**：通过 `Command(goto=..., update=...)` 在节点间移动，并同时把结果追加到状态。\n* **Persistence（持久化）**：文件工具在 `WORKING_DIRECTORY` 下读写；最终任务会把完整报告写入磁盘。\n\n## 为什么采用这种模式\n\n* 清晰的职责分离让行为更可预测、更易测试。\n* Supervisor 让控制流保持显式且可审计。\n* 每个 worker 的工具使用范围受限，可以减少 Prompt 膨胀并提高可靠性。\n* 顶层图可以组合多个团队，而不需要耦合它们的内部实现细节。\n\n## 如何扩展与调整\n\n* 在研究与写作之间增加 citation validator（引用验证器）。\n* 替换或增加搜索服务提供商。\n* 用 sandboxed executor（沙箱执行器）替换 Python REPL。\n* 使用 LangSmith 持久化 checkpoint（检查点）和 trace（轨迹），用于调试与评估。\n\n## 运行要求与说明\n\n* 必需密钥：`OPENAI_API_KEY`、`TAVILY_API_KEY`、`SERPAPI_API_KEY`、`EXA_API_KEY`。\n* 网页结果和专利列表会随时间变化，不同运行的输出可能不同。\n* 文件系统工具会写入工作目录。处理不可信内容时，请使用沙箱或 Docker 环境。\n* 流式输出会打印中间更新，便于追踪决策过程与工具调用。\n",
+    "7I3ty3fv0qU0": "# 依赖项",
+    "YjaPEd2n0r_D": "# API Key 配置",
+    "J6VrKUlVfkCH": "<div class=\"admonition tip\">\n    <p class=\"admonition-title\">为 LangGraph 开发配置 <a href=\"https://smith.langchain.com\">LangSmith</a></p>\n    <p style=\"padding-top: 5px;\">\n        注册 LangSmith 后，可以更快发现问题并改进 LangGraph 项目的性能。LangSmith 可利用 trace data（轨迹数据）来调试、测试和监控基于 LangGraph 构建的 LLM 应用；入门方式请参阅<a href=\"https://docs.smith.langchain.com\">官方文档</a>。\n    </p>\n</div>",
+    "9x5eWCOs06AK": "# 导入依赖",
+    "354568e2-aef0-4af9-8a79-e64d3eea752f": "# 创建工具\n\n每个团队都会由一个或多个智能体组成，每个智能体又可以拥有一个或多个工具。下面先统一定义各团队将使用的工具。\n\n我们从研究团队开始。\n\n**ResearchTeam 工具**\n\n研究团队可以使用搜索引擎和 URL scraper（网页抓取器）在互联网上查找信息。你也可以在下面增加更多能力，以提升团队表现。",
+    "504ee1c6-2b6a-439d-9046-df54e1e15698": "# 辅助工具函数（Helper Utilities）\n\n接下来创建几个辅助函数，让下面这些操作写起来更简洁：\n\n1. 创建 worker agent（工作智能体）。\n2. 为子图创建 supervisor（监督者）。\n\n这样可以减少后面图组合代码的样板内容，更容易看清整个流程到底是怎样连接起来的。"
+  },
+  "code_comment_replacements": {
+    "7L1Gp9opxkjm": [
+      {
+        "old": "# Option 1 (preferred): create a `.env` file in your project folder with:",
+        "new": "# 方案 1（推荐）：在项目目录中创建 `.env` 文件，并写入："
+      },
+      {
+        "old": "# Option 2: set directly in the notebook with magic:",
+        "new": "# 方案 2：直接通过 Notebook magic 命令设置："
+      },
+      {
+        "old": "# Load from .env if available",
+        "new": "# 如果存在 `.env`，则从中加载。"
+      },
+      {
+        "old": "# Fallback: ask if still missing",
+        "new": "# Fallback（回退方案）：如果仍缺少密钥，则交互式询问。"
+      }
+    ],
+    "4024eb89-843d-4cc3-ab3f-e1eb4d031179": [
+      {
+        "old": "# Stdlib",
+        "new": "# Python 标准库（stdlib）"
+      },
+      {
+        "old": "# Third party",
+        "new": "# 第三方依赖（third party）"
+      }
+    ]
+  }
+}
