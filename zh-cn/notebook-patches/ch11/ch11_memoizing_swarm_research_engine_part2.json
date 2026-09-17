@@ -1,0 +1,47 @@
+{
+  "notebook": "ch11/ch11_memoizing_swarm_research_engine.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "uv9mcGj3373_": "## 需要牢记的 caching trade-offs（缓存权衡）\n\nTiered caching（分层缓存）在纸面上看起来像是纯收益，但它的成本会在高负载和长时间运行中逐渐显现。上线这类系统前，需要真正理解下面这些问题：\n\n1. **Similarity threshold（相似度阈值）本质上是 precision / recall（精确率 / 召回率）旋钮。** 低于约 0.85 时，planner 可能拿到针对*不同事实集合*生成的缓存决策；高于约 0.95 时，又会错过合理的同义改写，缓存逐渐失去收益。下面的阈值扫描会把这个权衡具体展示出来。\n\n2. **Linear scan（线性扫描）在这里可以接受，但不适合生产环境。** `TieredCache.lookup` 每次比较都会执行 `for entry in self._entries`。缓存条目超过约 10K 后，这部分会开始主导延迟；规模扩大时应换成 FAISS / hnswlib / pgvector。\n\n3. **缓存决策没有 TTL（Time To Live，生存时间）。** 缓存中的 `DONE` 默认世界没有发生变化，但 sentiment（情绪）、pricing（价格）和 supply-chain（供应链）事实都会过期。真实系统通常会按事实来源设置 TTL，或者在相关事实发生写入时主动使缓存失效。\n\n4. **Cache poisoning（缓存污染）不仅是语义问题，也是结构问题。** 幻觉出来的工具名，或缺失必需 kwarg 的调用，仍可能被解析成合法 JSON、写入缓存，并在所有相似上下文中被立即重放，因此一次错误 LLM 输出会被不断放大。解决办法是让 `_validate_planner_decision()` 守住每一次 `cache.store()`。瞬时错误的 fallback（例如 timeout → 合成 `DONE`）同样不能进入缓存，否则等于教会缓存以后永远提前放弃。\n\n5. **Embeddings（嵌入）不是免费，只是便宜。** `text-embedding-3-small` 约为 $0.02 / 1M tokens，因此一次 lookup 约 $2e-5。单次看几乎可以忽略，但到百万请求规模就会显现。只有当 `hit_rate × avoided_LLM_cost > embedding_cost` 时，缓存才真正有经济收益。\n\n6. **Cross-tenant leakage（跨租户泄漏）。** 当前 key 是 `(task, facts)`。如果多个用户共享同一个 cache，一个用户的事实可能通过 semantic hit（语义命中）影响另一个用户的计划。生产环境应按 tenant（租户）分片。\n\n7. **Cache key（缓存键）必须覆盖 planner 的完整 conditioning context（条件上下文）。** LLM 实际看到的是 `(task, facts, tools_available, stale_tools)`。如果只按 `(task, facts)` 建 key，那么一个在 stale-tool 压力下生成的缓存 `DONE`，可能被一个完全没有 stale tools 的新 Agent 重放，从而绕过你专门设计的 anti-looping（防循环）信号。正确做法是把 LLM 能看到的全部上下文封装进 `PlannerContext` 并用于构建 key；即使在 semantic tier（语义层）中，`stale_tools` 和 `tools_available` 也必须精确匹配，因为仅靠 facts 的 cosine similarity（余弦相似度）无法证明约束集合等价。"
+  },
+  "code_comment_replacements": {
+    "zw_7k1mz374A": [
+      {
+        "old": "# Run the swarm and visualize the cache win.",
+        "new": "# 运行 swarm（群体系统），并把缓存带来的收益可视化。"
+      },
+      {
+        "old": "# This makes live LLM + Tavily calls — make sure your .env keys are set.",
+        "new": "# 这里会实际调用 LLM + Tavily——运行前请确认 .env 中的密钥已经配置。"
+      },
+      {
+        "old": "# ---------- Plots ----------",
+        "new": "# ---------- 图表 ----------"
+      },
+      {
+        "old": "# 1. Per-agent decision breakdown (stacked bar) — shows the cache warming up.",
+        "new": "# 1. 按 Agent 拆解决策构成（stacked bar，堆叠柱状图）——观察 cache warming（缓存预热）过程。"
+      },
+      {
+        "old": "# 2. Cumulative LLM calls vs cumulative steps — the savings curve.",
+        "new": "# 2. 累计 LLM 调用次数 vs 累计步骤数——展示缓存带来的节省曲线。"
+      },
+      {
+        "old": "# 3. Honest metrics — useful work vs looping.",
+        "new": "# 3. Honest metrics（真实效率指标）——区分有效工作与循环空转。"
+      },
+      {
+        "old": "# 4. Cache tier composition — where do the hits actually come from?",
+        "new": "# 4. Cache tier（缓存层级）构成——命中实际来自哪个层级？"
+      }
+    ]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "notebook": "ch06/ch06_A2A_MCP_Governed.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "voTX30GvWXzi": "# 关于本 Notebook：对工具执行进行沙箱隔离（Sandboxing Tool Execution）\n\n你将构建一个受治理的 **Agent-to-Agent（A2A，智能体到智能体）** 层，它位于 LLM 智能体与 **Model Context Protocol（MCP，模型上下文协议）** Server 之间。在这种架构中，智能体永远不会直接调用 MCP；它实际上与外部世界形成了类似“空气隔离（air-gapped）”的边界。智能体只会发出结构化的 **ToolRequest** 对象——也就是对执行意图的声明，而这些意图必须先通过独立的强制执行层。\n\nA2A governor（治理器）充当确定性的防火墙。它执行一套严格的多阶段策略，包括显式 allowlist（允许列表）、资源预算、逻辑隔离规则和严格的参数门禁。当治理器遇到受限制动作时，会通过 **LangGraph interrupt（中断）** 暂停执行、记录当前状态，并等待外部审批信号后再恢复。每一个决定——无论允许、拒绝还是暂停——都会以标准化 A2A event（事件）进行流式发送，并记录为机器可读的 JSON artifact（制品）。\n\n**重要限制（Notebook 演示）**：本 Notebook 可选地通过控制台输入模拟 **Human-in-the-loop（HITL，人在回路）** 审批。在生产环境中，这种同步阻塞应替换为异步的带外审批系统，例如 Slack、工单系统或专用 Governance UI，由外部系统向 graph state 发送 `resume` 命令。\n\n### 生产环境中的常见陷阱与架构细节\n\n* **工具分类（Tool categories）：** 不要只依赖简单的字符串匹配。生产环境应使用由 tool discovery 动态填充的 registry（注册表），避免“Execution”工具仅凭命名技巧伪装成“Discovery”工具。\n* **审批流程（Approval flow）：** 要确保 interrupt 真正可持久化。生产级系统必须能由外部信号（webhook/UI）恢复，以承受较长的人类审批延迟而不超时。\n* **隔离范围（Separation scope）：** 本 Notebook 按单次运行强制 connection 与 execution 步骤互斥。对于多轮任务，应把这些“contamination flags（污染标记）”持久化到 state store，以持续维护风险边界。\n* **LLM 提案（LLM proposals）：** 治理要从请求形成之前开始。在 reasoning 阶段就根据策略校验候选工具名，避免智能体甚至尝试构造被禁止的请求。\n* **能力配额（Capability quotas）：** 在 category 层级实施配额，防止 **Alias Evasion（别名规避）**——即智能体通过轮换多个具有相同高风险结果的工具，绕过单工具配额。\n* **制品过滤（Artifact filtering）：** 集中管理 artifact 生成，并在统一 wrapper 中限定允许的 artifact 类型，防止内部推理或敏感 metadata “静默泄漏”到日志中。\n* **会话生命周期（Session lifecycle）：** MCP session 应绑定到单个任务生命周期。连接与断开都发生在同一任务范围内，可以避免孤儿 socket 与 async cancel-scope 问题。\n\n### 六种强制执行机制\n\n1. **Tool Allowlist（工具允许列表，The Gate）：** 使用显式、基于 pattern 的策略，只把经过审核且可达的工具暴露给 agentic reasoning 层。\n2. **Budget Limits（预算限制，The Wallet）：** 对单任务总工具调用次数、最大并行执行数和总 wall-clock runtime 设置硬限制，防止失控循环和成本激增。\n3. **Argument Gates（参数门禁，The Inspector）：** 在执行前检查工具参数，拦截“范围过宽的动作”（例如删除 `*`）或规模过大的搜索请求。\n4. **Connection Separation（连接隔离，The Protocol）：** 一条有状态的互斥规则；智能体不能在同一个 execution turn 中同时进行 discovery/connection 与 privileged execution。\n5. **Approval Workflows（审批工作流，The Judge）：** 对标记为“Restricted”的工具原生触发 HITL，强制先保存状态并中断，直到人类授权。\n6. **Structured Artifacts（结构化制品，The Scribe）：** 为每次工具调用自动生成机器可读的决策日志，形成不可变的审计轨迹，服务合规和事后分析。\n\n**注意：** 本 Notebook 展示的是 execution boundary（执行边界）上的治理，而不是服务间的密码学信任；identity（身份）、attestation（证明）与 remote isolation（远程隔离）属于互补能力。",
+    "R13eoQiNrI80": "# 这里要构建什么\n\n本 Notebook 展示如何通过治理边界对**工具执行进行沙箱隔离（sandboxing tool execution）**：\n\n1. **ToolRequest/ToolResult Schema**：LangGraph 只发出结构化请求，从不直接调用 MCP\n2. **`governed_call()`**：所有 MCP 访问的单一强制执行点\n3. **Tool Categorization（工具分类）**：使用 discovery、connection、execution、other 等显式类别执行隔离规则\n4. **三类聚焦策略（Three Focused Policies）**：\n   - Discovery Only：阻止 execution 工具\n   - Restricted SerpApi：SerpApi execution 必须审批\n   - Budget Limited：最多 3 次调用，用于测试预算耗尽\n5. **Budget Tracker（预算跟踪器）**：限制调用次数、并行度、运行时间和隔离约束\n6. **Argument Validation（参数校验）**：为 Exa/SerpApi 查询设置长度和结果数门禁\n7. **Approval Workflow（审批工作流）**：与 A2A event 集成，包括 status 与 artifact\n8. **Structured Artifacts（结构化制品）**：只允许 `policy_decision`、`tool_call_log`、`approval_request`、`approval_log`、`budget_stats`、`result_summary` 等指定类型\n9. **Audit Report Generator（审计报告生成器）**：根据 A2A artifacts 生成机器可读报告，并提炼强制执行洞察\n\n### 架构收益（Architecture Benefits）\n\n- **No Direct MCP Access（禁止直接访问 MCP）**：模型无法绕过 governor\n- **On-Demand MCP Connection（按需连接 MCP）**：只有工具调用获准后才打开 MCP session\n- **Single Enforcement Point（单一强制执行点）**：所有决策集中在 `governed_call()`\n- **Machine-Readable Audit（机器可读审计）**：每次决策都记录为 JSON artifact\n- **Category-Based Separation（基于类别的隔离）**：registry 由 discovery 填充，并采用安全默认值\n- **Fail Closed（故障关闭）**：未知工具默认拒绝\n- **Defense in Depth（纵深防御）**：policy + budget + validation + approval + artifact filtering\n\n### 威胁模型（Threat Model）\n\n工具调用属于 privileged execution（特权执行），而 MCP 会显著提高 capability density（能力密度）。即使是正常规划，也可能出现失败：\n- **Runaway loops（失控循环）**：预算限制阻止无限工具调用\n- **Repeated calls（重复调用）**：单工具限制阻止过度使用\n- **Broad actions（范围过宽的动作）**：参数门禁阻止批量操作\n- **Capability escalation（能力升级）**：策略限定可触达能力面\n- **Separation violations（隔离违规）**：connection/execution 状态会被跟踪并强制执行\n\n### 演示结果（Demo Results）\n\n1. **Discovery Only**：普通网页搜索 ✅（允许 Exa web search）\n2. **Code Search Blocked**：StackOverflow/code 查询 ❌（阻止 Exa code search）\n3. **Budget Exhaustion**：Agent 循环调用 Exa web search ❌（3 次后阻止）\n4. **Separation Rule**：先 connection 再 execution ❌（违反隔离规则）\n5. **HITL Approval**：通过 interrupt 审批 code search ✅\n6. **Audit Report**：从全部 A2A artifacts 生成综合机器可读报告\n\n### 核心洞察（Key Insights）\n\n- **Structured sandboxing（结构化沙箱）**优于只靠 Prompt engineering\n- **Explicit categories（显式分类）**优于 substring matching\n- **Argument gates（参数门禁）**可以在请求阶段阻止失控行为\n- **A2A events** 提供实时可审计性\n- **ToolRequest objects** 防止意外绕过治理层\n- **`governed_call()`** 确保每个决定都被记录\n- **Audit reports** 支持合规与调试\n\n### 审计报告（Audit Reporting）\n\n`AuditReportGenerator` 会收集 A2A artifacts，并生成综合报告，内容包括：\n- **Summary statistics（汇总统计）**：允许/拒绝请求数量、成功率\n- **Budget usage（预算使用）**：总调用数、耗时、按工具拆分、隔离状态\n- **Executed tool calls（已执行工具调用）**：含时间戳、参数、输出的详细日志\n- **Policy decisions（策略决策）**：每次 allow/deny 决策、原因及预算快照\n- **Approval workflow（审批工作流）**：全部审批请求和审批结果\n- **Enforcement insights（强制执行洞察）**：拒绝原因分布与行为模式\n- **Recommendations（建议）**：基于执行模式给出的可操作建议\n\n这可以为合规、调试和策略优化提供**机器可读审计轨迹（machine-readable audit trails）**。\n\n### 生产环境扩展（Production Extensions）\n\n- 接入真实审批系统（Slack、邮件、工单）\n- 增加策略版本控制和回滚\n- 实现 per-user / per-tenant 策略\n- 建立策略测试框架\n- 增加实时监控与告警\n- 将审计报告导出到合规系统（SOC2、GDPR）\n- 构建策略分析 dashboard\n- 扩展到 multi-agent coordination（多智能体协同）\n\n本 Notebook 证明：面对 MCP 规模的工具生态，**通过结构化强制执行实现治理（governance via structured enforcement）**既具有可操作性，也是必要的。",
+    "LyNPlexnWXzj": "## 安装（Installation）",
+    "DdbjrwMlWXzk": "## API Key 配置（API Keys Setup）",
+    "jNn_Pl4mWXzk": "## 核心依赖导入（Core Imports）",
+    "hcgnH8M-WXzk": "# 工具请求与结果 Schema（Tool Request and Result Schemas）\n\n定义类型化 schema，让 LangGraph 生成工具请求并接收治理执行后的结果。"
+  },
+  "code_comment_replacements": {
+    "gVDpIEhxWXzk": [
+      {
+        "old": "# A2A imports",
+        "new": "# A2A 相关导入"
+      },
+      {
+        "old": "# MCP imports",
+        "new": "# MCP 相关导入"
+      },
+      {
+        "old": "# LangChain imports",
+        "new": "# LangChain 相关导入"
+      },
+      {
+        "old": "# Exa imports",
+        "new": "# Exa 相关导入"
+      },
+      {
+        "old": "# LangGraph imports",
+        "new": "# LangGraph 相关导入"
+      },
+      {
+        "old": "# Apply nest_asyncio for Jupyter compatibility",
+        "new": "# 应用 nest_asyncio 以兼容 Jupyter 运行环境"
+      }
+    ],
+    "nWnDkUlLWXzl": [
+      {
+        "old": "Structured tool request from LangGraph agent.",
+        "new": "来自 LangGraph 智能体的结构化工具请求。"
+      },
+      {
+        "old": "Structured result from governed execution.",
+        "new": "治理执行返回的结构化结果。"
+      }
+    ]
+  }
+}

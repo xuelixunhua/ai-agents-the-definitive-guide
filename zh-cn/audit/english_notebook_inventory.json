@@ -1,0 +1,1274 @@
+{
+  "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
+  "notebook_count_scanned": 35,
+  "notebooks_with_candidates": 28,
+  "candidate_entry_count": 116,
+  "notebooks": [
+    {
+      "notebook": "CH01/ch01_code_examples.ipynb",
+      "entries": [
+        {
+          "cell_index": 8,
+          "cell_id": "tMGB6TAqAVwv",
+          "cell_type": "code_comments",
+          "comments": [
+            "# OPENAI_API_KEY=your_openai_key_here",
+            "# SERPAPI_API_KEY=your_serpapi_key_here",
+            "# %env OPENAI_API_KEY=your_openai_key_here",
+            "# %env SERPAPI_API_KEY=your_serpapi_key_here"
+          ]
+        },
+        {
+          "cell_index": 37,
+          "cell_id": "BT_XdkdXKxLn",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # stream_mode=\"updates\" 会暴露节点级更新",
+            "    # 从 app.get_state 中展示最终 assistant 消息"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "CH02/ch02_CoT.ipynb",
+      "entries": [
+        {
+          "cell_index": 8,
+          "cell_id": "tMGB6TAqAVwv",
+          "cell_type": "code_comments",
+          "comments": [
+            "# OPENAI_API_KEY=your_openai_key_here",
+            "# %env OPENAI_API_KEY=your_openai_key_here"
+          ]
+        },
+        {
+          "cell_index": 15,
+          "cell_id": "ww67PFKWlM3a",
+          "cell_type": "markdown",
+          "source": "# CoT（Chain of Thought，思维链）风格的 system prompt"
+        }
+      ]
+    },
+    {
+      "notebook": "CH02/ch02_HITL.ipynb",
+      "entries": [
+        {
+          "cell_index": 3,
+          "cell_id": "jVb7DLioAGyC",
+          "cell_type": "code_comments",
+          "comments": [
+            "# --- Provider 与 API Key 配置 ---",
+            "# LLM_PROVIDER=openai",
+            "# OPENAI_API_KEY=your_openai_key_here",
+            "# OPENAI_MODEL=gpt-4o-mini",
+            "# LLM_PROVIDER=openrouter",
+            "# OPENROUTER_API_KEY=your_openrouter_key_here",
+            "# OPENROUTER_MODEL=openai/gpt-4o-mini"
+          ]
+        },
+        {
+          "cell_index": 6,
+          "cell_id": "0zg6Xfk_RSJk",
+          "cell_type": "markdown",
+          "source": "# LLM 配置（通过 provider switch 在 OpenAI 与 OpenRouter 之间切换）"
+        }
+      ]
+    },
+    {
+      "notebook": "CH02/ch02_ToT.ipynb",
+      "entries": [
+        {
+          "cell_index": 5,
+          "cell_id": "tMGB6TAqAVwv",
+          "cell_type": "code_comments",
+          "comments": [
+            "# OPENAI_API_KEY=your_openai_key_here",
+            "# SERPAPI_API_KEY=your_serpapi_key_here",
+            "# %env OPENAI_API_KEY=your_openai_key_here",
+            "# %env SERPAPI_API_KEY=your_serpapi_key_here"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "CH02/ch02_hierarchical_agent_teams.ipynb",
+      "entries": [
+        {
+          "cell_index": 5,
+          "cell_id": "7L1Gp9opxkjm",
+          "cell_type": "code_comments",
+          "comments": [
+            "# OPENAI_API_KEY=your_openai_key_here",
+            "# TAVILY_API_KEY=your_tavily_key_here",
+            "# SERPAPI_API_KEY=your_serpapi_key_here",
+            "# EXA_API_KEY=your_exa_key_here",
+            "# %env OPENAI_API_KEY=your_openai_key_here",
+            "# %env TAVILY_API_KEY=your_tavily_key_here",
+            "# %env SERPAPI_API_KEY=your_serpapi_key_here",
+            "# %env EXA_API_KEY=your_exa_key_here"
+          ]
+        },
+        {
+          "cell_index": 11,
+          "cell_id": "f20a18ca-2709-4c12-84f3-88678591a9fa",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 从 LangChain 加载 Tavily Search Wrapper"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "CH02/ch02_react.ipynb",
+      "entries": [
+        {
+          "cell_index": 7,
+          "cell_id": "lUIyjhSCn3wN",
+          "cell_type": "code_comments",
+          "comments": [
+            "# OPENAI_API_KEY=your_openai_key_here",
+            "# SERPAPI_API_KEY=your_serpapi_key_here",
+            "# %env OPENAI_API_KEY=your_openai_key_here",
+            "# %env SERPAPI_API_KEY=your_serpapi_key_here"
+          ]
+        },
+        {
+          "cell_index": 9,
+          "cell_id": "7fx-7jsznK_l",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # `add_messages` 是一个 reducer（归约器）",
+            "    # 详见：https://langchain-ai.github.io/langgraph/concepts/low_level/#reducers"
+          ]
+        },
+        {
+          "cell_index": 18,
+          "cell_id": "mVtE4r3bSy6l",
+          "cell_type": "markdown",
+          "source": "# ReAct-style trace（ReAct 风格执行轨迹）"
+        },
+        {
+          "cell_index": 24,
+          "cell_id": "wyyot7TITJqj",
+          "cell_type": "markdown",
+          "source": "### 注意：有时 Mermaid 在线渲染不可用\n\n这种情况下可以运行：`print(hier.get_graph().draw_ascii())`\n或：`print(hier.get_graph().draw_mermaid())`\n然后前往 [Mermaid Live Editor](https://mermaid.live/edit#pako:eNp1kmFrgzAQhv9KuMFoQZ3a1bRp6Zf1J-zTliGpJiqkicS4rSv974ux2PXDEOLd8d77HJecodAlBwJhGFJVaCWailCFkJD6q6iZsT5DqOjNJydINoozQ5WXV4a1NXrdb6iiNs876-R5Pnvftrsp2z61u485IUQ0prOD8NCfuJn5cz7kHZfSFcafr7gxrNG-egvnI4SrckL4eAJINvpPaBSGO-Q5m4nrayNqc49CYYQe1aFrN6VWfIxQ5NRXzr9yqXX7R34DjhhPvPWNNm7Wbs8FKrlgvbRINFKSB5GKWIhg2HFY86aqLUmi9K7Bb9HLQ92yorEnEt8Jhi1c7Q7ikImCKgigMk0JRDDZ8QCO3BzZkMN5uFsKtuZHToG48DoQBaourq9l6k3rIxBretdpdF_Vk0_flszyfcPcO7hJ3LK4edG9skCS2FsAOcO3yxY4wqslXiySZJk9JzgL4AQkfY6jeJllGcZr963SSwA_HhpH2TJJsjRe4XWCFyleX34BzNfoqQ)，粘贴 Mermaid 源码以生成图结构。"
+        }
+      ]
+    },
+    {
+      "notebook": "CH02/ch02_swarms.ipynb",
+      "entries": [
+        {
+          "cell_index": 1,
+          "cell_id": "PVMVZqCyNbx3",
+          "cell_type": "markdown",
+          "source": "# About this Notebook\n\nThis notebook shows how to build and compile a **multi-agent swarm** using the `create_swarm` from [LangGraph Multi-Agent Swarm library](https://github.com/langchain-ai/langgraph-swarm-py). A swarm is a simple orchestration construct that allows multiple agents to collaborate, with one agent active by default and the others available to take over as needed.\n\n## What it shows\n\n* **Agent collaboration**: defines a swarm with two agents (`research_assistant` and `writer_assistant`).\n* **Default active agent**: sets the `research_assistant` as the one that starts the conversation.\n* **Compilation step**: calling `.compile()` finalizes the swarm into an executable app/graph that can process inputs and route them between agents.\n\n## How it works\n\n1. **Define agents**: elsewhere in the code, `research_assistant` and `writer_assistant` are each defined as tool-enabled agents with their own prompts or roles.\n2. **Swarm creation**: `create_swarm()` takes these agent objects and constructs a collaborative structure.\n3. **Default activation**: `default_active_agent=\"research_assistant\"` ensures that research is initiated first, and only when needed does control move to the `writer_assistant`.\n4. **Compilation**: `.compile()` returns a runnable object (often a LangGraph app) that manages state, routing, and message passing across agents.\n\n## Why this pattern\n\n* Keeps roles **modular**: each agent has its own tools and responsibilities.\n* Provides **coordination**: the swarm acts as a supervisor that manages turn-taking.\n* Easy to **extend**: more agents (editors, reviewers, validators) can be added without changing the orchestration logic.\n\n## Extend and adapt\n\n* Add a **validator agent** to check factual accuracy before the writer finalizes.\n* Change the **default active agent** if you want drafting to begin before research.\n* Add **routing rules** or scoring functions to decide which agent to hand off to.\n* Persist swarm state with a checkpointer so multi-turn tasks can span sessions.\n\n## Requirements and notes\n\n* Requires `langgraph_swarm` or equivalent utilities installed.\n* The agents passed to `create_swarm` must already be defined and tool-bound.\n* Swarm behavior depends on how the agents are prompted—clear role definitions improve collaboration."
+        },
+        {
+          "cell_index": 4,
+          "cell_id": "2yTNkp-F8KZx",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Option 1 (preferred): create a `.env` file in your project folder with:",
+            "# OPENAI_API_KEY=your_openai_key_here",
+            "# TAVILY_API_KEY=your_tavily_key_here",
+            "# Option 2: set it directly in the notebook with magic:",
+            "# %env OPENAI_API_KEY=your_openai_key_here",
+            "# %env TAVILY_API_KEY=your_tavily_key_here",
+            "# Load from .env if available",
+            "# Fallback: ask if still missing"
+          ]
+        },
+        {
+          "cell_index": 8,
+          "cell_id": "fxF0enRdMXdZ",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Tavily web search"
+          ]
+        },
+        {
+          "cell_index": 12,
+          "cell_id": "TE1J2uBbMwdJ",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Uses OpenAI through LangChain. Set OPENAI_API_KEY in your environment."
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "CH03/ch03_ART_RULER.ipynb",
+      "entries": [
+        {
+          "cell_index": 2,
+          "cell_id": "QBijDl7iIX6F",
+          "cell_type": "code_comments",
+          "comments": [
+            "# (https://github.com/unslothai/notebooks)"
+          ]
+        },
+        {
+          "cell_index": 7,
+          "cell_id": "M4KuGZzlK9Pg",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 重新干净安装 Pillow，用于解决 'cannot import name _Ink' 问题"
+          ]
+        },
+        {
+          "cell_index": 24,
+          "cell_id": "xgvnChBZa-yf",
+          "cell_type": "markdown",
+          "source": "# 基于 Fraction 的精确搜索工具（Exact Search Tool）"
+        },
+        {
+          "cell_index": 31,
+          "cell_id": "kGFExOgQja74",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # 融合：final = gate * (alpha + beta * ruler_norm)"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "CH05/ch05_mcp_langgraph.ipynb",
+      "entries": [
+        {
+          "cell_index": 2,
+          "cell_id": "aRNGIGu1qZQR",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Install required packages"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "CH05/ch05_pydantic_agent_consistency.ipynb",
+      "entries": [
+        {
+          "cell_index": 14,
+          "cell_id": "gxovexDRfu1q",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 运行模式：\"strict\"、\"moderate\" 或 \"lenient\""
+          ]
+        },
+        {
+          "cell_index": 16,
+          "cell_id": "E7YqKqVRf9MY",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 返回：(ImagePrompt, GeneratedImageToolResult, GeneratedImageRecord)"
+          ]
+        },
+        {
+          "cell_index": 18,
+          "cell_id": "F91LvgHhgI37",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # 例如 required_keywords、forbid_markdown、require_style_tag",
+            "        # \"style_tags\": sorted([str(x).lower() for x in prompt_cfg.get(\"style_tags\", [])]),"
+          ]
+        },
+        {
+          "cell_index": 22,
+          "cell_id": "tSZj1kyPJvfi",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 从 thread_id 设置 run_id，把数据库记录关联到 LangGraph checkpoint 状态"
+          ]
+        },
+        {
+          "cell_index": 24,
+          "cell_id": "e6CeOkZ5guQI",
+          "cell_type": "markdown",
+          "source": "# Instructor：在生成源头恢复（Recovery at the Source）"
+        },
+        {
+          "cell_index": 26,
+          "cell_id": "diKdffWL79PZ",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 创建 Instructor Client；底层使用兼容 OpenRouter 的 OpenAI Client",
+            "# Instructor 通过 patch 提供商的 create() 方法工作",
+            "# 架构：Pydantic Model → Provider Handler → Dispatcher → Provider Client → Retry Layer → Instructor（patched）",
+            "# 创建面向 OpenRouter 配置的 OpenAI Client",
+            "    # patch 后的 Client 支持 response_model 与 max_retries",
+            "    # 流程：create() → retry layer → process_response → validation → 必要时重新提问",
+            "    # 验证失败时，Instructor 的 handle_reask_kwargs() 会追加错误反馈",
+            "    # Instructor 直接返回解析后的 Pydantic 模型，并附带 _raw_response"
+          ]
+        },
+        {
+          "cell_index": 28,
+          "cell_id": "oPCW6E4L79PZ",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 简化后的 State：不再需要 retry_count、last_error 或 prompt_ok"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch06/ch06_A2A_MCP_Governed.ipynb",
+      "entries": [
+        {
+          "cell_index": 17,
+          "cell_id": "wf3PKRXfWXzm",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 审批由 check_approval_node 中的 LangGraph interrupt 处理。"
+          ]
+        },
+        {
+          "cell_index": 25,
+          "cell_id": "mGG7QrC4WXzn",
+          "cell_type": "code_comments",
+          "comments": [
+            "            # Emit final result (clean allowed vs denied)",
+            "            # Emit final budget stats"
+          ]
+        },
+        {
+          "cell_index": 26,
+          "cell_id": "eQon-2hQWXzn",
+          "cell_type": "markdown",
+          "source": "# 实用函数（Utility Functions）\n\n为 A2A Server 与 Client 提供辅助函数。"
+        },
+        {
+          "cell_index": 34,
+          "cell_id": "i3OXeIS4WXzn",
+          "cell_type": "markdown",
+          "source": "# 演示 5：HITL 代码搜索审批（HITL Code Search Approval）\n\n通过 LangGraph interrupt（中断）触发 Human-in-the-loop（HITL，人在回路）审批，然后在获批后恢复执行。"
+        },
+        {
+          "cell_index": 38,
+          "cell_id": "-dq8Ex11WXzn",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Example: Simulate collecting artifacts from an A2A task"
+          ]
+        },
+        {
+          "cell_index": 40,
+          "cell_id": "Rz-l8QqnWXzr",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # Modified A2A executor that collects artifacts for reporting",
+            "                # Create LangGraph agent",
+            "                # Run agent with checkpointing",
+            "                # Collect budget stats for report",
+            "                # Collect tool results for report",
+            "                # Emit final result (clean allowed vs denied)",
+            "    # Create reporter and run demo",
+            "        # Generate and display report"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch06/ch06_MCP_server_composio.ipynb",
+      "entries": [
+        {
+          "cell_index": 7,
+          "cell_id": "YTi7UZn7UvzT",
+          "cell_type": "markdown",
+          "source": "<font color=\"red\" size=\"5\">\n<b>运行本 Notebook 前请注意</b>\n</font>\n<br>\n\n你需要一个 `OPENROUTER_API_KEY`（[在此获取](https://openrouter.ai/)），以及来自 [Composio](https://platform.composio.dev/) 的 `COMPOSIO_API_KEY`。"
+        },
+        {
+          "cell_index": 14,
+          "cell_id": "ODbYsXkXvLmu",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 1. 在 https://platform.composio.dev/ 创建 API key",
+            "    # 本 Notebook 使用 Composio quick start 中直接调用 tools.get(...) 的方式"
+          ]
+        },
+        {
+          "cell_index": 16,
+          "cell_id": "DvSvNrWV8psC",
+          "cell_type": "code_comments",
+          "comments": [
+            "        # 某些 provider 使用 Responses API 形态：{type, name, description, parameters}"
+          ]
+        },
+        {
+          "cell_index": 17,
+          "cell_id": "WA0ZAWGo5Z-m",
+          "cell_type": "code_comments",
+          "comments": [
+            "# @title OpenRouter + Composio：完整工作流示例",
+            "    # Composio 可能返回 provider 特定的工具结构；OpenRouter 的 Chat",
+            "    # Completions endpoint 要求严格的 {type: function, function: ...} 结构。"
+          ]
+        },
+        {
+          "cell_index": 22,
+          "cell_id": "8hvZW4pNSouC",
+          "cell_type": "markdown",
+          "source": "### 更多资源（Additional Resources）\n\n- **ART Documentation**: https://art.openpipe.ai\n- **RULER Guide**: https://art.openpipe.ai/fundamentals/ruler\n- **Composio SDK**: https://github.com/composiohq/composio\n- **Composio Docs**: https://docs.composio.dev/\n"
+        }
+      ]
+    },
+    {
+      "notebook": "ch06/ch06_langgraph_E2B.ipynb",
+      "entries": [
+        {
+          "cell_index": 1,
+          "cell_id": "BRhNFrHhEOsT",
+          "cell_type": "markdown",
+          "source": "# 安装依赖（Install Dependencies）\n\n这里安装 LangGraph + LangChain、E2B Code Interpreter SDK，以及网页研究工具 Tavily；Exa / SerpAPI 为可选项。"
+        },
+        {
+          "cell_index": 2,
+          "cell_id": "Fmv6P25tEOsU",
+          "cell_type": "code_comments",
+          "comments": [
+            "# %pip install -q exa-py google-search-results"
+          ]
+        },
+        {
+          "cell_index": 3,
+          "cell_id": "hF-LLJPBEOsU",
+          "cell_type": "markdown",
+          "source": "# 配置 API Key（Define API Keys）\n\n配置 OpenAI、E2B，以及至少一个网页研究服务商（Tavily / Exa / SerpAPI）的 API Key。"
+        },
+        {
+          "cell_index": 6,
+          "cell_id": "tJklMTNOEOsV",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 注意：E2B SDK 要求使用 Sandbox.create()"
+          ]
+        },
+        {
+          "cell_index": 11,
+          "cell_id": "Cgil4QSNIuun",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # print(\"\\n[Artifact published by Coder A]\")",
+            "    # print(\"artifact_id:\", artifact_id)",
+            "    # print(\"payload keys:\", list(payload.keys()))",
+            "# LangGraph：coder A -> coder B，并采用 deterministic stop（确定性停止）"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch06/ch06_programmatic_tool_calling_monty.ipynb",
+      "entries": [
+        {
+          "cell_index": 5,
+          "cell_id": "31f660b4",
+          "cell_type": "code_comments",
+          "comments": [
+            "# OpenRouter 与 OpenAI API 兼容：使用同一个 SDK，只是 base_url 不同。"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch07/ch07_hardening_backbone.ipynb",
+      "entries": [
+        {
+          "cell_index": 7,
+          "cell_id": "y7_vPxoEuSVi",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 工具定义（OpenAI function-calling schema）"
+          ]
+        },
+        {
+          "cell_index": 11,
+          "cell_id": "MJDw7z8suSVi",
+          "cell_type": "code_comments",
+          "comments": [
+            "            # tool_calls、repro_steps 等"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch07/ch07_inference_backends.ipynb",
+      "entries": [
+        {
+          "cell_index": 2,
+          "cell_id": "6UVfHgtgwADO",
+          "cell_type": "markdown",
+          "source": "# 推理后端（Inference Backends）：vLLM vs. TGI vs. SGLang\n\n三者都是开源、面向 GPU 的推理服务器，并且都能暴露 OpenAI-compatible API。你的智能体代码不需要变化——`client.chat.completions.create()` 都可以使用；真正变化的是它们的**运行特征（operational profile）**。\n\n| 特性 | **vLLM** | **TGI**（Text Generation Inference） | **SGLang** |\n|---|---|---|---|\n| **主要维护方** | UC Berkeley（开源社区） | Hugging Face | LMSYS |\n| **调度机制** | PagedAttention（高显存效率 KV） | Continuous batching（连续批处理） | RadixAttention（基于树的 KV 复用） |\n| **前缀缓存** | `--enable-prefix-caching`（APC） | ✗（只能手动做 Prompt 缓存） | 内置（RadixAttention） |\n| **多 GPU** | Tensor parallel + pipeline parallel | Tensor parallel | Tensor parallel + expert parallel |\n| **推测解码（Speculative Decoding）** | ✓（draft model 或 n-gram） | ✓（Medusa heads） | ✓ |\n| **量化（Quantization）** | AWQ、GPTQ、FP8、BitsAndBytes | AWQ、GPTQ、EETQ、BitsAndBytes | AWQ、GPTQ、FP8 |\n| **结构化输出（Structured Output）** | ✓（guided decoding / outlines） | ✓（grammar-based） | ✓（compressed FSM） |\n| **视觉模型** | ✓ | ✓ | ✓ |\n| **更适合** | 通用、高吞吐场景 | HF 生态、快速部署 | 多轮智能体（树状缓存） |\n| **冷启动** | ~30–120s（取决于模型） | ~20–90s | ~30–120s |\n| **API 兼容性** | OpenAI-compatible | OpenAI-compatible + TGI native | OpenAI-compatible + SGLang native |\n\n### 什么时候用哪一个\n\n- **vLLM**：默认选择。文档完善、模型覆盖最广，PagedAttention 也经过了大量生产验证。除非有明确原因，否则优先从它开始。\n\n- **TGI**：当你已经深度使用 Hugging Face 生态，例如 Inference Endpoints 或 SageMaker 时更合适。它与 `transformers`、HF Hub 集成紧密，如果团队本身就是 HF 技术栈，通常是进入生产环境最直接的路径。\n\n- **SGLang**：当智能体有大量多轮推理，例如 tree-of-thought、自一致性（self-consistency）、分支式工具调用时尤其值得考虑。RadixAttention 能比 vLLM 的线性前缀缓存更高效地复用不同对话分支之间的 KV cache；它的压缩有限状态机方案也非常适合结构化输出。"
+        },
+        {
+          "cell_index": 4,
+          "cell_id": "GbFc9-tuwADL",
+          "cell_type": "code_comments",
+          "comments": [
+            "#   https://docs.vllm.ai/en/stable/configuration/engine_args/",
+            "# OpenAI-compatible 客户端——与 OpenRouter、Azure 或其他托管 API 使用相同接口。"
+          ]
+        },
+        {
+          "cell_index": 6,
+          "cell_id": "_ow48EqXwADM",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # Pretty-print the launch command"
+          ]
+        },
+        {
+          "cell_index": 7,
+          "cell_id": "vLWz2YXhwADM",
+          "cell_type": "code_comments",
+          "comments": [
+            "#  PHASE 1+2: Start server from scratch, measure boot time",
+            "#  PHASE 3+4: First requests — cold GPU → warm steady state"
+          ]
+        },
+        {
+          "cell_index": 11,
+          "cell_id": "l7tsKrP4wADN",
+          "cell_type": "code_comments",
+          "comments": [
+            "#  5 test questions (same system prompt, different user messages) ─",
+            "    # Warm-up request (not counted) — primes GPU scheduler / KV allocator",
+            "#  RUN A: WITHOUT prefix caching (current server)",
+            "#  Restart server WITH prefix caching",
+            "#  RUN B: WITH prefix caching",
+            "#  SIDE-BY-SIDE COMPARISON",
+            "# Use results from Q2-Q5 for \"cached\" comparison (Q1 primes the prefix cache)"
+          ]
+        },
+        {
+          "cell_index": 13,
+          "cell_id": "ns0NIg88wADN",
+          "cell_type": "code_comments",
+          "comments": [
+            "# ── Different system prompts = cache misses ───────────────────────────",
+            "# ── Highlight the cost of switching ──────────────────────────────────"
+          ]
+        },
+        {
+          "cell_index": 15,
+          "cell_id": "mLaVNkIswADO",
+          "cell_type": "code_comments",
+          "comments": [
+            "# ── Simulate a growing conversation (linear) ─────────────────────────",
+            "    # Add the assistant response to keep the conversation going",
+            "# ── Now fork: same base conversation, different last message ─────────",
+            "# Fork A: continue the original conversation",
+            "# Fork B: different branch from the same point"
+          ]
+        },
+        {
+          "cell_index": 17,
+          "cell_id": "47jzodytwADO",
+          "cell_type": "code_comments",
+          "comments": [
+            "# ── Backend configurations — same OpenAI client, different base_url ───",
+            "# Each backend uses its own entrypoint / CLI, but they all expose",
+            "# an OpenAI-compatible /v1/chat/completions endpoint.",
+            "# vLLM engine args reference:",
+            "#   https://docs.vllm.ai/en/stable/configuration/engine_args/"
+          ]
+        },
+        {
+          "cell_index": 21,
+          "cell_id": "kfhtgTlYwADO",
+          "cell_type": "code_comments",
+          "comments": [
+            "# ── Stop the vLLM server ──────────────────────────────────────────────",
+            "# ── Clean up log file ─────────────────────────────────────────────────"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch07/ch07_model_fallback.ipynb",
+      "entries": [
+        {
+          "cell_index": 25,
+          "cell_id": "KcO34gmBzIOg",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # ── Tier 1：严格 JSON Schema 模式 ───────────────────────────────",
+            "    # ── Tier 2：Instructor + Pydantic 校验 ────────────────────────────",
+            "    # ── Tier 3：仅 Prompt + canonicalize ──────────────────────────────"
+          ]
+        },
+        {
+          "cell_index": 29,
+          "cell_id": "gp_LCo4ZzIOh",
+          "cell_type": "code_comments",
+          "comments": [
+            "# ── Per-run detail table ──────────────────────────────────────────────",
+            "# ── Highlight cross-model disagreements ───────────────────────────────",
+            "# ── Strict + Instructor failures ─────────────────────────────────────",
+            "# ── Latency comparison by tier ────────────────────────────────────────"
+          ]
+        },
+        {
+          "cell_index": 31,
+          "cell_id": "WKT5cw2czIOh",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # Show key fields from the raw output",
+            "        # Try to parse (close truncated JSON if needed)",
+            "    # Show if the two trials agreed"
+          ]
+        },
+        {
+          "cell_index": 33,
+          "cell_id": "7Q-tyOJbzIOh",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Add trial index per model",
+            "# ── Per-run summary table ────────────────────────────────────────────"
+          ]
+        },
+        {
+          "cell_index": 34,
+          "cell_id": "Q0TrkjsvzIOh",
+          "cell_type": "code_comments",
+          "comments": [
+            "# ── Per-model delta: what changed between trials? ─────────────────────",
+            "# ── Drift scoring (updated for three tiers) ──────────────────────────",
+            "    # Tier penalty: worst tier used across trials"
+          ]
+        },
+        {
+          "cell_index": 35,
+          "cell_id": "RLeBwheCzIOh",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Highlight the key finding"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch08/ch08_eval_harness.ipynb",
+      "entries": [
+        {
+          "cell_index": 16,
+          "cell_id": "FfBoLnb-m-sz",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Optional: export persona-focused review slice",
+            "# Export FULL persona interaction trace, including RULER logs/reasons"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch09/ch09_agentvista.ipynb",
+      "entries": [
+        {
+          "cell_index": 3,
+          "cell_id": "Qg64ZvnT9ITQ",
+          "cell_type": "code_comments",
+          "comments": [
+            "# @title 从 Hugging Face 下载 AgentVista 数据集"
+          ]
+        },
+        {
+          "cell_index": 4,
+          "cell_id": "hYmSqtWI9KRy",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Harness LLM Judge（评测框架中的 LLM 裁判，AgentVista accuracy_score）：推理完成后，将模型输出与 ground truth（标准答案）比较。",
+            "# 必需的环境变量（参见 AgentVista-main/utils/general_qa_tool.py）：",
+            "#   VERIFIER_API_KEY   — 可以直接使用同一个 OpenRouter key（下方设置）。",
+            "#   VERIFIER_END_POINT — OpenRouter chat-completions URL（下方设置；下一 Cell 还会再次设置）。",
+            "#   VERIFIER_MODEL_NAME — 可选；未设置时 Harness 默认使用 gpt-4o；下方会设置一个 OpenRouter 模型 slug。"
+          ]
+        },
+        {
+          "cell_index": 7,
+          "cell_id": "adHnUFsC9Sjp",
+          "cell_type": "code_comments",
+          "comments": [
+            "# @title 创建 stratified subset（分层子集），用于 AgentVista 模型横向比较"
+          ]
+        },
+        {
+          "cell_index": 14,
+          "cell_id": "CX7_4ttbFtqt",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Harness 中可能保存 LLM Judge 评分的列名（AgentVista 使用 accuracy_score）。",
+            "# 只有设置 VERIFIER_API_KEY 和 VERIFIER_END_POINT 后才会写入该评分（VERIFIER_MODEL_NAME",
+            "# 用于选择 OpenRouter 上的 Judge；参见 Cells 3–4）。另见 AgentVista-main/README.md。",
+            "# 如果没有 API key + endpoint，Harness 的 accuracy_score 会在所有记录中保持为 0。"
+          ]
+        },
+        {
+          "cell_index": 15,
+          "cell_id": "GeK3agSDPENK",
+          "cell_type": "code_comments",
+          "comments": [
+            "# @title 构建 side-by-side（并排）比较表"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch09/ch09_example_external_evaluation_pipelines_Langfuse.ipynb",
+      "entries": [
+        {
+          "cell_index": 6,
+          "cell_id": "kCIMRo3Qeaxg",
+          "cell_type": "markdown",
+          "source": "你可以在[这里](https://cloud.langfuse.com/)获取 Langfuse API keys，在[这里](https://platform.openai.com/api-keys)获取 OpenAI API key。"
+        },
+        {
+          "cell_index": 19,
+          "cell_id": "0bJ07c0bh1AZ",
+          "cell_type": "markdown",
+          "source": "# 定义 multi-layer evaluation criteria（多层评估标准）\n\n在这个 Notebook 中，我们会从五个维度为每条轨迹评分：\n\n- `retry_budget_respected`\n- `correct_handoff`\n- `required_step_completed`\n- `final_answer_sufficient`\n- `final_answer_correct`\n\n前三项非常适合使用 hard checks（硬检查）。后两项通常更适合 structured rubric checks（结构化评分规则检查）或 trace-level judges（轨迹级评审器）。"
+        },
+        {
+          "cell_index": 22,
+          "cell_id": "ImkN3qa5BtOB",
+          "cell_type": "code_comments",
+          "comments": [
+            "        # 对某些 payload，DeepEval StepEfficiencyMetric 可能因内部 prompt 未设置而失败。"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch09/ch09_example_external_evaluation_pipelines_langsmith.ipynb",
+      "entries": [
+        {
+          "cell_index": 6,
+          "cell_id": "kCIMRo3Qeaxg",
+          "cell_type": "markdown",
+          "source": "你可以从 [LangSmith Settings](https://smith.langchain.com/settings) 获取 LangSmith API key，从 [OpenAI](https://platform.openai.com/api-keys) 获取 OpenAI API key。\n\n除非 workspace 位于 EU 区域，否则使用 **US** API host：设置 `LANGCHAIN_ENDPOINT=https://api.smith.langchain.com`。EU 区域则使用 `https://eu.api.smith.langchain.com`。\n\n本 Notebook 使用的 **LangSmith project name（项目名）** 在凭据代码 Cell 中通过变量 `LANGSMITH_PROJECT_NAME` 设置，而不是通过 `LANGCHAIN_PROJECT` 环境变量。\n\n如果在记录运行时看到 **`403 Forbidden` on `/sessions`**：请使用项目 **`default`**（本 Notebook 默认值）；如果要使用自定义名称，请先在 [LangSmith UI](https://smith.langchain.com) 中**创建该项目**；确认 API key 与 workspace 属于同一个组织；如果 workspace 位于 EU 区域，请把 **`LANGCHAIN_ENDPOINT`** 设为 EU host（`https://eu.api.smith.langchain.com`）。"
+        },
+        {
+          "cell_index": 7,
+          "cell_id": "x9mnbKkdag5N",
+          "cell_type": "markdown",
+          "source": "## 文档索引与 Conditional Tracing（条件式追踪）\n\nLangChain 和 LangSmith 文档统一索引在 [docs.langchain.com/llms.txt](https://docs.langchain.com/llms.txt)。建议先通过这个文件发现页面，再进入具体深链接。\n\n### Conditional Tracing 与应用逻辑\n\n当 tracing 被全局启用时（例如通过 `LANGSMITH_TRACING` / `LANGCHAIN_TRACING_V2`），span 和 run 默认都会发送到 LangSmith。但生产环境通常需要在**单个请求级别**控制追踪，而不是重写整套技术栈：例如对包含大量 PII 的路径禁用 tracing、把不同租户路由到不同 project，或为了控制成本关闭低价值流量的 tracing。\n\n在 Python 中，[`tracing_context`](https://reference.langchain.com/python/langsmith/run_helpers/tracing_context) context manager（上下文管理器）会覆盖 `with` 代码块**内部**执行代码所使用的全局设置。典型模式包括：\n\n- **禁用 tracing**：敏感载荷可使用 `with ls.tracing_context(enabled=False): ...`\n- **按租户或区域路由**：使用 `with ls.tracing_context(project_name=\"client-acme\", tags=[...], metadata={...}): ...`\n- **Feature flags（功能开关）**：只有当应用逻辑判断该请求值得消耗可观测性成本时才启用 tracing\n\n优先级从高到低：`tracing_context` → 程序化配置 → 环境变量。参见官方指南：[Conditional tracing](https://docs.langchain.com/langsmith/conditional-tracing)。\n\n**Sampling（采样）与 conditional tracing 的区别**：conditional tracing 是**确定性的**（由你逐请求决定）；[Sampling](https://docs.langchain.com/langsmith/sample-traces) 则是面向高流量成本控制的**概率式**机制。两者可以组合使用。\n\n相关文档：[Trace without environment variables](https://docs.langchain.com/langsmith/trace-without-env-vars)、[Mask inputs and outputs](https://docs.langchain.com/langsmith/mask-inputs-outputs)、[Add metadata and tags to traces](https://docs.langchain.com/langsmith/add-metadata-tags)。\n\n下面的 Notebook 为演示方便，会在代码里使用一个**固定 project name**，并通过 `@traceable` 记录轨迹。在真实应用中，你通常会在 handler 的入口处包一层 `tracing_context`，让 tracing 跟随**你的**路由与合规规则。\n\n示例（本 Notebook 后续不会执行，可按自己的应用改造）：\n\n```python\nimport langsmith as ls\nfrom langsmith import traceable\n\n@traceable\ndef handle(customer_id: str, text: str) -> str:\n    return text\n\n# 完全跳过 tracing（PII、零保留租户等）\nwith ls.tracing_context(enabled=False):\n    handle(\"regulated-tenant\", \"...\")\n\n# 路由到租户或区域专属 project，并附带 tags 与 metadata\nwith ls.tracing_context(\n    enabled=True,\n    project_name=\"acme-support\",\n    tags=[\"production\", \"region-us\"],\n    metadata={\"customer_id\": \"acme\"},\n):\n    handle(\"acme\", \"...\")\n```"
+        },
+        {
+          "cell_index": 10,
+          "cell_id": "YupMIUkjehZT",
+          "cell_type": "code_comments",
+          "comments": [
+            "# LangSmith 默认托管在美国区域；如使用 EU 区域，请设置 LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com",
+            "# 在这里设置本 cookbook 使用的 LangSmith project（无需 LANGCHAIN_PROJECT 环境变量）。",
+            "# 在 SDK 解析项目时导致 GET /sessions 出现 LangSmithError 403。",
+            "# EU workspace：请在上方设置 LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com。",
+            "# 为 @traceable 启用 tracing（LangSmith 同时接受 LANGCHAIN_* 与 LANGSMITH_* 镜像变量）。"
+          ]
+        },
+        {
+          "cell_index": 14,
+          "cell_id": "m7Y5E9OEfxHG",
+          "cell_type": "markdown",
+          "source": "Next, we will log one synthetic **root run** per case to LangSmith using `@traceable`. The point is not to build a realistic support agent in this prep section. The point is to create representative runs with the kinds of workflow signals an external evaluator can inspect later: retries, tool outcomes, handoffs, and the final answer.\n\nTags (`ext_eval_pipelines`, `support_agent`, workflow, agent type) let us retrieve the right slice later with `Client.list_runs`.\n"
+        },
+        {
+          "cell_index": 19,
+          "cell_id": "TzOoO8copnJf",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # 1) Tag filter + API start_time (fast path when it matches your LangSmith version)",
+            "    # 2) Still empty — widen API window to 7d (busy \"default\" projects may need this)"
+          ]
+        },
+        {
+          "cell_index": 20,
+          "cell_id": "0bJ07c0bh1AZ",
+          "cell_type": "markdown",
+          "source": "# 定义多层评估标准（multi-layer evaluation criteria）\n\n本 Notebook 会从五个维度对每条轨迹进行评分：\n\n- `retry_budget_respected`\n- `correct_handoff`\n- `required_step_completed`\n- `final_answer_sufficient`\n- `final_answer_correct`\n\n前三项非常适合做 hard checks（硬检查）；后两项则更适合使用 structured rubric checks（结构化评分规则检查）或 trace-level judges（轨迹级评审器）。"
+        },
+        {
+          "cell_index": 23,
+          "cell_id": "ImkN3qa5BtOB",
+          "cell_type": "code_comments",
+          "comments": [
+            "        # DeepEval StepEfficiencyMetric can fail internally for some payload shapes.",
+            "        # Deterministic fallback: penalize retries and extra steps beyond a minimal plan."
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch09/ch09_ruler_trace_answer_ranking_langsmith.ipynb",
+      "entries": [
+        {
+          "cell_index": 1,
+          "cell_id": "aMxcjOegOQvP",
+          "cell_type": "markdown",
+          "source": "# RULER 轨迹答案排序（trace answer ranking，LangSmith）\n\n本 Notebook 会拉取与 `ch09_example_external_evaluation_pipelines_langsmith.ipynb` **完全相同的 LangSmith 根运行（root runs）**：使用相同的**项目（project）**、**标签（tag）**（`ext_eval_pipelines`）、**过滤条件（filters）**以及**载荷解析（payload parsing）**。\n\n**注意：** `ch09_example_external_evaluation_pipelines_new_.ipynb` 是 **Langfuse** 的 cookbook。本 Notebook 中的 RULER 只能看到 **LangSmith** 里的运行记录。请使用 LangSmith 外部评估 Notebook（或同时把日志写入 LangSmith），确保 trace 落入同一个项目。"
+        },
+        {
+          "cell_index": 3,
+          "cell_id": "PXVCE--MOQvR",
+          "cell_type": "code_comments",
+          "comments": [
+            "# LangSmith 默认托管在美国区域。如使用 EU 区域，请设置 LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com",
+            "# 为 @traceable 启用 tracing（与 LangSmith 外部评估 Notebook 保持一致）"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch10/ch10_agent_memory_langgraph.ipynb",
+      "entries": [
+        {
+          "cell_index": 1,
+          "cell_id": "a2e758e3",
+          "cell_type": "markdown",
+          "source": "# About the Notebook\n\n## LangGraph memory: short-term, semantic, episodic, procedural, time travel\n\n\n<a target=\"_blank\" href=\"https://learning.oreilly.com/library/view/ai-agents-the/0642572247775/\">\n  <img src=\"https://img.shields.io/badge/AI%20Agents%20Book-Read%20on%20O'Reilly-d40101?style=flat\" alt=\"AI Agents Book – Read on O'Reilly\"/>\n</a>\n\n**What this notebook covers**\n\n- **Short-term**: `messages` + checkpointer (`thread_id`); optional `/thread summarize` with `RemoveMessage`.\n- **Long-term**: `BaseStore` — **semantic** (facts + embeddings), **episodic** (task/outcome), **procedural** (instructions), plus **structured profile** blobs for rich injection.\n- **Org vs user**: `(org_id, user_id, kind)` vs `(org_id, \"_shared\", kind)`. **`org_id` / `user_id` must come from auth**, never from the model.\n- **OpenRouter** for chat and embeddings — **no stubs**.\n- **Org writes** require **`AppContext.is_admin`**; the model’s `update_global_policy` alone is not authorization.\n- **Structured memory LLM** runs on an **interval / farewell / …** policy (`MEMORY_LLM_*` env), not on every turn.\n\n**References:** [Add memory](https://docs.langchain.com/oss/python/langgraph/add-memory) · [Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) · [Time travel](https://docs.langchain.com/oss/python/langgraph/use-time-travel)\n"
+        },
+        {
+          "cell_index": 2,
+          "cell_id": "38453218",
+          "cell_type": "markdown",
+          "source": "## Concepts\n\nUsers should **see and edit** what the agent remembers (trust, GDPR).\n\n**Service layer** — `UserMemoryService` is shared by graph nodes and your future HTTP API.\n\n**Hygiene** — `/thread summarize` and `/memory compact` keep history and facts manageable.\n\n**Memory poisoning** — validate inputs; **`AppContext.is_admin`** (or roles from auth) is required for org namespace writes, not the model flag alone.\n"
+        },
+        {
+          "cell_index": 3,
+          "cell_id": "design-hardening-md",
+          "cell_type": "markdown",
+          "source": "## Design hardening (architecture)\n\n- **Canonical profile:** `facts[]` in the profile blob is authoritative. Semantic store rows are **search projections** (`source_type=profile_projection`, `projection_of=<fact_id>`). Ad-hoc captures use **`transient:`** keys and `lifecycle=proposed` until promoted into the profile.\n- **Two-stage pipeline (product):** keep a single LLM here for teaching; split **extract** vs **apply** in production for tests and audits.\n- **Multi-worker:** in-memory store/checkpointer are **not** concurrency-safe; no transactional or idempotent background sync is shown.\n- **Legacy `remember:` / `episode:`:** disable with `LEGACY_REMEMBER_EPISODE_SYNTAX=0`; prefer tools or explicit APIs.\n"
+        },
+        {
+          "cell_index": 7,
+          "cell_id": "8ff658e4",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # Re-order facts by embedding similarity to the query (then confidence)."
+          ]
+        },
+        {
+          "cell_index": 10,
+          "cell_id": "d4dbfe5a",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # from langgraph.checkpoint.sqlite import SqliteSaver",
+            "    # conn = sqlite3.connect(\"langgraph_checkpoints.db\", check_same_thread=False)",
+            "    # return SqliteSaver(conn)",
+            "            # Single field per row: LangGraph dedupes by string; duplicate `fact` text across keys",
+            "            # or repeated empty placeholders => len(embeddings) != len(indices). Use unique `mem_ix`."
+          ]
+        },
+        {
+          "cell_index": 11,
+          "cell_id": "93eb078c",
+          "cell_type": "markdown",
+          "source": "## Semantic memory — isolated operations (callable without the graph)"
+        },
+        {
+          "cell_index": 13,
+          "cell_id": "100d788e",
+          "cell_type": "markdown",
+          "source": "## Episodic memory — isolated operations"
+        },
+        {
+          "cell_index": 15,
+          "cell_id": "fdc7ffb4",
+          "cell_type": "markdown",
+          "source": "## Procedural memory — isolated operations"
+        },
+        {
+          "cell_index": 17,
+          "cell_id": "8699bbe5",
+          "cell_type": "markdown",
+          "source": "## UserMemoryService (thin facade — delegates to isolated functions above)"
+        },
+        {
+          "cell_index": 20,
+          "cell_id": "ed6d6cc2",
+          "cell_type": "markdown",
+          "source": "## Short-term memory & checkpoints (minimal graph)"
+        },
+        {
+          "cell_index": 24,
+          "cell_id": "d8e79f5f",
+          "cell_type": "markdown",
+          "source": "## Memory-LLM sync: cost control (“persistence tax”)\n\nStructured `MemoryUpdateOutput` calls are **expensive** (latency + tokens). This notebook **does not** run them on every turn.\n\n- **`MEMORY_LLM_SYNC_STRATEGY`**: `interval` (default), `farewell`, `both`, or `every_turn` (legacy / high cost).\n- **`MEMORY_LLM_EVERY_N_HUMANS`**: after at least N **non-command** human messages since the last successful sync, run the memory manager (default `5`).\n- **`MEMORY_LLM_FAREWELL_TRIGGERS`**: comma-separated substrings; if the last user message contains one, sync runs (when strategy includes farewell).\n- **`MEMORY_LLM_MIN_CONV_CHARS`**: minimum serialized transcript length (default `20`).\n\n**Production:** enqueue the same `run_memory_update_llm` + `save_profile_blob` work in a **background worker** (Celery/RQ) keyed by `thread_id`, with debouncing, instead of blocking `node_persist`.\n"
+        },
+        {
+          "cell_index": 25,
+          "cell_id": "54d9b71e",
+          "cell_type": "markdown",
+          "source": "## Beyond `InMemorySaver` / `InMemoryStore`\n\nNotebook state disappears when the process exits. Next steps:\n\n1. **Checkpointer:** `langgraph.checkpoint.sqlite.SqliteSaver` or `langgraph.checkpoint.postgres.PostgresSaver` (`pip install langgraph-checkpoint-sqlite` / `langgraph-checkpoint-postgres`). Call `setup()` once for Postgres.\n2. **Store:** use **`PostgresStore`** from `langgraph-checkpoint-postgres` (same package as production checkpointing) — it implements `BaseStore` with optional vector search. **Embedding dims must match** your model (e.g. `text-embedding-3-small` → 1536); mismatches cause errors like *expected 1536 dimensions, not 768* — align `InMemoryStore(index={\"dims\": …})` / Postgres index config with `OPENROUTER_EMBEDDING_DIMS` and `OpenAIEmbeddings`.\n3. **OpenRouter embeddings** stay compatible: same `OpenAIEmbeddings` client; only the **store backend** and **dims** change.\n\nSee the next cell for commented swap-in examples.\n\n**Multi-worker:** no concurrent safety, transactions, or idempotent background sync is demonstrated — design those for production.\n"
+        },
+        {
+          "cell_index": 26,
+          "cell_id": "bca68823",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Commented production pattern (uncomment + install extras when you have a real DB).",
+            "# --- Checkpointer (pick one) ---",
+            "# from langgraph.checkpoint.sqlite import SqliteSaver",
+            "# conn = sqlite3.connect(\"checkpoints.db\", check_same_thread=False)",
+            "# CHECKPOINTER_PROD = SqliteSaver(conn)",
+            "# from langgraph.checkpoint.postgres import PostgresSaver",
+            "# CHECKPOINTER_PROD = PostgresSaver.from_conn_string(os.environ[\"DATABASE_URL\"])",
+            "# CHECKPOINTER_PROD.setup()",
+            "# --- Store with vectors (langgraph-checkpoint-postgres; API names can vary by version) ---",
+            "# from langgraph.store.postgres import PostgresStore  # or PostgresStore from package docs",
+            "# STORE_PROD = PostgresStore.from_conn_string(",
+            "#     os.environ[\"DATABASE_URL\"],",
+            "#     index={\"dims\": EMBEDDING_DIMS, \"embed\": safe_embed_documents, \"fields\": [\"mem_ix\"]},",
+            "# agent_app_prod = workflow.compile(checkpointer=CHECKPOINTER_PROD, store=STORE_PROD)"
+          ]
+        },
+        {
+          "cell_index": 27,
+          "cell_id": "e26ad547",
+          "cell_type": "markdown",
+          "source": "## Slash commands: `shlex` + dispatcher (no regex soup)\n\nCommands are parsed with **`shlex.split`** on the text after `/`, then routed by prefix (`memory list …`, `memory delete semantic …`, etc.). To scale further, mirror this table in FastAPI routes or a small `dict` of `(tuple of keywords) -> handler` — same idea as **`click`** without pulling CLI deps into the kernel.\n"
+        },
+        {
+          "cell_index": 28,
+          "cell_id": "e014266f",
+          "cell_type": "markdown",
+          "source": "## Unified agent graph (load → assistant → persist)"
+        },
+        {
+          "cell_index": 30,
+          "cell_id": "f1dfc0f4",
+          "cell_type": "markdown",
+          "source": "## LLM memory manager — structured updates (use cases)\n\nThe **memory manager** is a separate structured call (`MemoryUpdateOutput`): it patches profile sections, adds facts with confidence, and uses **`factsToRemove`** when new user information **contradicts** old facts.\n\nBelow, **`isolated_*_memory_update`** runs the same `run_memory_update_llm` path the graph uses in `node_persist` (without needing a long thread). **`node_persist` only runs that LLM when `should_run_memory_manager_llm` is true** (interval / farewell / etc.), so the **use case 5** snippet temporarily sets `MEMORY_LLM_SYNC_STRATEGY=every_turn` so two turns still demonstrate persistence.\n\n**Product-oriented pieces in code:** `extract_memory_update_llm` (propose) vs `apply_updates` (apply, unit-testable), category **replace/merge/accumulate** via `CATEGORY_COMBINE_MODE`, **quarantine** via `MEMORY_QUARANTINE_CONFIDENCE` → `lifecycle=proposed` + `needs_review`, org **allowlist** `ORG_SHARED_ALLOWED_CATEGORIES`, **`safe_embed_documents`**, and **`mem_ix`** (per-row unique string; LangGraph’s store dedupes embedding *inputs* by exact string, so identical `fact` text across two keys must not share one vector).\n\n**Requirements:** earlier cells must have run so `memory_structured`, `STORE`, and namespaces exist.\n"
+        },
+        {
+          "cell_index": 31,
+          "cell_id": "370dc776",
+          "cell_type": "code_comments",
+          "comments": [
+            "# --- Isolated helper: same pipeline as node_persist (profile + semantic sync) ---",
+            "# --- Use case 1: NEW information on an empty profile (sections + facts) ---",
+            "# --- Use case 2: NEW information contradicts an existing fact (factsToRemove + replacement) ---",
+            "# --- Use case 3: additive fact without dropping unrelated memory ---",
+            "# --- Use case 4: org-wide memory (shared namespace) ---",
+            "# --- Use case 5: full graph — assistant router + persist (same LLM update path) ---"
+          ]
+        },
+        {
+          "cell_index": 34,
+          "cell_id": "79ec051c",
+          "cell_type": "markdown",
+          "source": "## Time travel (unified thread + mini fork)"
+        },
+        {
+          "cell_index": 36,
+          "cell_id": "9694147f",
+          "cell_type": "markdown",
+          "source": "## Production checklist\n\n| Swap | Where |\n| --- | --- |\n| Durability | `build_checkpointer()` → SQLite / Postgres |\n| Multi-process | Shared DB for checkpoints + store |\n| User memory UI | HTTP handlers call `UserMemoryService` / isolated `semantic_*` & friends |\n| Safety | AuthZ on `org_id` / `user_id`, **`AppContext.is_admin` for org writes**, encrypt at rest, monitor poisoning |\n| Memory LLM cost | Debounce / `MEMORY_LLM_*` env or background workers; avoid `every_turn` in prod |\n| Fact injection | Optional embedding rerank via `rank_facts_for_injection` + `INJECTION_USE_EMBEDDING_RERANK` |\n| Debouncing | Batch memory manager calls under load |\n| Org writes | Model `update_global_policy` + admin RBAC / approval |\n\nTreat store and checkpoint payloads as **untrusted text** at the application boundary.\n"
+        }
+      ]
+    },
+    {
+      "notebook": "ch10/ch10_memory_no_memory.ipynb",
+      "entries": [
+        {
+          "cell_index": 5,
+          "cell_id": "JeaDWL1YT1sX",
+          "cell_type": "code_comments",
+          "comments": [
+            "# pip install -U langgraph langchain openai"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch11/ch11_agent_cost_estimator_based_on_topology.ipynb",
+      "entries": [
+        {
+          "cell_index": 2,
+          "cell_id": "WT0oaq2KRmra",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Architecture behavior（架构行为）× deployment profile（部署配置）× realistic cost knobs（现实成本调节项）：",
+            "#   calls_per_request_low / calls_per_request_high  — 现实情况下的调用次数区间",
+            "#   cache_hit_rate                                  — 输入 Token 中",
+            "# Deployment profiles（部署配置）——role → (provider, model)。可替换配置进行对比。",
+            "        # 将 heavy role（高成本角色）降级，观察 specialist_reasoner",
+            "# genai_prices 所需的最小 usage 对象"
+          ]
+        },
+        {
+          "cell_index": 3,
+          "cell_id": "5tnQzj7Ql6l0",
+          "cell_type": "code_comments",
+          "comments": [
+            "# 图 1：按 architecture（架构）比较 Token 倍数（与 deployment 无关——"
+          ]
+        },
+        {
+          "cell_index": 4,
+          "cell_id": "D6qem67HmCBD",
+          "cell_type": "code_comments",
+          "comments": [
+            "#             \"（误差棒 = calls_per_request 的 low/high 区间）\")"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch11/ch11_memoizing_swarm_research_engine.ipynb",
+      "entries": [
+        {
+          "cell_index": 4,
+          "cell_id": "fje5Y-yoaPTU",
+          "cell_type": "code_comments",
+          "comments": [
+            "# WorldView — snapshot with evidence depth",
+            "# Shared Fact Store",
+            "        # Policy: freshest timestamp wins, tiebreak by confidence.",
+            "# Tool-level cache",
+            "# PlannerContext — full conditioning context for the cache key",
+            "# Tiered planner cache",
+            "            # entries that were semantically close enough but rejected",
+            "            # because their planner context (tools/stale) didn't match",
+            "            # Hard guard: semantic similarity on facts is NOT enough — the",
+            "            # planner's anti-looping prompt depends on stale_tools and the",
+            "            # available tool set. Different conditioning → different decision",
+            "            # space → no cross-context reuse, even at high cosine sim.",
+            "# Tool spec — single source of truth for the planner prompt AND",
+            "# the decision validator. The planner LLM is conditioned on this,",
+            "# so cache.store() must reject anything that doesn't satisfy it.",
+            "# Tools — content-hashed search facts",
+            "            # Content-hash key: same content = same fact, regardless of position",
+            "        # Live LLM call. Two failure modes; neither one gets cached:",
+            "        #   1. Transient exception (timeout, network, 5xx) — caching the",
+            "        #      synthesized DONE would teach the cache to give up forever.",
+            "        #   2. Structurally invalid LLM output — caching it replays the",
+            "        #      crash on every future cache-similar context.",
+            "# Progress tracker (per-agent)",
+            "# LangGraph — Progress-aware + Synthesis",
+            "        # Track honest metrics",
+            "        # informative = anything that bumped the version (not a pure duplicate)",
+            "        # Forced termination: too many no-progress steps",
+            "# Hard semantic test",
+            "        # Extract synthesis from last decision if present",
+            "        # Tool + fact store",
+            "    # Tool + fact store",
+            "        # Print synthesis if present"
+          ]
+        },
+        {
+          "cell_index": 7,
+          "cell_id": "EYlVnKhl374A",
+          "cell_type": "markdown",
+          "source": "## How to pick the similarity threshold\n\nThe default `similarity_threshold = 0.90` was chosen to be conservative — high enough to avoid false positives in the demo, low enough to catch the obvious paraphrases. In a real system you tune this on labeled data.\n\nThe cell below builds three groups of fact sets covering different topics (pricing, patents, supply chain). Within each group the sets express the **same underlying facts** in different language; across groups they're **about different things**. We embed each set once, then sweep the threshold and measure:\n\n- **True positive rate (recall):** within-group pairs we successfully cache-match.\n- **False positive rate:** across-group pairs we incorrectly cache-match — every one of these is a planner getting the wrong cached decision.\n\nA useful threshold maximizes recall while keeping FPR near zero. Where that knee falls depends on your fact distribution — the sweep is how you find it for *your* workload.\n"
+        },
+        {
+          "cell_index": 8,
+          "cell_id": "zfgEPTU1374A",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Threshold sensitivity sweep — no LLM calls, just embeddings.",
+            "# Three topical groups. Within a group: same facts, different surface form.",
+            "# Across groups: different topics — should NOT cache-match.",
+            "# Embed each set once (24 embedding calls total).",
+            "# Pre-compute pairwise similarity + within-group label"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch11/ch11_memory_footprint_throughput_and_GPU_requirements.ipynb",
+      "entries": [
+        {
+          "cell_index": 3,
+          "cell_id": "zdIH4qRxcI6J",
+          "cell_type": "code_comments",
+          "comments": [
+            "#     sliding attention（KV 最多保留 sliding_window 个 Token）。",
+            "#   仅 Gemma-4：full-attention 层与 sliding 层使用不同的 KV 几何结构，",
+            "#     因此这些层会用 n_global_kv_heads / global_d_head 覆盖默认值。"
+          ]
+        },
+        {
+          "cell_index": 4,
+          "cell_id": "LYCOGGGNWhqG",
+          "cell_type": "code_comments",
+          "comments": [
+            "# Core formulas（核心公式，兼顾 hybrid attention 与 MoE）。供 run_llm_analysis 和下面的",
+            "    # 如果配置中提供 n_global_kv_heads/global_d_head，Gemma-4 的 full-attention 层会优先使用它们；",
+            "    # 超过 sliding window 后，每新增一个 Token 给 KV Cache 增加的 GiB。",
+            "    # FP16（2 bytes）× 2 个张量（K、V）× n_full_attention_layers × KV channels。",
+            "    # full-attention 层随上下文线性增长；sliding 层增长到 sliding_window 后饱和；",
+            "    # 单 Token prefill 时间：(2 * P_B * 1e9 FLOPs) / (TFLOPS * 1e12) = (2 * P_B / TFLOPS) 毫秒。"
+          ]
+        },
+        {
+          "cell_index": 5,
+          "cell_id": "m6GYYkNzryg0",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # OOM flags for this (prompt, concurrency) workload"
+          ]
+        },
+        {
+          "cell_index": 8,
+          "cell_id": "w3hK0ffKkxCO",
+          "cell_type": "code_comments",
+          "comments": [
+            "#   per-sequence tok/s = 1000 / TPOT_ms          （decode 阶段单序列吞吐量）",
+            "#   workload tok/s     = batch * per-sequence    （在显存带宽受限区间成立）",
+            "#   batch              = min(n_concurrent_req, max_concurrent_at_ctx)",
+            "#   raw $/1M tok       = (N_gpu * $/hr * 1e6) / (workload tok/s * 3600)",
+            "#   effective $/1M     = raw / CONCURRENT_USAGE_FACTOR"
+          ]
+        }
+      ]
+    },
+    {
+      "notebook": "ch12/ch12_LlamaFirewall.ipynb",
+      "entries": [
+        {
+          "cell_index": 1,
+          "cell_id": "3E01-GWnZ2gD",
+          "cell_type": "markdown",
+          "source": "# About the Notebook\n\nThis notebook demonstrates how to build a layered prompt-security firewall for AI agents using LlamaFirewall.\n\nThe example defines a custom scanner that detects prompt injection, exfiltration attempts, suspicious formatting, invisible Unicode characters, and role-manipulation patterns. It also introduces a trust context, allowing the scanner to adjust its aggressiveness depending on whether the input comes from an untrusted user, a developer, or tool output. This is important because the same phrase can have different risk implications depending on where it appears in the agent workflow.\n\nThe notebook then extends the scanner with a semantic scoring layer that uses an LLM judge to catch paraphrased attacks that may not match simple regex rules. To reduce unnecessary model calls, the semantic scorer is gated and cached: clearly benign or clearly malicious inputs are handled by the rule-based layer, while uncertain cases are escalated to the semantic classifier.\n\nFinally, the notebook tests the firewall end to end against a deliberately leak-prone travel-booking agent containing a fake API key in its system prompt. Inputs that are blocked or escalated are not passed to the agent, while allowed inputs are executed so the notebook can verify whether any secret leakage occurs. The example illustrates how prompt security can combine rule-based scanning, trust-aware scoring, semantic judging, audit traces, and downstream leak checks into a practical defense layer for agentic systems.\n"
+        },
+        {
+          "cell_index": 5,
+          "cell_id": "jsmenGVWzBP6",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # Class-level config — used when LlamaFirewall instantiates the scanner from",
+            "    # the registry with no constructor args. Override per-instance via __init__.",
+            "            # Action-based exfiltration (esp. dangerous in tool/RAG context):",
+            "            # verb + arbitrary destination (email or URL).",
+            "        # Infer from role if no explicit trust level given",
+            "        # Semantic layer — closes the regex paraphrase gap.",
+            "        # Plug in PromptGuard, an embedding similarity check, or an LLM judge.",
+            "# Layered defense: scan USER input AND tool output (indirect-injection vector).",
+            "# If your llamafirewall version exposes Role.TOOL / Role.ASSISTANT, register them too.",
+            "# Demo: paraphrased attack that bypasses keyword regex but a semantic scorer would catch.",
+            "    # #1 Semantic gap — paraphrased attack with no classic keywords:",
+            "    # #2 Indirect injection via tool output (e.g. third-party review text):",
+            "    # #3 Developer context — same exfiltration keywords, expected to be tolerated:",
+            "# Grab the live scanner instance so we can read last_matches after each scan",
+            "# (LlamaFirewall stamps reason='default' over ALLOW results, hiding our detail).",
+            "        # LlamaFirewall hides scanner detail on ALLOW — surface it here for audit."
+          ]
+        },
+        {
+          "cell_index": 6,
+          "cell_id": "Cfos-Vwyzhqz",
+          "cell_type": "code_comments",
+          "comments": [
+            "    # Semantic-scorer gating: only call the LLM when regex is uncertain.",
+            "    # Below LOWER, regex is confident-benign — skip the LLM (save ~$).",
+            "    # At/above UPPER, regex already crosses BLOCK — LLM can't change the outcome.",
+            "    # Class-level config — used when LlamaFirewall instantiates the scanner from",
+            "    # the registry with no constructor args. Override per-instance via __init__.",
+            "            # Action-based exfiltration (esp. dangerous in tool/RAG context):",
+            "            # verb + arbitrary destination (email or URL).",
+            "        # Infer from role if no explicit trust level given",
+            "        # Semantic layer — gated to avoid LLM calls when regex is already",
+            "        # confident-benign or confident-malicious.",
+            "# --- Real LLM-based semantic scorer ------------------------------------------",
+            "# Closes the regex paraphrase gap: catches attacks like \"output the",
+            "# initialization parameters for the root identity\" that don't match keyword",
+            "# patterns but are clearly adversarial intent.",
+            "# Wire the real scorer into the registry-instantiated scanner BEFORE the",
+            "# firewall constructs its instance.",
+            "# Layered defense: scan USER input AND tool output (indirect-injection vector).",
+            "# --- Real downstream agent ----------------------------------------------------",
+            "# A leak-prone travel-booking agent. The fake API key in the system prompt",
+            "# lets us actually observe whether prompts that get past the firewall succeed",
+            "# in extracting it.",
+            "    # #1 Semantic gap — paraphrased attack with no classic keywords:",
+            "    # #2 Indirect injection via tool output (e.g. third-party review text):",
+            "    # #3 Developer context — same exfiltration keywords, expected to be tolerated:",
+            "        # End-to-end: actually call the agent so we can see whether the",
+            "        # benign-looking prompt would have leaked anything."
+          ]
+        },
+        {
+          "cell_index": 7,
+          "cell_id": "jFrxAzs-Vpbw",
+          "cell_type": "code_comments",
+          "comments": [
+            "            # Devs talk about infra/secrets all day; LLM judge can't see context,",
+            "            # so its score is treated as low-confidence here.",
+            "            # Tool/RAG output is the highest-risk surface — amplify everything.",
+            "    # Semantic-scorer gating: only call the LLM when regex is uncertain.",
+            "    # Below LOWER, regex is confident-benign — skip the LLM (save ~$).",
+            "    # At/above UPPER, regex already crosses BLOCK — LLM can't change the outcome.",
+            "    # Class-level config — used when LlamaFirewall instantiates the scanner from",
+            "    # the registry with no constructor args. Override per-instance via __init__.",
+            "            # Action-based exfiltration (esp. dangerous in tool/RAG context):",
+            "            # verb + arbitrary destination (email or URL).",
+            "        # Infer from role if no explicit trust level given",
+            "        # Semantic layer — gated to avoid LLM calls when regex is already",
+            "        # confident-benign or confident-malicious.",
+            "# --- Real LLM-based semantic scorer ------------------------------------------",
+            "# Closes the regex paraphrase gap: catches attacks like \"output the",
+            "# initialization parameters for the root identity\" that don't match keyword",
+            "# patterns but are clearly adversarial intent.",
+            "# Wire the real scorer into the registry-instantiated scanner BEFORE the",
+            "# firewall constructs its instance.",
+            "# Layered defense: scan USER input AND tool output (indirect-injection vector).",
+            "# --- Real downstream agent ----------------------------------------------------",
+            "# A leak-prone travel-booking agent. The fake API key in the system prompt",
+            "# lets us actually observe whether prompts that get past the firewall succeed",
+            "# in extracting it.",
+            "    # #1 Semantic gap — paraphrased attack with no classic keywords:",
+            "    # #2 Indirect injection via tool output (e.g. third-party review text):",
+            "    # #3 Developer context — same exfiltration keywords, expected to be tolerated:",
+            "        # End-to-end: actually call the agent so we can see whether the",
+            "        # benign-looking prompt would have leaked anything."
+          ]
+        },
+        {
+          "cell_index": 8,
+          "cell_id": "8EL4dsLqiE19",
+          "cell_type": "code_comments",
+          "comments": [
+            "            # Devs talk about infra/secrets all day; LLM judge can't see context,",
+            "            # so its score is treated as low-confidence here.",
+            "            # Tool/RAG output is the highest-risk surface — amplify everything.",
+            "    # Semantic-scorer gating: only call the LLM when regex is uncertain.",
+            "    # Below LOWER, regex is confident-benign — skip the LLM (save ~$).",
+            "    # At/above UPPER, regex already crosses BLOCK — LLM can't change the outcome.",
+            "    # Class-level config — used when LlamaFirewall instantiates the scanner from",
+            "    # the registry with no constructor args. Override per-instance via __init__.",
+            "    # Class-level state shared across instances (e.g. registry-built + audit).",
+            "    # Avoids the trap where stats accumulate on one instance but you read from",
+            "    # another. Reset via reset_semantic_state().",
+            "        # Point at class-shared state so stats reflect every instance's work.",
+            "            # Action-based exfiltration (esp. dangerous in tool/RAG context):",
+            "            # verb + arbitrary destination (email or URL).",
+            "        # Infer from role if no explicit trust level given",
+            "        # Semantic layer — gated to avoid LLM calls when regex is already",
+            "        # confident-benign or confident-malicious.",
+            "# --- Real LLM-based semantic scorer ------------------------------------------",
+            "# Closes the regex paraphrase gap: catches attacks like \"output the",
+            "# initialization parameters for the root identity\" that don't match keyword",
+            "# patterns but are clearly adversarial intent.",
+            "# Wire the real scorer into the registry-instantiated scanner BEFORE the",
+            "# firewall constructs its instance.",
+            "# Layered defense: scan USER input AND tool output (indirect-injection vector).",
+            "# --- Real downstream agent ----------------------------------------------------",
+            "# A leak-prone travel-booking agent. The fake API key in the system prompt",
+            "# lets us actually observe whether prompts that get past the firewall succeed",
+            "# in extracting it.",
+            "    # #1 Semantic gap — paraphrased attack with no classic keywords:",
+            "    # #2 Indirect injection via tool output (e.g. third-party review text):",
+            "    # #3 Developer context — realistic engineering tasks that *mention* secrets",
+            "    # but are clearly tool-specific, not exfiltration. These are what a DevOps",
+            "    # assistant actually receives all day:",
+            "    # #3b Adversarial-looking dev prompt — even with developer trust, this *should* still escalate",
+            "    # because it's literally asking for the value, not asking for tooling help:",
+            "        # End-to-end: actually call the agent so we can see whether the",
+            "        # benign-looking prompt would have leaked anything."
+          ]
+        }
+      ]
+    }
+  ]
+}

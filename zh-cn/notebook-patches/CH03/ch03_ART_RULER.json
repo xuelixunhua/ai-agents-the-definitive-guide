@@ -1,0 +1,161 @@
+{
+  "notebook": "CH03/ch03_ART_RULER.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "Emg-y6MMIX6D": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH03/ch03_ART_RULER.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>",
+    "i--YtzTHdwdM": "# 关于本 Notebook\n\n本 Notebook 使用 **OpenPipe ART** 与 **LangGraph** 构建并训练一个**数学求解 AI 智能体（math-solving AI agent）**。智能体需要解决 Countdown 风格的算术谜题：给定若干数字和一个目标值，它必须仅使用 +、−、×、÷ 构造出一个结果精确等于目标值的合法算术表达式。\n\n底层主要包含以下部分：\n\n* **数据集（Dataset）：** 一组规模较小的 Countdown 谜题数据，其中 5,000 条用于训练，100 条用于测试。\n* **工具（Tools）：** 智能体可以调用若干专用工具：读取当前数字、搜索可能的解，以及返回最终答案。\n* **判定函数（Judge Function）：** 一个确定性的“裁判”，用于检查数学结果是否正确、数字是否只按规则使用一次，以及表达式是否干净合法（例如不能除以零）。\n* **模型与后端（Model & Backend）：** 使用 ART 的本地后端以及可训练模型，本例采用 Qwen2.5-7B-Instruct。\n* **轨迹展开（Rollouts）：** Notebook 定义了一次完整 episode，也就是一次 rollout 如何运行：智能体接收题目、逐步推理、调用工具并输出表达式。\n* **训练循环（Training Loop）：** 每个 batch 中，模型响应会同时接受两类评分：确定性的硬正确性检查，以及来自 **RULER** 的软质量评估。RULER 是一个学习式评估器（learned evaluator），能够提供更细粒度的反馈；最终 reward 会融合两类信号来指导训练。\n* **测试（Testing）：** 最后在未见过的谜题上测试训练后的模型，检查其是否能够正确求解。",
+    "pOMCNkBVIX6G": "<a name=\"Environment-Variables\"></a>\n\n### 环境变量（Environment Variables）\n\n**OpenAI（用于 RULER judge model）**\n\nRULER 奖励函数（reward function）会调用第三方模型来判断智能体表现的质量。任何 LiteLLM 支持的模型都可以使用。本例使用 OpenAI 的 o4-mini，因此需要设置 `OPENAI_API_KEY` 环境变量。\n\n**Weights & Biases（可选）**\n\nNotebook 后续会创建一个模型，用于自动把指标记录到 Weights & Biases，并把 chat completions 记录到 Weave。若要启用这些功能，需要通过环境变量提供 Weights & Biases API key。",
+    "zUAsmtOuYloJ": "# 导入依赖",
+    "h7OCmttOaZrh": "# 数据集（Dataset）：5,000 条训练 / 100 条测试",
+    "t8EBRJdmad0T": "# 最终答案容器（Final Answer Holder）",
+    "EXczjIalajG5": "# 表达式求值辅助函数（Expression Evaluation Helpers）",
+    "sewEjiDtar0Y": "# 智能体工具（Tools for the Agent）",
+    "IGbSXX3Kau69": "# 确定性裁判（Deterministic Judge）",
+    "XzpER3pfa2iC": "# 模型与后端（Model and Backend）",
+    "dZenr1T0a58c": "# 场景（Scenarios）",
+    "xgvnChBZa-yf": "# 基于 Fraction 的精确搜索工具（Exact Search Tool）",
+    "7_tUXwsxbLwr": "# 轨迹展开（Rollout）",
+    "1Qs5vOyTbP-y": "# 汇总辅助函数（Utils for Summaries）",
+    "c3fPVbV7bXii": "# 训练循环与推理（Training Loop & Inference）"
+  },
+  "code_comment_replacements": {
+    "QBijDl7iIX6F": [
+      {
+        "old": "# Portions adapted from Unsloth Notebooks",
+        "new": "# 部分内容改编自 Unsloth Notebooks"
+      },
+      {
+        "old": "# and OpenPipe",
+        "new": "# 以及 OpenPipe"
+      }
+    ],
+    "KczQY3FUFcXe": [
+      {
+        "old": "# Suppress all warnings",
+        "new": "# 屏蔽所有 warning"
+      }
+    ],
+    "M4KuGZzlK9Pg": [
+      {
+        "old": "# Clean reinstall of Pillow to resolve 'cannot import name _Ink'",
+        "new": "# 重新干净安装 Pillow，用于解决 'cannot import name _Ink' 问题"
+      }
+    ],
+    "IgZvUqaEabw_": [
+      {
+        "old": "# 100 items",
+        "new": "# 100 条样本"
+      }
+    ],
+    "Gttee8PRafKj": [
+      {
+        "old": "# expression string, for example \"(44 + 35) + 19\"",
+        "new": "# 表达式字符串，例如 \"(44 + 35) + 19\""
+      },
+      {
+        "old": "# for bookkeeping",
+        "new": "# 用于记录与追踪"
+      },
+      {
+        "old": "Return final expression string and source ids.\n    The expression must evaluate exactly to the target using only allowed numbers at most once each.",
+        "new": "返回最终表达式字符串与 source ids。\n    表达式必须精确计算得到目标值，并且每个允许的数字最多使用一次。"
+      }
+    ],
+    "qr87wANSakWO": [
+      {
+        "old": "Evaluate with float for permissive mode.",
+        "new": "在宽松模式下使用 float 进行求值。"
+      },
+      {
+        "old": "Evaluate with Fraction for strict integer intermediate checks.",
+        "new": "使用 Fraction 求值，以执行严格的整数中间结果检查。"
+      },
+      {
+        "old": "Return list of integer literals used in the expression.\n    Counts only true integer literals. Treats unary negatives as the same by abs().",
+        "new": "返回表达式中使用到的整数字面量列表。\n    只统计真正的整数字面量，并通过 abs() 把一元负数视为同一个数。"
+      }
+    ],
+    "1p4XK67masuM": [
+      {
+        "old": "Return the active countdown numbers and target as {'nums': [...], 'target': int}.",
+        "new": "以 {'nums': [...], 'target': int} 的形式返回当前 Countdown 数字与目标值。"
+      }
+    ],
+    "XKX_71WLax1c": [
+      {
+        "old": "Returns (reward, value, reason).\n    Reward is 1.0 if the expression evaluates to target and uses the allowed numbers legally, else 0.0.\n    If enforce_integer_intermediates is true, evaluation uses Fraction.",
+        "new": "返回 (reward, value, reason)。\n    如果表达式计算结果等于目标值，并且合法使用允许的数字，则 Reward 为 1.0；否则为 0.0。\n    如果 enforce_integer_intermediates 为 true，则使用 Fraction 进行求值。"
+      },
+      {
+        "old": "# Validate characters to be safe",
+        "new": "# 验证字符，避免不安全或不支持的表达式"
+      },
+      {
+        "old": "# Check number usage",
+        "new": "# 检查数字使用是否合法"
+      }
+    ],
+    "1MtJe_zGbD9P": [
+      {
+        "old": "Try to find a valid expression using each number at most once with + - * /.\n    Uses Fraction to avoid numeric error and can require integer intermediates.\n    Returns an expression string or \"\" if none found within the limit.",
+        "new": "尝试使用 + - * / 构造一个合法表达式，并保证每个数字最多使用一次。\n    使用 Fraction 避免数值误差，并可要求所有中间结果为整数。\n    如果在搜索上限内找到解，则返回表达式字符串；否则返回 \"\"。"
+      },
+      {
+        "old": "# multiset of values, order free",
+        "new": "# 由数值构成的多重集合，不考虑顺序"
+      },
+      {
+        "old": "# commutative first",
+        "new": "# 优先处理满足交换律的运算"
+      }
+    ],
+    "24EiU_1IbMiv": [
+      {
+        "old": "# numeric only metrics",
+        "new": "# metrics 只保留数值字段"
+      },
+      {
+        "old": "# text info into metadata",
+        "new": "# 文本信息写入 metadata"
+      },
+      {
+        "old": "# rubric for RULER",
+        "new": "# 提供给 RULER 的评分 rubric"
+      }
+    ],
+    "kGFExOgQja74": [
+      {
+        "old": "# Hard correctness gate already set reward and metrics[\"correct\"]",
+        "new": "# 硬正确性门控已经设置 reward 和 metrics[\"correct\"]"
+      },
+      {
+        "old": "# Ensure numeric only metrics exist",
+        "new": "# 确保 metrics 中只保留数值字段"
+      },
+      {
+        "old": "# Ask RULER to score each group. Guard on errors or availability.",
+        "new": "# 请求 RULER 为每个 group 评分，并对错误或不可用情况做保护"
+      },
+      {
+        "old": "# change to a model you have",
+        "new": "# 替换为你可用的模型"
+      },
+      {
+        "old": "# Combine: final = gate * (alpha + beta * ruler_norm)",
+        "new": "# 融合：final = gate * (alpha + beta * ruler_norm)"
+      },
+      {
+        "old": "# Inference on 10 held out tests",
+        "new": "# 在 10 个留出测试样本上进行推理"
+      }
+    ]
+  }
+}

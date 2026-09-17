@@ -1,0 +1,101 @@
+{
+  "notebook": "ch08/ch08_eval_harness.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "OB_WFnC7m-sx": "# 关于本 Notebook\n\n通用评估框架（Evaluation Harness）示例（LangGraph + OpenRouter）\n\n本 Notebook 以支持工单（support ticket）为例，展示一套真实、非 Mock 的智能体系统评估框架模式。\n\n它复现了交互式评估面板中的核心机制：\n\n1. 构造结构化测试场景\n2. 以有界并行方式并发执行异步生成\n3. 分批评分（LLM Judge + 确定性检查）\n4. 通过后台工作线程实时追踪进度\n5. 按违规项排序供专家复核，并导出 CSV",
+    "pljAT11fm-sy": "## 如何编写有效的评估场景（Evaluation Scenarios）\n\n高质量场景不只是描述一个任务，还需要定义智能体应在什么上下文中工作，以及评审者具体应该检查什么。\n\n### 1）清楚定义成功标准\n- 明确期望行为、约束条件和可接受的解决结果。\n- 给出评审者可以直接验证的具体成功信号。\n\n### 2）加入边界案例（Edge Cases）\n- 增加存在歧义、高压力或政策约束较强的情形。\n- 这些场景能够暴露推理、工具使用和升级逻辑中的薄弱点。\n\n### 3）有意识地使用 Persona（用户画像）\n- 覆盖不同的用户知识水平、沟通方式和预期。\n- 这样可以让评估覆盖超出“理想用户”行为。\n\n### 4）建模对话流程\n- 把场景视为多轮轨迹（multi-turn trajectories），而不只是单次 Prompt。\n- 加入预期的追问、需要澄清的节点和触发升级的条件。\n\n### 5）显式加入压力维度（Stress Dimensions）\n- `urgency`：用户需要立即解决问题。\n- `ambiguity`：关键信息缺失，智能体应提出澄清问题。\n- `emotional_frustration`：用户愤怒或不信任，回复应起到降温作用。\n- `knowledge_mismatch`：用户误解系统行为，回复应帮助其理解。\n- `adversarial_intent`：用户试图绕过安全措施，回复应坚持政策边界。\n\n一个实用场景通常包括：persona、情绪状态、压力维度、背景、用户目标以及预期对话路径。",
+    "FVqG5Y7Pm-sz": "## 如何适配这套模板\n\n- 用你的领域工具替换示例工具。\n- 用生产环境中的 Schema 替换 `TicketScenario` / `TicketOutput`。\n- 保留相同的评估机制：有界并发（bounded concurrency）、分批评分（batched scoring）、进度追踪，以及违规优先（violation-first）的人工复核。\n- 加入真正与你领域相关的确定性检查，例如 Schema、合规要求、政策规则和风格约束。\n- 将每条评估记录持久化到 CSV / Parquet / 数据库，并在模型或 Prompt 晋级之前，在 CI/CD 中应用阈值门槛。",
+    "R8hj50WAm-sz": "## 领域专家复核工作流（Domain-Expert Review Workflow）\n\n这复现了交互式评估面板中同样实用的一套测试闭环：\n\n1. 从面向用户的真实字段中抽样场景\n2. 运行带实时阶段进度的异步评估\n3. 按违规标记、压力维度失败以及低分结果确定复核优先级\n4. 导出 CSV，供领域专家快速交叉检查\n\n重要的是：应导出完整的 trace（轨迹）字段，包括输入文本、生成 Prompt/输出、Judge Prompt/输出，以及可用时的 RULER 日志，而不只是聚合分数。\n\n这种方式的杠杆很高，因为团队无需依赖遥测平台，也能开展严肃的质量复核。",
+    "luatdE5Cm-sz": "## 基于 Persona 的 RULER 评估（OpenRouter）\n\n这一部分加入受 persona 条件约束的场景集合，并使用 RULER 对输出进行评分。\n\nRULER 的重要使用说明：\n- 当你要对**同一个**场景上下文中的多个候选轨迹进行评分时，RULER 最有价值。\n- 因此，本 Notebook 会为每个 persona 场景组生成多个候选结果，再进行相对排序。\n\n这样做的价值在于：\n- 检查输出能否适配不同用户背景和 persona；\n- 捕捉确定性检查可能遗漏的风格或帮助性漂移（style/helpfulness drift）；\n- 继续使用同一套由 OpenRouter 支撑的评估栈进行评分。"
+  },
+  "code_comment_replacements": {
+    "OPzJI_S7m-sx": [
+      {
+        "old": "# Install dependencies (run once per environment)",
+        "new": "# 安装依赖（每个环境运行一次）"
+      }
+    ],
+    "Z-U15kSJm-sy": [
+      {
+        "old": "\"\"\"Normalize product aliases for consistent categorization.\"\"\"",
+        "new": "\"\"\"归一化产品别名，以保持分类结果一致。\"\"\""
+      }
+    ],
+    "RIE0OoCom-sy": [
+      {
+        "old": "\"\"\"Thread-safe progress bridge (worker thread -> notebook thread).\"\"\"",
+        "new": "\"\"\"线程安全的进度桥接器（工作线程 -> Notebook 线程）。\"\"\""
+      },
+      {
+        "old": "# Phase 1: concurrent generation (0-60%)",
+        "new": "# 阶段 1：并发生成（0-60%）"
+      },
+      {
+        "old": "# Phase 2: batched LLM scoring (60-95%)",
+        "new": "# 阶段 2：分批进行 LLM 评分（60-95%）"
+      },
+      {
+        "old": "# Finalization",
+        "new": "# 收尾处理"
+      }
+    ],
+    "VN-11JMvm-sy": [
+      {
+        "old": "# Practical scenario template + optional persona enrichment",
+        "new": "# 实用场景模板 + 可选的 persona 信息增强"
+      }
+    ],
+    "aFk0L-4mm-sz": [
+      {
+        "old": "# Review-priority slice + CSV export",
+        "new": "# 按复核优先级切片 + CSV 导出"
+      },
+      {
+        "old": "# (analogous to sorting by RULER/rule violations first)",
+        "new": "# （类似于优先按 RULER / 规则违规项排序）"
+      },
+      {
+        "old": "# Export FULL interaction trace (all columns, not just summary columns shown above)",
+        "new": "# 导出完整交互轨迹（所有列，而不只是上方展示的摘要列）"
+      }
+    ],
+    "7rPZJE9Nm-sz": [
+      {
+        "old": "# Compact pipeline view for quick reviewer orientation",
+        "new": "# 紧凑版流水线视图，帮助评审者快速理解流程"
+      }
+    ],
+    "zaxTUp3mm-sz": [
+      {
+        "old": "\"\"\"Notebook-local RULER scorer with explicit OpenRouter LiteLLM wiring.\"\"\"",
+        "new": "\"\"\"Notebook 内部使用的 RULER 评分器，显式配置 OpenRouter LiteLLM 连接。\"\"\""
+      },
+      {
+        "old": "\"\"\"RULER scores groups of candidates for the SAME scenario/persona context.\"\"\"",
+        "new": "\"\"\"RULER 会对同一场景 / persona 上下文中的候选结果组进行评分。\"\"\""
+      },
+      {
+        "old": "# Best practice: use multiple candidates per group (4-8 ideal)",
+        "new": "# 最佳实践：每组使用多个候选结果（理想数量为 4-8 个）"
+      }
+    ],
+    "9rKzHPFjm-sz": [
+      {
+        "old": "# Build multiple candidate trajectories per scenario group for RULER relative ranking.",
+        "new": "# 为每个场景组构建多条候选轨迹，用于 RULER 相对排序。"
+      },
+      {
+        "old": "# Best-practice group size is typically 4-8 trajectories.",
+        "new": "# 最佳实践中的分组规模通常为 4-8 条轨迹。"
+      }
+    ]
+  }
+}

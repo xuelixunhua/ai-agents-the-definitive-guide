@@ -1,0 +1,20 @@
+{
+  "notebook": "ch09/ch09_agentvista.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "code_comment_replacements": {
+    "Qg64ZvnT9ITQ": [
+      {
+        "old": "# @title Download AgentVista dataset from Hugging Face",
+        "new": "# @title 从 Hugging Face 下载 AgentVista 数据集"
+      }
+    ]
+  }
+}

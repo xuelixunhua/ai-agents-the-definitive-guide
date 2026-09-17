@@ -1,0 +1,41 @@
+{
+  "notebook": "ch09/ch09_example_external_evaluation_pipelines_Langfuse.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "DqejNWyyemqW": "先定义一组有代表性的客服场景。每个案例都包含预期的 workflow（工作流）、必需的操作步骤、正确的 handoff target（交接目标），以及稍后用于 correctness checks（正确性检查）的 reference answer（参考答案）。",
+    "m7Y5E9OEfxHG": "接下来，我们会为每个案例向 Langfuse 记录一条 synthetic trace（合成轨迹）。这一准备环节的目标不是构建一个逼真的客服 Agent，而是创建具有代表性的轨迹，其中包含 external evaluator（外部评估器）稍后可以检查的工作流信号：重试、工具执行结果、handoff（交接）和最终答案。",
+    "oSEeesvpGanI": "对于基于 LLM 的检查，应保留评分理由。它们有助于调试，也方便后续复核边界案例。对于 hard checks（硬检查），布尔结果通常已经足够；但对于 judge-based scores（基于评审器的评分），解释本身也会成为 audit trail（审计轨迹）的一部分。"
+  },
+  "code_comment_replacements": {
+    "K1K-eOQAsgTM": [
+      {
+        "old": "# Store your secrets in a local .env file or your notebook environment.",
+        "new": "# 将密钥保存在本地 .env 文件或 Notebook 环境中。"
+      },
+      {
+        "old": "# Do not hardcode credentials directly in the notebook.",
+        "new": "# 不要在 Notebook 中直接硬编码凭据。"
+      }
+    ],
+    "YupMIUkjehZT": [
+      {
+        "old": "# Get keys for your project from the project settings page: https://cloud.langfuse.com",
+        "new": "# 可在项目设置页面获取项目密钥：https://cloud.langfuse.com"
+      }
+    ],
+    "3P491ylsd9To": [
+      {
+        "old": "# Additional comparable scenarios so RULER can rank 3-5 similar answers per group.",
+        "new": "# 补充可比较场景，使 RULER 能在每组中对 3–5 个相似答案进行排序。"
+      }
+    ]
+  }
+}

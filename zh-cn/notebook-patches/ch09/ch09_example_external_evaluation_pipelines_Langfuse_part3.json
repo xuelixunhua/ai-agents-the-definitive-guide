@@ -1,0 +1,28 @@
+{
+  "notebook": "ch09/ch09_example_external_evaluation_pipelines_Langfuse.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "JZ03vuqjh41e": "现在你应该能在 Langfuse UI 的 *Traces（轨迹）* 页面看到这些具有代表性的客服 Agent 轨迹。",
+    "XIO21rBblD1z": "## 为什么只有 tracing（链路追踪）还不够\n\nTracing 能展示延迟、重试、工具调用和输出等运行行为。这些信息必不可少，但仍然不完整：当你更换模型或调整 orchestration（编排）方式时，还需要确认系统是否继续满足工作流特定的质量要求，例如是否执行了正确的 handoff（交接）、是否完成必需步骤，以及最终答案是否充分且正确。",
+    "dwMP3D4soqeJ": "## 获取具有代表性的 production traces（生产轨迹）\n\n从 Langfuse 获取轨迹本身很直接。真正重要的不是随便拉取近期轨迹，而是选出具有代表性的样本。实际使用时，通常会先按时间窗口筛选，再根据 tags（标签）、workflow（工作流）、agent type（Agent 类型）或其他与当前发布决策相关的切片进一步缩小范围。\n\n下面的示例保留 Langfuse 的轨迹获取逻辑，并演示如何在拉取后继续用 Python 叠加筛选条件。",
+    "0bJ07c0bh1AZ": "# 定义 multi-layer evaluation criteria（多层评估标准）\n\n在这个 Notebook 中，我们会从五个维度为每条轨迹评分：\n\n- `retry_budget_respected`\n- `correct_handoff`\n- `required_step_completed`\n- `final_answer_sufficient`\n- `final_answer_correct`\n\n前三项非常适合使用 hard checks（硬检查）。后两项通常更适合 structured rubric checks（结构化评分规则检查）或 trace-level judges（轨迹级评审器）。",
+    "cdSce8v0rEOF": "Hard checks（硬检查）应尽可能承担更多工作：\n\n- `retry_count <= max_retries`\n- 必需的工具调用成功完成\n- 需要升级处理时，存在必需的 handoff（交接）标签\n- 轨迹中出现必需的工作流步骤\n\n随后，再对仅靠严格的程序化比较无法充分判断的‘充分性’和‘正确性’增加 rubric-based checks（基于评分规则的检查）。",
+    "bTeadSh7rEOF": "当执行路径本身很重要，而不只是最终答案重要时，就适合使用 trace-level judging（轨迹级评审）。这也是 trajectory judge（轨迹评审器）或 RULER 这类系统非常适配的场景：当某些失败只有在完整路径中才能看见时，用明确的目标达成评分规则比较不同 trajectory（轨迹）。\n\n下面的代码继续保持生产模式的简洁性：对工作流合规性使用 hard checks（硬检查），对充分性和正确性使用 external judge-style scoring（外部评审式评分）。"
+  },
+  "code_comment_replacements": {
+    "ImkN3qa5BtOB": [
+      {
+        "old": "# DeepEval StepEfficiencyMetric can fail internally (prompt not set) for some payloads.",
+        "new": "# 对某些 payload，DeepEval StepEfficiencyMetric 可能因内部 prompt 未设置而失败。"
+      }
+    ]
+  }
+}

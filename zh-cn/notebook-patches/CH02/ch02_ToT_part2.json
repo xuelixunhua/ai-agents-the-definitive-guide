@@ -1,0 +1,84 @@
+{
+  "notebook": "CH02/ch02_ToT.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "code_comment_replacements": {
+    "tMGB6TAqAVwv": [
+      {
+        "old": "# --- API Key Setup ---",
+        "new": "# --- API Key 配置 ---"
+      },
+      {
+        "old": "# Option 1 (preferred): create a `.env` file in your project folder with:",
+        "new": "# 方案 1（推荐）：在项目目录中创建 `.env` 文件，并写入："
+      },
+      {
+        "old": "# Option 2: set it directly in the notebook with magic:",
+        "new": "# 方案 2：直接通过 Notebook magic 命令设置："
+      },
+      {
+        "old": "# Load from .env if available",
+        "new": "# 如果存在 `.env`，则从中加载。"
+      },
+      {
+        "old": "# Fallback: ask if still missing",
+        "new": "# Fallback（回退方案）：如果仍缺少密钥，则交互式询问。"
+      }
+    ],
+    "vJRENQaEjxf7": [
+      {
+        "old": "# creative, cheaper",
+        "new": "# 更偏创意，成本更低"
+      },
+      {
+        "old": "# stricter judge",
+        "new": "# 更严格的评审模型"
+      },
+      {
+        "old": "# reuse small model for drafting",
+        "new": "# 起草阶段复用小模型"
+      }
+    ],
+    "FW_ftJzKkClp": [
+      {
+        "old": "\"\"\"Generator (small): propose 3 creative approaches (ToT-style branching).\"\"\"",
+        "new": "\"\"\"小型生成器：提出 3 个有创意的方案（ToT 风格分支）。\"\"\""
+      },
+      {
+        "old": "\"\"\"Judge (stronger): critique options and select best one.\"\"\"",
+        "new": "\"\"\"更强的评审模型：批判性比较候选方案，并选出最佳方案。\"\"\""
+      },
+      {
+        "old": "# Defensive clamp",
+        "new": "# 防御性限制索引范围，避免越界。"
+      },
+      {
+        "old": "\"\"\"Researcher (tool-using): propose queries, call search tool(s), synthesize sources JSON.\"\"\"",
+        "new": "\"\"\"工具型研究员：提出查询、调用搜索工具，并综合得到 sources JSON。\"\"\""
+      },
+      {
+        "old": "# 1) Ask for tight queries (structured)",
+        "new": "# 1）请求精确查询（结构化输出）"
+      },
+      {
+        "old": "# 2) Call tool(s) explicitly (deterministic, observable)",
+        "new": "# 2）显式调用工具（确定、可观察）"
+      },
+      {
+        "old": "# 3) Synthesize to a clean JSON list of sources",
+        "new": "# 3）综合为干净的 JSON 来源列表"
+      },
+      {
+        "old": "\"\"\"Writer (small): outline + intro from chosen plan and sources.\"\"\"",
+        "new": "\"\"\"小型写作模型：基于选中的方案与资料生成大纲和引言。\"\"\""
+      }
+    ]
+  }
+}

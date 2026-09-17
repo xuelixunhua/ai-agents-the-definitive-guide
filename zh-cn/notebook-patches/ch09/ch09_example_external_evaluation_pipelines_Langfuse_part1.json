@@ -1,0 +1,21 @@
+{
+  "notebook": "ch09/ch09_example_external_evaluation_pipelines_Langfuse.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "epVx0uo_Tfl8": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH09/ch09_example_external_evaluation_pipelines_Langfuse.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>",
+    "lpBUMxFAXtXx": "<!-- NOTEBOOK_METADATA source: \"Jupyter Notebook\" title: \"Evaluate Langfuse Agent Traces with an External Evaluation Pipeline\" description: \"This notebook shows how to fetch representative production traces from Langfuse, score them externally, optionally push custom scores back, and turn critical failures into a replayable benchmark set for model comparison.\" category: \"Evaluation\" sidebarTitle: \"External Evaluation Pipelines\"-->\n\n# 使用外部评估流水线评估 Langfuse Agent 轨迹\n\n本篇 cookbook 展示如何把 Langfuse 作为 trace store（轨迹存储）、filtering layer（过滤层）以及可选的 score visualization layer（评分可视化层），构建一条外部 evaluation pipeline（评估流水线）。\n\nTracing（链路追踪）能告诉你发生了什么：延迟、工具调用、重试和输出。但它无法告诉你，更换模型之后是否仍然满足应用自身的质量标准。因此，我们会从 Langfuse 获取具有代表性的轨迹，在 Langfuse 之外完成评分，可选地把结果写回，并在替换模型之前把关键失败提升为可重放的 benchmark set（基准集）。",
+    "ZuvcGc7qYEza": "最重要的实践选择，是不要让这个 Notebook 只依赖 LLM judge（大模型评审器）。\n\n更稳妥的做法，是混合三类信号：\n\n- **Hard checks（硬检查）**：直接验证可以确定判断的项目，例如重试预算、Schema 有效性、工具是否成功、是否包含必需的 handoff（交接）标签，或数值是否在容差范围内。\n- **Structured rubric checks（结构化评分规则检查）**：评估充分性、完整性等维度。\n- **Trace-level judge checks（轨迹级评审检查）**：当执行路径本身和最终答案一样重要时，用于判断整条轨迹。\n\n这种组合也符合 Langfuse 在生产环境中的典型价值：保存 traces（轨迹）、筛选具有代表性的样本，并可视化自定义评分。评分逻辑本身应体现良好的评估实践，而不是只关注语气、愉悦度等风格特征。\n\n<iframe\n  width=\"100%\"\n  className=\"aspect-[3230/2160] rounded mt-10\"\n  src=\"https://www.youtube-nocookie.com/embed/rHfME8KDmIw?si=V4m8smxZ219AKmOU\"\n  title=\"YouTube video player\"\n  frameborder=\"0\"\n  allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\n  referrerpolicy=\"strict-origin-when-cross-origin\"\n  allowFullScreen\n></iframe>",
+    "NU2J48CgYAfs": "---\n\n完成本篇 cookbook 后，你将能够：\n\n- 使用时间窗口和标签过滤器，从 Langfuse 获取具有代表性的 production traces（生产轨迹）。\n- 为 Agent 工作流和最终结果定义 multi-layer evaluation criteria（多层评估标准）。\n- 使用硬检查、评分规则检查或二者结合，在外部对轨迹进行评分。\n- 可选地把选定的评分结果写回 Langfuse。\n- 把关键失败提升为可重放的 benchmark set（基准集）。\n- 在重新部署之前，用该基准集比较候选模型版本。\n- 当单条轨迹指标不足以区分质量时，可选地使用 RULER 等 relative trajectory ranking（相对轨迹排序）方法。\n",
+    "DYZ1ZOESb788": "**说明**：本篇 cookbook 使用 Jupyter Notebook 进行演示；在生产环境中，你可以使用自己偏好的 orchestration tool（编排工具）。只需要把相关代码提取到 `.py` 文件，并确保运行时能够获得全部依赖即可。\n\n",
+    "nAQ3R0T1cOXT": "## （准备工作）把具有代表性的客服 Agent 轨迹加载到 Langfuse\n\n本演示不采用泛化的文本风格示例，而是使用一个轻量级客服 Agent 工作流。每条 synthetic trace（合成轨迹）都会包含足够的信息来评估 Agent 行为：重试次数、handoff target（交接目标）、必需步骤、工具执行结果以及最终答案。\n\n在生产环境中，你应该首先获取真实轨迹。这里我们创建具有代表性的合成轨迹，让 Notebook 后面的内容可以专注于评估流水线本身。",
+    "kCIMRo3Qeaxg": "你可以在[这里](https://cloud.langfuse.com/)获取 Langfuse API keys，在[这里](https://platform.openai.com/api-keys)获取 OpenAI API key。"
+  }
+}

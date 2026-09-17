@@ -1,0 +1,123 @@
+{
+  "notebook": "ch11/ch11_agent_cost_estimator_based_on_topology.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "RU-vD6psVxQo": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH11/ch11_agent_cost_estimator_based_on_topology.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>"
+  },
+  "code_comment_replacements": {
+    "WT0oaq2KRmra": [
+      {
+        "old": "# API cost estimator for agent architectures",
+        "new": "# Agent architecture（智能体架构）的 API 成本估算器"
+      },
+      {
+        "old": "# Architecture behavior × deployment profile × realistic cost knobs:",
+        "new": "# Architecture behavior（架构行为）× deployment profile（部署配置）× realistic cost knobs（现实成本调节项）："
+      },
+      {
+        "old": "#   - calls_per_request with low/high bands (dominant source of variance)",
+        "new": "#   - calls_per_request 及其 low/high 区间（成本波动的主要来源）"
+      },
+      {
+        "old": "#   - cache_hit_rate per step (prefix caching discount on input tokens)",
+        "new": "#   - 每一步的 cache_hit_rate（prefix caching，前缀缓存，可降低输入 Token 成本）"
+      },
+      {
+        "old": "# Swap DEPLOYMENT_PROFILES entries to compare the \"same architecture,",
+        "new": "# 通过替换 DEPLOYMENT_PROFILES 中的条目，可以比较“同一套架构、"
+      },
+      {
+        "old": "# different model mix\" trade-off without touching the architecture.",
+        "new": "# 不同模型组合”之间的权衡，而无需改动架构本身。"
+      },
+      {
+        "old": "# Architecture definitions — behavior, not model IDs.",
+        "new": "# Architecture definitions（架构定义）——描述行为，而不是绑定具体 model ID。"
+      },
+      {
+        "old": "# Optional fields:",
+        "new": "# 可选字段："
+      },
+      {
+        "old": "#   calls_per_request_low / calls_per_request_high  — realistic band",
+        "new": "#   calls_per_request_low / calls_per_request_high  — 现实情况下的调用次数区间"
+      },
+      {
+        "old": "#   cache_hit_rate                                  — fraction of input",
+        "new": "#   cache_hit_rate                                  — 输入 Token 中"
+      },
+      {
+        "old": "#                                                     served from cache",
+        "new": "#                                                     由缓存命中的比例"
+      },
+      {
+        "old": "# One call, nothing to cache against.",
+        "new": "# 单次调用，没有可复用的前缀缓存。"
+      },
+      {
+        "old": "# First call establishes the prefix — no cache yet.",
+        "new": "# 第一次调用用于建立 prefix（前缀），此时还没有缓存。"
+      },
+      {
+        "old": "# Tool loop is the dominant cost knob. Real traces span 1-8+ steps;",
+        "new": "# Tool loop（工具循环）是最主要的成本调节项。真实 trace（轨迹）通常会跨 1–8+ 个步骤；"
+      },
+      {
+        "old": "# the system prompt + tool descriptions cache well across iterations.",
+        "new": "# system prompt（系统提示）和工具描述在多轮迭代之间通常具有较高缓存复用率。"
+      },
+      {
+        "old": "# Specialist fires conditionally. Heavy model, sensitive to the band.",
+        "new": "# Specialist（专家智能体）按条件触发。由于使用较重模型，成本对调用区间非常敏感。"
+      },
+      {
+        "old": "# Deployment profiles — role → (provider, model). Swap to compare.",
+        "new": "# Deployment profiles（部署配置）——role → (provider, model)。可替换配置进行对比。"
+      },
+      {
+        "old": "# Downgrade the heavy role — see whether the specialist_reasoner",
+        "new": "# 将 heavy role（高成本角色）降级，观察 specialist_reasoner"
+      },
+      {
+        "old": "# step still carries its weight at mini pricing.",
+        "new": "# 在 mini 价格水平下是否仍然值得保留。"
+      },
+      {
+        "old": "# Minimal usage object expected by genai_prices",
+        "new": "# genai_prices 所需的最小 usage 对象"
+      },
+      {
+        "old": "# Helpers",
+        "new": "# Helpers（辅助函数）"
+      },
+      {
+        "old": "\"\"\"Price one call. fresh + cached input are billed at different rates\n    by the provider; genai_prices honors the split via cached_input_tokens.\"\"\"",
+        "new": "\"\"\"计算单次调用价格。provider（供应商）会对 fresh input（新输入）与 cached input（缓存输入）采用不同费率；genai_prices 通过 cached_input_tokens 保留这一区分。\"\"\""
+      },
+      {
+        "old": "\"\"\"Estimate across ALL deployment profiles. Returns (steps_df, arch_df)\n    where arch_df has one row per (deployment, architecture).\"\"\"",
+        "new": "\"\"\"对全部 deployment profiles（部署配置）进行估算。返回 (steps_df, arch_df)，其中 arch_df 每个 (deployment, architecture) 组合对应一行。\"\"\""
+      },
+      {
+        "old": "# Multipliers relative to Single-shot WITHIN each deployment.",
+        "new": "# 在每个 deployment（部署配置）内部，以 Single-shot 为基准计算 multiplier（倍数）。"
+      },
+      {
+        "old": "# Run the estimator across all deployments",
+        "new": "# 在全部 deployment 上运行估算器"
+      },
+      {
+        "old": "# Quick cross-deployment delta — the whole reason the profile abstraction exists.",
+        "new": "# 快速比较跨 deployment 的成本差异——这也是 profile abstraction（配置抽象）存在的核心价值。"
+      }
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+name: Apply zh-CN notebook patches
+
+on:
+  push:
+    branches:
+      - zh-cn-translation
+    paths:
+      - "zh-cn/notebook-patches/**"
+      - "scripts/apply_zh_cn_notebook_patch.py"
+      - ".github/workflows/apply-zh-cn-notebook-patches.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: zh-cn-translation-notebook-automation
+  cancel-in-progress: false
+
+jobs:
+  apply-notebook-translations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out translation branch
+        uses: actions/checkout@v4
+        with:
+          ref: zh-cn-translation
+          fetch-depth: 0
+
+      - name: Apply all zh-CN notebook manifests
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          manifests = sorted(Path("zh-cn/notebook-patches").rglob("*.json"))
+          if not manifests:
+              raise SystemExit("No notebook translation manifests found")
+
+          for manifest in manifests:
+              data = json.loads(manifest.read_text(encoding="utf-8"))
+              notebook = Path(data["notebook"])
+              if not notebook.exists():
+                  raise FileNotFoundError(notebook)
+              subprocess.run(
+                  [
+                      "python",
+                      "scripts/apply_zh_cn_notebook_patch.py",
+                      str(notebook),
+                      str(manifest),
+                  ],
+                  check=True,
+              )
+          PY
+
+      - name: Validate notebook JSON
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          for manifest in Path("zh-cn/notebook-patches").rglob("*.json"):
+              data = json.loads(manifest.read_text(encoding="utf-8"))
+              notebook = Path(data["notebook"])
+              json.loads(notebook.read_text(encoding="utf-8"))
+              print(f"validated: {notebook}")
+          PY
+
+      - name: Commit applied translations
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- '*.ipynb'
+          if git diff --cached --quiet; then
+            echo "No notebook changes to commit"
+            exit 0
+          fi
+          git commit -m "i18n: apply zh-CN notebook translation manifests"
+          # Another translation workflow may have advanced the branch while this job
+          # was running. Rebase the generated notebook commit before pushing so the
+          # two automation jobs do not fail each other with a non-fast-forward race.
+          git fetch origin zh-cn-translation
+          git pull --rebase origin zh-cn-translation
+          git push origin HEAD:zh-cn-translation

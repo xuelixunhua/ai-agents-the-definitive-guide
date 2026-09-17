@@ -1,0 +1,36 @@
+{
+  "notebook": "ch07/ch07_hardening_backbone.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {},
+  "code_comment_replacements": {
+    "MJDw7z8suSVi": [
+      {"old": "Count tokens in a single chat message using tiktoken.", "new": "使用 tiktoken 计算单条聊天消息的 token 数量。"},
+      {"old": "Follows the OpenAI token-counting recipe: every message has a fixed", "new": "遵循 OpenAI 的 token 计数方法：每条消息都有固定的"},
+      {"old": "overhead for role/name framing, plus the content tokens.", "new": "role/name 结构开销，再加上消息内容本身的 token。"},
+      {"old": "Count total tokens for a full conversation history.", "new": "计算完整对话历史的 token 总数。"},
+      {"old": "Includes the 2-token reply primer that the API adds after the last message.", "new": "其中包含 API 在最后一条消息之后添加的 2-token 回复起始标记（reply primer）。"}
+    ],
+    "RlYTWh3WuSVj": [
+      {"old": "The Context Janitor: keeps the system prompt and the last N turns,", "new": "Context Janitor：保留系统 Prompt 和最近 N 轮对话，"},
+      {"old": "discarding the middle. Injects a summary of pruned content.", "new": "丢弃中间历史，并注入一条被裁剪内容的摘要。"},
+      {"old": "Token counts are computed with tiktoken — the same BPE tokenizer", "new": "token 数量使用 tiktoken 计算——它采用与模型一致的 BPE（Byte Pair Encoding）分词器，"},
+      {"old": "the model uses — so the pruning threshold is exact, not a guess.", "new": "因此裁剪阈值来自精确计数，而不是粗略猜测。"}
+    ],
+    "WLx8h-QOuSVj": [
+      {"old": "Trip the fuse if the agent is burning money or stuck in a loop.", "new": "当智能体持续消耗预算或陷入循环时触发熔断。"},
+      {"old": "Call this AFTER every LLM call.", "new": "应在每次 LLM 调用之后执行此检查。"}
+    ],
+    "9bCurq0uuSVj": [
+      {"old": "Run one hardened agent turn: prune → call LLM → tools → metrics → breaker → checkpoint.", "new": "执行一轮加固后的智能体流程：裁剪 → 调用 LLM → 工具 → 指标 → 熔断器 → 检查点。"},
+      {"old": "Returns the assistant's final reply.", "new": "返回 assistant 的最终回复。"}
+    ]
+  }
+}

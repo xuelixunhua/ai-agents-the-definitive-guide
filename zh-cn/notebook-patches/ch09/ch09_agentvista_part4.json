@@ -1,0 +1,143 @@
+{
+  "notebook": "ch09/ch09_agentvista.ipynb",
+  "code_comment_replacements": {
+    "hYmSqtWI9KRy": [
+      {
+        "old": "# Harness LLM judge (AgentVista accuracy_score): after inference, compares model output to ground truth.",
+        "new": "# Harness LLM Judge（评测框架中的 LLM 裁判，AgentVista accuracy_score）：推理完成后，将模型输出与 ground truth（标准答案）比较。"
+      },
+      {
+        "old": "# Required env vars (see AgentVista-main/utils/general_qa_tool.py):",
+        "new": "# 必需的环境变量（参见 AgentVista-main/utils/general_qa_tool.py）："
+      },
+      {
+        "old": "#   VERIFIER_API_KEY   — same OpenRouter key is fine (set below).",
+        "new": "#   VERIFIER_API_KEY   — 可以直接使用同一个 OpenRouter key（下方设置）。"
+      },
+      {
+        "old": "#   VERIFIER_END_POINT — OpenRouter chat-completions URL (set below; also set again in the next cell).",
+        "new": "#   VERIFIER_END_POINT — OpenRouter chat-completions URL（下方设置；下一 Cell 还会再次设置）。"
+      },
+      {
+        "old": "#   VERIFIER_MODEL_NAME — optional; defaults to gpt-4o in the harness if unset; we set an OpenRouter slug below.",
+        "new": "#   VERIFIER_MODEL_NAME — 可选；未设置时 Harness 默认使用 gpt-4o；下方会设置一个 OpenRouter 模型 slug。"
+      },
+      {
+        "old": "# Cheap, text-only judge on OpenRouter (change if you prefer e.g. openai/gpt-4.1)",
+        "new": "# OpenRouter 上成本较低的纯文本 Judge（如有需要可改成例如 openai/gpt-4.1）。"
+      }
+    ],
+    "BCl7sgKm9M5N": [
+      {
+        "old": "# @title Configure OpenRouter for multi model evaluation",
+        "new": "# @title 配置 OpenRouter 进行多模型评估"
+      },
+      {
+        "old": "# If you skipped cell 3, still pick a judge model for OpenRouter (text-only scoring).",
+        "new": "# 如果跳过了 Cell 3，这里仍需为 OpenRouter 指定一个 Judge 模型（仅做文本评分）。"
+      }
+    ],
+    "dnM4bEqM9O_3": [
+      {
+        "old": "# @title Load parquet dataset and export embedded images safely",
+        "new": "# @title 加载 Parquet 数据集并安全导出嵌入图像"
+      }
+    ],
+    "adHnUFsC9Sjp": [
+      {
+        "old": "# @title Create a stratified AgentVista subset for side by side model comparison",
+        "new": "# @title 创建 stratified subset（分层子集），用于 AgentVista 模型横向比较"
+      }
+    ],
+    "KcMb8-jOnB5-": [
+      {
+        "old": "# @title Validate subset structure and exported images",
+        "new": "# @title 验证子集结构与已导出的图像"
+      },
+      {
+        "old": "# Show a few examples visually",
+        "new": "# 直观展示几个示例"
+      }
+    ],
+    "KZm6BQjjnWWM": [
+      {
+        "old": "# @title Tiny sanity check on 2 samples with one model before the full run",
+        "new": "# @title 完整运行前，先用一个模型在 2 个样本上做 Sanity Check（冒烟验证）"
+      }
+    ],
+    "_W4V7QrNngpA": [
+      {
+        "old": "# @title Inspect sanity check predictions before full evaluation",
+        "new": "# @title 完整评估前检查 Sanity Check 的预测结果"
+      }
+    ],
+    "5kiY00kHo1xv": [
+      {
+        "old": "# @title Inspect sanity predictions in detail",
+        "new": "# @title 详细检查 Sanity Check 的预测结果"
+      }
+    ],
+    "TcmCZz4H9U0r": [
+      {
+        "old": "# @title Run AgentVista on the same subset for all selected models",
+        "new": "# @title 让所有选定模型在同一个子集上运行 AgentVista"
+      }
+    ],
+    "eKlYRES89XvN": [
+      {
+        "old": "# @title Load and merge outputs from all models",
+        "new": "# @title 加载并合并所有模型的输出"
+      }
+    ],
+    "CX7_4ttbFtqt": [
+      {
+        "old": "# @title Standardize result fields, recover domain, and compute correctness",
+        "new": "# @title 统一结果字段、恢复 Domain（领域）信息并计算正确性"
+      },
+      {
+        "old": "# Harness column names that may hold LLM-judge scores (AgentVista: accuracy_score).",
+        "new": "# Harness 中可能保存 LLM Judge 评分的列名（AgentVista 使用 accuracy_score）。"
+      },
+      {
+        "old": "# Populated only when VERIFIER_API_KEY and VERIFIER_END_POINT are set (VERIFIER_MODEL_NAME",
+        "new": "# 只有设置 VERIFIER_API_KEY 和 VERIFIER_END_POINT 后才会写入该评分（VERIFIER_MODEL_NAME"
+      },
+      {
+        "old": "# selects the judge on OpenRouter; see cells 3–4). See AgentVista-main/README.md.",
+        "new": "# 用于选择 OpenRouter 上的 Judge；参见 Cells 3–4）。另见 AgentVista-main/README.md。"
+      },
+      {
+        "old": "# Without API key + endpoint, harness accuracy_score stays 0 for every row.",
+        "new": "# 如果没有 API key + endpoint，Harness 的 accuracy_score 会在所有记录中保持为 0。"
+      },
+      {
+        "old": "# Optional relaxed diagnostic metric",
+        "new": "# 可选的宽松诊断指标"
+      }
+    ],
+    "GeK3agSDPENK": [
+      {
+        "old": "# @title Build a side by side comparison table",
+        "new": "# @title 构建 side-by-side（并排）比较表"
+      }
+    ],
+    "6kKgtCC9PGCC": [
+      {
+        "old": "# @title Plot per domain accuracy by model",
+        "new": "# @title 绘制各模型按 Domain（领域）划分的准确率"
+      }
+    ],
+    "DnGVuME1PHt_": [
+      {
+        "old": "# @title Plot overall accuracy by model",
+        "new": "# @title 绘制各模型的整体准确率"
+      }
+    ],
+    "6gvnc1YQPJo7": [
+      {
+        "old": "# @title Show how to extend the schema with your own use case data",
+        "new": "# @title 展示如何使用自己的业务数据扩展 Schema（数据结构）"
+      }
+    ]
+  }
+}

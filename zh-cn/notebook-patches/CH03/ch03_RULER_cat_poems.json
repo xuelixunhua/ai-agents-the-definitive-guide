@@ -1,0 +1,42 @@
+{
+  "notebook": "CH03/ch03_RULER_cat_poems.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "wGOUwOX8cv-2": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH03/ch03_RULER_cat_poems.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"在 Colab 中打开\"/>\n</a>",
+    "K4GEpfd2cH7R": "# 关于本 Notebook\n\n本 Notebook 演示如何使用 [OpenPipe ART](https://art.openpipe.ai/getting-started/about) 的 **智能体强化调优（Agentic Reinforcement Tuning, ART）** 框架，配合 [RULER](https://art.openpipe.ai/fundamentals/ruler) 奖励模型，对语言模型输出进行**评估与排序**。\n\n示例构造了一个简单的诗歌写作场景：要求模型生成**以猫为主题的诗歌**。Notebook 手工定义三条不同质量的响应轨迹（trajectory）——**高质量、一般质量和偏题**——来演示评分过程。随后，这些轨迹会被组成一个组，并由 RULER 自动评分。RULER 是一个学习式评估器（learned evaluator），能够对模型输出给出细粒度质量判断。\n\n本 Notebook 将展示：\n\n* 如何定义和组织表示模型消息历史与补全结果的**轨迹（trajectory）**：`art.Trajectory`。\n* 如何使用 `art.rewards` 模块中的 **`ruler_score_group`** 对多个输出进行统一评估。\n* 如何依据奖励分数（reward score）对响应进行排序；这是强化调优（reinforcement tuning）和偏好建模（preference modeling）中的关键步骤。"
+  },
+  "code_comment_replacements": {
+    "Lf3bPFLiDAwH": [
+      {
+        "old": "# Load from .env if available",
+        "new": "# 如果存在 .env 文件，则从中加载环境变量"
+      }
+    ],
+    "bvBdh0KWDTgA": [
+      {
+        "old": "# Shared setup",
+        "new": "# 共享配置"
+      },
+      {
+        "old": "# Three trajectories with different quality levels",
+        "new": "# 三条不同质量水平的轨迹"
+      },
+      {
+        "old": "# Score with RULER",
+        "new": "# 使用 RULER 评分"
+      },
+      {
+        "old": "# Show ranking",
+        "new": "# 展示排序结果"
+      }
+    ]
+  }
+}

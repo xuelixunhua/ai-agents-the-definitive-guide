@@ -1,0 +1,64 @@
+{
+  "notebook": "ch09/ch09_example_external_evaluation_pipelines_langsmith.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "AcLzLA3hTS2y": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH09/ch09_example_external_evaluation_pipelines_langsmith.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"在 Colab 中打开\"/>\n</a>",
+    "lpBUMxFAXtXx": "<!-- NOTEBOOK_METADATA source: \"Jupyter Notebook\" title: \"使用外部评估流水线评估 LangSmith Agent 轨迹\" description: \"本 Notebook 演示如何将代表性轨迹推送到 LangSmith（美国区 API），拉取后进行评分，可选地附加反馈，并把关键失败转化为可重放的基准集，用于模型对比。\" category: \"Evaluation\" sidebarTitle: \"外部评估流水线（LangSmith）\"-->\n\n# 使用外部评估流水线（external evaluation pipeline）评估 LangSmith Agent 轨迹\n\n本 cookbook 演示如何将 **LangSmith** 作为外部评估流水线的轨迹存储（trace store）、过滤层（filtering layer）以及可选反馈层（feedback layer）。这里使用的是 **美国区托管** 的 LangSmith API（`https://api.smith.langchain.com`）。\n\nTracing（链路追踪）可以告诉你发生了什么：延迟、工具调用、重试和输出；但它不会告诉你，更换模型之后是否仍然满足应用自己的质量门槛。因此，我们会先推送轨迹，再拉取具有代表性的运行记录；需要时可以在核心可观测性 UI 之外进行评分，可选地把 **feedback（反馈）** 附加回运行记录，并在替换模型之前把关键失败提升为可重放的 benchmark（基准集）。",
+    "ZuvcGc7qYEza": "最重要的实践设计之一，是不要让整个 Notebook 只依赖 LLM-as-a-judge（让大模型充当评审）。\n\n更稳妥的做法，是混合使用三类信号：\n\n- **Hard checks（硬检查）**：直接验证可程序化判断的事项，例如重试预算、Schema 有效性、工具是否成功、是否存在必需的 handoff（交接）标签，或数值容差是否满足要求。\n- **Structured rubric checks（结构化评分规则检查）**：用于评估充分性、完整性等维度。\n- **Trace-level judge checks（轨迹级评审检查）**：当执行路径本身也很重要，而不只是最终答案时使用。\n\n这种组合也符合 LangSmith 在生产环境中最典型的价值：把运行记录保存到 project（项目），筛选代表性样本，并对 feedback 做可视化或查询。评分逻辑本身应当体现良好的评估实践，而不是把重点放在语气、愉悦度等风格特征上。\n\n<iframe\n  width=\"100%\"\n  className=\"aspect-[3230/2160] rounded mt-10\"\n  src=\"https://www.youtube-nocookie.com/embed/rHfME8KDmIw?si=V4m8smxZ219AKmOU\"\n  title=\"YouTube video player\"\n  frameborder=\"0\"\n  allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\n  referrerpolicy=\"strict-origin-when-cross-origin\"\n  allowFullScreen\n></iframe>",
+    "NU2J48CgYAfs": "---\n\n学完这个 cookbook 后，你将能够：\n\n- 将带有 tags（标签）和结构化输出的合成客服 Agent 轨迹推送到 LangSmith。\n- 通过 SDK，使用时间窗口和标签过滤器，从 LangSmith project 中拉取具有代表性的 **root runs（根运行）**。\n- 为 Agent 工作流和结果定义多层评估标准。\n- 使用 hard checks、rubric checks 或两者结合的方式（包括 `deepeval` 指标），在外部对轨迹进行评分。\n- 可选地把 **feedback（反馈）** 写回 LangSmith 运行记录，之后可在 UI 中继续筛选。\n- 将关键失败提升为可重放的 benchmark set（基准集）。\n- 在重新部署前，在该基准集上比较候选模型版本。\n- 理解 **RULER-style group ranking（RULER 风格的分组排序）** 如何补充开放任务中的逐轨迹评分。\n- 理解 **conditional tracing（条件式追踪）**（`tracing_context`）如何把可观测性与应用逻辑连接起来，例如合规、租户隔离和成本控制。",
+    "DYZ1ZOESb788": "**注意：** 本 cookbook 使用 Jupyter Notebook 进行演示；在生产环境中，你可以使用自己偏好的编排工具。只需把相关代码提取到 `.py` 文件，并确保运行时具备全部依赖即可。",
+    "nAQ3R0T1cOXT": "## （准备工作）将具有代表性的客服 Agent 轨迹加载到 LangSmith\n\n这个示例不使用泛化的文本风格任务，而是采用一个轻量级客服 Agent 工作流。每条合成轨迹都包含足以评估 Agent 行为的结构化信息：重试次数、handoff 目标、必需步骤、工具执行结果以及最终答案。\n\n在生产环境中，你通常会先接入真实轨迹（例如来自已完成埋点的应用）。这里我们创建代表性的合成轨迹，让 Notebook 后续部分可以把重点放在评估流水线本身。",
+    "kCIMRo3Qeaxg": "你可以从 [LangSmith Settings](https://smith.langchain.com/settings) 获取 LangSmith API key，从 [OpenAI](https://platform.openai.com/api-keys) 获取 OpenAI API key。\n\n除非 workspace 位于 EU 区域，否则使用 **US** API host：设置 `LANGCHAIN_ENDPOINT=https://api.smith.langchain.com`。EU 区域则使用 `https://eu.api.smith.langchain.com`。\n\n本 Notebook 使用的 **LangSmith project name（项目名）** 在凭据代码 Cell 中通过变量 `LANGSMITH_PROJECT_NAME` 设置，而不是通过 `LANGCHAIN_PROJECT` 环境变量。\n\n如果在记录运行时看到 **`403 Forbidden` on `/sessions`**：请使用项目 **`default`**（本 Notebook 默认值）；如果要使用自定义名称，请先在 [LangSmith UI](https://smith.langchain.com) 中**创建该项目**；确认 API key 与 workspace 属于同一个组织；如果 workspace 位于 EU 区域，请把 **`LANGCHAIN_ENDPOINT`** 设为 EU host（`https://eu.api.smith.langchain.com`）。",
+    "x9mnbKkdag5N": "## 文档索引与 Conditional Tracing（条件式追踪）\n\nLangChain 和 LangSmith 文档统一索引在 [docs.langchain.com/llms.txt](https://docs.langchain.com/llms.txt)。建议先通过这个文件发现页面，再进入具体深链接。\n\n### Conditional Tracing 与应用逻辑\n\n当 tracing 被全局启用时（例如通过 `LANGSMITH_TRACING` / `LANGCHAIN_TRACING_V2`），span 和 run 默认都会发送到 LangSmith。但生产环境通常需要在**单个请求级别**控制追踪，而不是重写整套技术栈：例如对包含大量 PII 的路径禁用 tracing、把不同租户路由到不同 project，或为了控制成本关闭低价值流量的 tracing。\n\n在 Python 中，[`tracing_context`](https://reference.langchain.com/python/langsmith/run_helpers/tracing_context) context manager（上下文管理器）会覆盖 `with` 代码块**内部**执行代码所使用的全局设置。典型模式包括：\n\n- **禁用 tracing**：敏感载荷可使用 `with ls.tracing_context(enabled=False): ...`\n- **按租户或区域路由**：使用 `with ls.tracing_context(project_name=\"client-acme\", tags=[...], metadata={...}): ...`\n- **Feature flags（功能开关）**：只有当应用逻辑判断该请求值得消耗可观测性成本时才启用 tracing\n\n优先级从高到低：`tracing_context` → 程序化配置 → 环境变量。参见官方指南：[Conditional tracing](https://docs.langchain.com/langsmith/conditional-tracing)。\n\n**Sampling（采样）与 conditional tracing 的区别**：conditional tracing 是**确定性的**（由你逐请求决定）；[Sampling](https://docs.langchain.com/langsmith/sample-traces) 则是面向高流量成本控制的**概率式**机制。两者可以组合使用。\n\n相关文档：[Trace without environment variables](https://docs.langchain.com/langsmith/trace-without-env-vars)、[Mask inputs and outputs](https://docs.langchain.com/langsmith/mask-inputs-outputs)、[Add metadata and tags to traces](https://docs.langchain.com/langsmith/add-metadata-tags)。\n\n下面的 Notebook 为演示方便，会在代码里使用一个**固定 project name**，并通过 `@traceable` 记录轨迹。在真实应用中，你通常会在 handler 的入口处包一层 `tracing_context`，让 tracing 跟随**你的**路由与合规规则。\n\n示例（本 Notebook 后续不会执行，可按自己的应用改造）：\n\n```python\nimport langsmith as ls\nfrom langsmith import traceable\n\n@traceable\ndef handle(customer_id: str, text: str) -> str:\n    return text\n\n# 完全跳过 tracing（PII、零保留租户等）\nwith ls.tracing_context(enabled=False):\n    handle(\"regulated-tenant\", \"...\")\n\n# 路由到租户或区域专属 project，并附带 tags 与 metadata\nwith ls.tracing_context(\n    enabled=True,\n    project_name=\"acme-support\",\n    tags=[\"production\", \"region-us\"],\n    metadata={\"customer_id\": \"acme\"},\n):\n    handle(\"acme\", \"...\")\n```",
+    "DqejNWyyemqW": "下面先定义一组具有代表性的客服场景。每个 case 都包含：预期 workflow（工作流）、必需执行步骤、正确 handoff 目标，以及后续可用于正确性检查的 reference answer（参考答案）。",
+    "0bJ07c0bh1AZ": "# 定义多层评估标准（multi-layer evaluation criteria）\n\n本 Notebook 会从五个维度对每条轨迹进行评分：\n\n- `retry_budget_respected`\n- `correct_handoff`\n- `required_step_completed`\n- `final_answer_sufficient`\n- `final_answer_correct`\n\n前三项非常适合做 hard checks（硬检查）；后两项则更适合使用 structured rubric checks（结构化评分规则检查）或 trace-level judges（轨迹级评审器）。",
+    "cdSce8v0rEOF": "Hard checks 应该尽可能承担更多工作：\n\n- `retry_count <= max_retries`\n- 必需工具调用执行成功\n- 需要升级处理时，存在必需的 handoff 标签\n- trajectory（执行轨迹）中出现了必需的 workflow 步骤\n\n对于严格程序化比较仍不足以判断的充分性和正确性问题，再补充 rubric-based checks（基于评分规则的检查）。",
+    "bTeadSh7rEOF": "当执行路径本身很重要，而不只是最终答案时，就适合使用 trace-level judging（轨迹级评审）。这也是 trajectory judge（轨迹评审器）或 RULER 这类系统特别适合的场景：当失败只有放到完整执行路径中才看得出来时，就把 trajectory 与显式的 goal-achievement rubric（目标达成评分规则）进行比较。\n\n下面的代码继续保持一个简单、可用于生产的模式：用 hard checks 检查 workflow 合规性，再用外部 judge 风格的评分评估充分性与正确性。"
+  },
+  "code_comment_replacements": {
+    "K1K-eOQAsgTM": [
+      {
+        "old": "# Store your secrets in a local .env file or your notebook environment.",
+        "new": "# 将密钥保存在本地 .env 文件或 Notebook 环境中。"
+      },
+      {
+        "old": "# Do not hardcode credentials directly in the notebook.",
+        "new": "# 不要把凭据直接硬编码到 Notebook。"
+      }
+    ],
+    "YupMIUkjehZT": [
+      {
+        "old": "# US-hosted LangSmith (default). For EU, set LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com",
+        "new": "# LangSmith 默认托管在美国区域；如使用 EU 区域，请设置 LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com"
+      },
+      {
+        "old": "# LangSmith project for this cookbook — set here (no LANGCHAIN_PROJECT env var required).",
+        "new": "# 在这里设置本 cookbook 使用的 LangSmith project（无需 LANGCHAIN_PROJECT 环境变量）。"
+      },
+      {
+        "old": "# Use \"default\" unless you created a dedicated project in the UI first. A non-existent name often",
+        "new": "# 除非已经在 UI 中创建专用项目，否则使用 \"default\"。不存在的项目名通常会"
+      },
+      {
+        "old": "# causes LangSmithError 403 on GET /sessions when the SDK resolves the project.",
+        "new": "# 在 SDK 解析项目时导致 GET /sessions 出现 LangSmithError 403。"
+      },
+      {
+        "old": "# EU workspace: set LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com above.",
+        "new": "# EU workspace：请在上方设置 LANGCHAIN_ENDPOINT=https://eu.api.smith.langchain.com。"
+      },
+      {
+        "old": "# Enable tracing for @traceable (LangSmith accepts LANGCHAIN_* and LANGSMITH_* mirrors)",
+        "new": "# 为 @traceable 启用 tracing（LangSmith 同时接受 LANGCHAIN_* 与 LANGSMITH_* 镜像变量）。"
+      }
+    ]
+  }
+}

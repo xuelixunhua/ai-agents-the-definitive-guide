@@ -1,0 +1,60 @@
+{
+  "notebook": "ch11/ch11_memory_footprint_throughput_and_GPU_requirements.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "code_comment_replacements": {
+    "LYCOGGGNWhqG": [
+      {
+        "old": "# Core formulas (hybrid-attention + MoE aware). Reused by run_llm_analysis and the",
+        "new": "# Core formulas（核心公式，兼顾 hybrid attention 与 MoE）。供 run_llm_analysis 和下面的"
+      },
+      {
+        "old": "# cost cell below.",
+        "new": "# 成本 Cell 复用。"
+      },
+      {
+        "old": "    # Gemma-4's full-attn layers use n_global_kv_heads/global_d_head if present;",
+        "new": "    # 如果配置中提供 n_global_kv_heads/global_d_head，Gemma-4 的 full-attention 层会优先使用它们；"
+      },
+      {
+        "old": "    # otherwise the full-attn layers use the same geometry as the rest.",
+        "new": "    # 否则 full-attention 层与其他层使用相同的 KV 几何结构。"
+      },
+      {
+        "old": "    # GiB added to KV cache per token once past any sliding window.",
+        "new": "    # 超过 sliding window 后，每新增一个 Token 给 KV Cache 增加的 GiB。"
+      },
+      {
+        "old": "    # FP16 (2 bytes) * 2 tensors (K, V) * n_full_attention_layers * KV channels.",
+        "new": "    # FP16（2 bytes）× 2 个张量（K、V）× n_full_attention_layers × KV channels。"
+      },
+      {
+        "old": "    # Full-attention layers grow linearly; sliding layers saturate at sliding_window;",
+        "new": "    # full-attention 层随上下文线性增长；sliding 层增长到 sliding_window 后饱和；"
+      },
+      {
+        "old": "    # linear-attention layers carry fixed state (approximated as 0 for sizing).",
+        "new": "    # linear-attention 层只携带固定大小状态（容量估算时近似按 0 处理）。"
+      },
+      {
+        "old": "    # MoE: weights use total (all experts resident); KV scales with concurrency.",
+        "new": "    # MoE：权重按总参数量计算（所有 experts 常驻）；KV Cache 则随并发序列数扩张。"
+      },
+      {
+        "old": "    # (2 * P_B * 1e9 FLOPs) / (TFLOPS * 1e12) = (2 * P_B / TFLOPS) milliseconds.",
+        "new": "    # 单 Token prefill 时间：(2 * P_B * 1e9 FLOPs) / (TFLOPS * 1e12) = (2 * P_B / TFLOPS) 毫秒。"
+      },
+      {
+        "old": "    # (2 * P_B GB) / (bw GB/s) = seconds; *1000 -> ms.",
+        "new": "    # TPOT：(2 * P_B GB) / (bw GB/s) = 秒；再乘 1000 转为毫秒。"
+      }
+    ]
+  }
+}

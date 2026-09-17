@@ -1,0 +1,66 @@
+{
+  "notebook": "ch11/ch11_memory_footprint_throughput_and_GPU_requirements.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "code_comment_replacements": {
+    "LYCOGGGNWhqG": [
+      {
+        "old": "\"\"\"Quick single-model sanity check using the helpers above.\"\"\"",
+        "new": "\"\"\"使用上面的辅助函数，对单个模型执行快速 Sanity Check（冒烟验证）。\"\"\""
+      }
+    ],
+    "w3hK0ffKkxCO": [
+      {
+        "old": "# COST - translate memory + throughput into $/1M output tokens.",
+        "new": "# COST（成本）——把内存占用与吞吐量换算为每 100 万输出 Token 的美元成本（$/1M output tokens）。"
+      },
+      {
+        "old": "# Simplified memory-bandwidth-bound model (matches the rest of the notebook):",
+        "new": "# 简化的 memory-bandwidth-bound（显存带宽受限）模型，与本 Notebook 其余部分保持一致："
+      },
+      {
+        "old": "#   per-sequence tok/s = 1000 / TPOT_ms          (decode-phase throughput)",
+        "new": "#   per-sequence tok/s = 1000 / TPOT_ms          （decode 阶段单序列吞吐量）"
+      },
+      {
+        "old": "#   workload tok/s     = batch * per-sequence    (valid in mem-BW-bound regime)",
+        "new": "#   workload tok/s     = batch * per-sequence    （在显存带宽受限区间成立）"
+      },
+      {
+        "old": "# Why price at the target workload batch, not max-concurrent: max-concurrent gives",
+        "new": "# 为什么按目标 workload batch（工作负载批大小）计价，而不是按 max-concurrent（最大并发）计价：max-concurrent 给出的"
+      },
+      {
+        "old": "# optimistic aggregate throughput that real servers rarely sustain (compute and",
+        "new": "# 是偏乐观的聚合吞吐量，真实服务器通常难以持续达到这一水平（因为 compute（计算）和"
+      },
+      {
+        "old": "# attention KV-read costs dominate long before you saturate memory capacity). The",
+        "new": "# attention KV-read（注意力 KV 读取）成本往往会在显存容量真正饱和之前先成为主导约束）。"
+      },
+      {
+        "old": "# workload-batch number is what you actually pay to serve the target n_concurrent_req.",
+        "new": "# 因此，真正决定目标 n_concurrent_req 服务成本的是 workload-batch 对应的吞吐量。"
+      },
+      {
+        "old": "# \"Effective\" = raw / utilization: you pay the hourly rate continuously, but only",
+        "new": "# \"Effective\"（有效成本）= raw / utilization：GPU 小时费会持续产生，但通常只有"
+      },
+      {
+        "old": "# CONCURRENT_USAGE_FACTOR of provisioned capacity is typically active. This is the",
+        "new": "# CONCURRENT_USAGE_FACTOR 比例的已配置容量会同时处于活跃状态。这个数才更接近"
+      },
+      {
+        "old": "# unit-economics number, not the raw GPU hourly rate.",
+        "new": "# unit economics（单位经济模型）关注的成本，而不是原始 GPU 小时价格。"
+      }
+    ]
+  }
+}

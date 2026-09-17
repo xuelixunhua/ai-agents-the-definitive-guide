@@ -1,0 +1,26 @@
+{
+  "notebook": "CH02/ch02_CoT.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "qOqKZljFGX1u": "# 依赖项",
+    "1KK3B09dk8EW": "# API 配置",
+    "QfMAz0sPk_IA": "# 导入依赖",
+    "Kl6oeTHYlHbB": "# 工具：Python REPL"
+  },
+  "code_comment_replacements": {
+    "tMGB6TAqAVwv": [
+      {
+        "old": "# --- API Key Setup ---",
+        "new": "# --- API Key 配置 ---"
+      }
+    ]
+  }
+}

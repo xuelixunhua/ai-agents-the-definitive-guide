@@ -1,0 +1,68 @@
+{
+  "notebook": "ch11/ch11_agent_cost_estimator_based_on_topology.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "code_comment_replacements": {
+    "5tnQzj7Ql6l0": [
+      {
+        "old": "# Plot 1: Token multiplier by architecture (deployment-independent —",
+        "new": "# 图 1：按 architecture（架构）比较 Token 倍数（与 deployment 无关——"
+      },
+      {
+        "old": "# tokens are a property of the topology, not the model mix).",
+        "new": "# Token 消耗由 topology（拓扑结构）决定，而不是由模型组合决定）。"
+      }
+    ],
+    "D6qem67HmCBD": [
+      {
+        "old": "# Plot 2: Cost per request — grouped by deployment, error bars show the",
+        "new": "# 图 2：单次请求成本——按 deployment（部署配置）分组；error bar（误差棒）展示"
+      },
+      {
+        "old": "# low/high band from calls_per_request uncertainty. The \"same topology,",
+        "new": "# calls_per_request 不确定性对应的 low/high 区间。\"同一 topology（拓扑结构）、"
+      },
+      {
+        "old": "# different deployment\" comparison is the whole reason we split behavior",
+        "new": "# 不同 deployment（部署配置）\"之间的比较，正是我们将架构行为"
+      },
+      {
+        "old": "# from deployment.",
+        "new": "# 与 deployment 拆开建模的核心原因。"
+      },
+      {
+        "old": "#ax.set_title(\"Estimated API cost per request\\n\"",
+        "new": "#ax.set_title(\"估算的单次请求 API 成本\\n\""
+      },
+      {
+        "old": "#             \"(error bars = low/high band on calls_per_request)\")",
+        "new": "#             \"（误差棒 = calls_per_request 的 low/high 区间）\")"
+      }
+    ],
+    "jlF96giJmFu6": [
+      {
+        "old": "# Plot 3: Token growth vs cost growth, colored by deployment. Each",
+        "new": "# 图 3：Token 增长 vs 成本增长，并按 deployment（部署配置）区分颜色。每种"
+      },
+      {
+        "old": "# architecture shows up twice — once per deployment. A line connects the",
+        "new": "# architecture（架构）会出现两次——每个 deployment 对应一个点。连线连接"
+      },
+      {
+        "old": "# two deployment points per architecture: the slope tells you how much",
+        "new": "# 同一架构的两个 deployment 点：斜率可以直观看出"
+      },
+      {
+        "old": "# moving the heavy role from gpt-5.4 → gpt-5.4-mini actually bought you.",
+        "new": "# 将 heavy role 从 gpt-5.4 → gpt-5.4-mini 后实际节省了多少成本。"
+      }
+    ]
+  }
+}

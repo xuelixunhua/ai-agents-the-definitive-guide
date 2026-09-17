@@ -1,0 +1,203 @@
+{
+  "notebook": "ch06/ch06_MCP_server_composio.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "0VlDStOJO6z5": "# 关于本 Notebook\n\n本 Notebook 介绍**大型工具生态（large tool ecosystems）**，以及智能体如何在**规模大、异构的工具集合（large, heterogeneous tool sets）**中进行推理。\n\n与为每个集成编写固定代码不同，本 Notebook 会根据自然语言用例在 Composio 中搜索匹配工具，再把这些工具暴露给智能体。\n\n重点不在执行性能，而在**工具发现（Tool Discovery）**、**规划（Planning）**、**认证（Authentication）**与**编排（Orchestration）**。\n\n---\n\n## 你在练习的核心思想\n\n本 Notebook 展示智能体如何从：\n\n* “我只有一个工具” <br>\n→ 转变为\n* “我有数百个工具，该如何决定用哪个？”\n\n关键概念包括：\n\n* 通过 Composio 进行**工具发现（Tool Discovery）**\n* 基于自然语言用例进行**工具选择（Tool Selection）**\n* 执行前完成**工作流规划（Workflow Planning）**\n* 为需要认证的工具进行**连接管理（Connection Management）**\n* **多轮工具推理（Multi-turn Tool Reasoning）**\n\n场景生成器（`generate_scenarios`）连接了：\n* Composio 的元工具 schema\n* 与真实的智能体任务\n\n---\n\n如果只记住一点：\n\n**现代智能体不只是调用工具。  \n它们会动态地发现、规划、认证并组合工具。**\n\nComposio 就是支持跨数百种应用工具包实现这一能力的基础设施层之一。",
+    "U4eiA6BMGuFX": "## 安装（Installation）\n",
+    "bRJ6ix_25Ydr": "# 设置 API Key",
+    "YTi7UZn7UvzT": "<font color=\"red\" size=\"5\">\n<b>运行本 Notebook 前请注意</b>\n</font>\n<br>\n\n你需要一个 `OPENROUTER_API_KEY`（[在此获取](https://openrouter.ai/)），以及来自 [Composio](https://platform.composio.dev/) 的 `COMPOSIO_API_KEY`。",
+    "TbKEyIzTQsnK": "# 导入依赖",
+    "icv-O5aSGuFY": "# 注意：这里承接 Chapter 3 的 ART 与 RULER，并将其应用到 MCP\n\n## 什么是智能体轨迹（Agent Trajectories）？\n\n在 ART 中，一条**轨迹（trajectory）**表示智能体与环境之间的一次完整交互序列：\n\n- **消息（Messages）**：用户输入、系统 Prompt、智能体响应\n- **工具调用（Tool Calls）**：携带参数的函数调用\n- **工具结果（Tool Results）**：工具执行后的返回结果\n- **奖励（Rewards）**：来自 RULER 或其他评估器的评分\n- **指标（Metrics）**：交互过程的元数据，例如轮数、是否成功等\n\n系统会收集并分组多条轨迹，然后由 RULER 进行**相对排序（relative ranking）**，判断哪些轨迹表现更好。这样，模型可以从轨迹之间的比较中学习，而不是依赖单一的绝对分数。",
+    "2DxoSHC1SouB": "### 使用 Composio 集成更丰富的工具\n\n**为什么多工具很重要：**\n- 不同应用工具包各有所长，例如邮件、日历、GitHub、Slack、网页搜索等\n- 组合多个工具，可以构建比单次 API 调用更贴近真实业务的工作流\n- 一个能力成熟的智能体，应当能够跨多个服务完成发现、规划、认证和执行\n\n**本 Notebook 中的 Composio 流程：**\n- 使用 `composio.tools.get(...)` 获取与 `USE_CASE` 匹配的工具\n- 将这些工具传入兼容 OpenAI 的工具调用循环\n- 由 Composio 通过其 provider 执行被选中的工具调用\n- 使用生成的场景探索不同工作流与难度等级\n\n**可以思考：**\n- 哪些工具包与你的用例最相关？\n- 面对不同类型的任务，智能体应如何决定使用哪个工具？\n- 真正执行之前，需要完成哪些连接或认证步骤？",
+    "5tMSdrrVSouC": "### 后续可以进一步尝试的方向：\n\n1. **增加比较样本（More Comparisons）** ✅\n   - 每个场景生成 5–10 条以上轨迹，而不只是 2–3 条\n   - 使用 RULER 对轨迹进行相对排序\n   - 改变策略，例如使用不同模型、Prompt 或工具使用模式\n   - 比较越充分，模型获得的学习信号通常越丰富\n\n2. **扩展工具能力（Better Tools）** ✅\n   - 将 Composio 作为大型动态工具生态接入\n   - 针对每个用例选择互补的工具和工具包\n   - 生成能够鼓励多工具协同使用的场景\n   - 训练智能体更合理地组合不同工具的结果\n\n**请记住**：RULER 会从你实际使用的工具和场景中学习什么叫“好”，不需要预先准备人工标注数据。",
+    "8hvZW4pNSouC": "### 更多资源（Additional Resources）\n\n- **ART Documentation**: https://art.openpipe.ai\n- **RULER Guide**: https://art.openpipe.ai/fundamentals/ruler\n- **Composio SDK**: https://github.com/composiohq/composio\n- **Composio Docs**: https://docs.composio.dev/\n"
+  },
+  "code_comment_replacements": {
+    "7J_2msbcGuFY": [
+      {
+        "old": "# Initialize variables that might be used later",
+        "new": "# 初始化后续可能会使用的变量"
+      }
+    ],
+    "dopngEafviwp": [
+      {
+        "old": "# Composio Setup",
+        "new": "# Composio 配置"
+      },
+      {
+        "old": "# Composio provides meta tools for discovering, authenticating, and executing tools.",
+        "new": "# Composio 提供用于发现、认证和执行工具的元工具"
+      },
+      {
+        "old": "# Set COMPOSIO_API_KEY in your environment or .env file before running the examples.",
+        "new": "# 运行示例前，请先在环境变量或 .env 文件中设置 COMPOSIO_API_KEY"
+      }
+    ],
+    "ODbYsXkXvLmu": [
+      {
+        "old": "# @title Composio Setup",
+        "new": "# @title Composio 配置"
+      },
+      {
+        "old": "# Composio Configuration",
+        "new": "# Composio 配置"
+      },
+      {
+        "old": "# 1. Create an API key at https://platform.composio.dev/",
+        "new": "# 1. 在 https://platform.composio.dev/ 创建 API key"
+      },
+      {
+        "old": "# 2. Set it in your environment or .env file as COMPOSIO_API_KEY",
+        "new": "# 2. 在环境变量或 .env 文件中将其设置为 COMPOSIO_API_KEY"
+      },
+      {
+        "old": "# 3. Pick a stable user_id for this notebook run",
+        "new": "# 3. 为本次 Notebook 运行选择一个稳定的 user_id"
+      },
+      {
+        "old": "# This notebook uses the direct tools.get(...) API from the Composio quick start.",
+        "new": "# 本 Notebook 使用 Composio quick start 中直接调用 tools.get(...) 的方式"
+      }
+    ],
+    "vapLzuKObcyL": [
+      {
+        "old": "# Small number for demo",
+        "new": "# 演示时使用较小数值"
+      }
+    ],
+    "DvSvNrWV8psC": [
+      {
+        "old": "# @title Composio Helper Functions",
+        "new": "# @title Composio 辅助函数"
+      },
+      {
+        "old": "Return the function payload for dict or SDK model tools.",
+        "new": "返回 dict 或 SDK model 工具对应的 function payload。"
+      },
+      {
+        "old": "# Some providers use the Responses API shape: {type, name, description, parameters}.",
+        "new": "# 某些 provider 使用 Responses API 形态：{type, name, description, parameters}"
+      },
+      {
+        "old": "Keep tool parameters in the JSON Schema subset accepted by Chat Completions.",
+        "new": "将工具参数限制在 Chat Completions 接受的 JSON Schema 子集中。"
+      },
+      {
+        "old": "Convert a Composio/OpenAI tool into the schema shape expected by ART.",
+        "new": "将 Composio/OpenAI 工具转换为 ART 所期望的 schema 结构。"
+      },
+      {
+        "old": "Normalize Composio tools to Chat Completions/OpenRouter's strict tool shape.",
+        "new": "将 Composio 工具规范化为 Chat Completions/OpenRouter 要求的严格工具结构。"
+      },
+      {
+        "old": "Call tools.get across SDK versions that differ on user_id placement.",
+        "new": "兼容不同 SDK 版本中 user_id 参数位置差异，并调用 tools.get。"
+      },
+      {
+        "old": "Fetch Composio tools, trying fallbacks when semantic search returns no tools.",
+        "new": "获取 Composio 工具；若语义搜索没有返回工具，则依次尝试回退策略。"
+      },
+      {
+        "old": "Fetch Composio tools used by the agent for the current USE_CASE.",
+        "new": "获取智能体针对当前 USE_CASE 所使用的 Composio 工具。"
+      }
+    ],
+    "WA0ZAWGo5Z-m": [
+      {
+        "old": "# @title OpenRouter + Composio: Comprehensive Workflow Example",
+        "new": "# @title OpenRouter + Composio：完整工作流示例"
+      },
+      {
+        "old": "Example: List the Composio tools selected for the current use case.",
+        "new": "示例：列出为当前用例选中的 Composio 工具。"
+      },
+      {
+        "old": "Example: Search Composio tools for a use case, then let the model use them.",
+        "new": "示例：为某个用例搜索 Composio 工具，然后让模型使用这些工具。"
+      },
+      {
+        "old": "# Composio may return provider-specific tool shapes. OpenRouter's Chat\n    # Completions endpoint expects the strict {type: function, function: ...} shape.",
+        "new": "# Composio 可能返回 provider 特定的工具结构；OpenRouter 的 Chat\n    # Completions endpoint 要求严格的 {type: function, function: ...} 结构。"
+      },
+      {
+        "old": "# For discovery/planning demos, keep the notebook moving even if the\n            # account is not connected or the SDK cannot execute normalized calls.",
+        "new": "# 对发现/规划类演示，即使账户尚未连接，或 SDK 无法执行规范化调用，\n            # 也保持 Notebook 继续运行。"
+      },
+      {
+        "old": "# Example 1: List available Composio tools for this use case",
+        "new": "# 示例 1：列出当前用例可用的 Composio 工具"
+      },
+      {
+        "old": "# Example 2: Complete workflow (requires OpenRouter API key)",
+        "new": "# 示例 2：完整工作流（需要 OpenRouter API key）"
+      }
+    ],
+    "qU8N7uJoLDV0": [
+      {
+        "old": "# @title Generate Scenarios with Composio Tools",
+        "new": "# @title 使用 Composio 工具生成场景"
+      },
+      {
+        "old": "# Simple example: Generate scenarios for one Composio tool selected by USE_CASE",
+        "new": "# 简单示例：针对 USE_CASE 选中的一个 Composio 工具生成场景"
+      },
+      {
+        "old": "# Step 1: Get available tools from Composio's semantic tool search",
+        "new": "# 第 1 步：通过 Composio 的语义工具搜索获取可用工具"
+      },
+      {
+        "old": "# Step 2: Choose the first matching tool for a focused demo",
+        "new": "# 第 2 步：选择第一个匹配工具，用于聚焦演示"
+      },
+      {
+        "old": "# Step 3: Generate scenarios (similar to the other tool examples)",
+        "new": "# 第 3 步：生成场景（与其他工具示例类似）"
+      }
+    ],
+    "o4-HzalELDV0": [
+      {
+        "old": "# @title Collect Tools from Composio",
+        "new": "# @title 从 Composio 收集工具"
+      },
+      {
+        "old": "# Collect Composio tools matching the current USE_CASE",
+        "new": "# 收集与当前 USE_CASE 匹配的 Composio 工具"
+      }
+    ],
+    "iUcyCcGKSouB": [
+      {
+        "old": "# @title Generate Scenarios with Enhanced Tool Set",
+        "new": "# @title 使用增强工具集生成场景"
+      },
+      {
+        "old": "Generate scenarios that leverage the enhanced tool set.\n    These scenarios should encourage the agent to use multiple tools effectively.",
+        "new": "生成能够利用增强工具集的场景。\n    这些场景应鼓励智能体有效组合多个工具。"
+      },
+      {
+        "old": "# Organize tools by source for scenario generation",
+        "new": "# 按来源整理工具，供场景生成使用"
+      },
+      {
+        "old": "# Combine all tools for scenario generation",
+        "new": "# 合并全部工具，用于生成场景"
+      },
+      {
+        "old": "# Can add resources if available",
+        "new": "# 如有可用 resources，可在此加入"
+      },
+      {
+        "old": "# Generate enhanced scenarios",
+        "new": "# 生成增强场景"
+      }
+    ]
+  }
+}
