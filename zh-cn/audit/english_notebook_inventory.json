@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 133,
+  "candidate_entry_count": 129,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -94,41 +94,19 @@
       "notebook": "CH02/ch02_hierarchical_agent_teams.ipynb",
       "entries": [
         {
-          "cell_index": 1,
-          "cell_id": "Vcf3Y5Q43OHt",
-          "cell_type": "markdown",
-          "source": "# About this notebook\n\nThis notebook builds a hierarchical, team based agent system with **LangGraph** and **LangChain** that can research on the web, scrape pages, search patents, run code, and collaborate to write and persist a report to disk. It demonstrates how to compose multiple subgraphs under a top level supervisor while keeping tools, roles, and state explicit.\n\n## What it shows\n\n* **Two specialized teams** coordinated by supervisors\n\n  1. **Research team** with search, scraping, Exa semantic search, and Google Patents\n  2. **Document writing team** with outline creation, document read and write, editing, and a Python REPL for simple charts\n* **Top level orchestrator** that routes work between the two teams and aggregates results\n* **Tooling mix**: Tavily, SerpAPI, Exa, WebBaseLoader scraping, and a Python REPL\n* **File persistence** in a working directory for outlines and the final report\n* **Streaming runs** that print step by step updates and **Mermaid PNG** graph previews for each team and the supervisor graph\n\n## What you will run\n\n1. . Define research tools\n\n   * `tavily_tool` for search results\n   * `scrape_webpages` to pull and concatenate page contents\n   * `patent_search` via SerpAPI Google Patents\n   * `exa_search_tool` for neural search with highlight snippets\n2. Define document tools\n\n   * `create_outline`, `read_document`, `write_document`, `edit_document` that operate in a sandboxed working directory\n   * `python_repl_tool` for quick calculations or charts printed to stdout\n3. Build **worker nodes** using `create_react_agent` and **LLM supervisors** with structured routing that pick the next worker or finish.\n4. Compile three graphs\n\n   * `research_graph` for web research and patents\n   * `paper_writing_graph` for outlining and writing with optional chart generation\n   * `super_graph` that orchestrates both teams end to end\n5. Execute an example\n\n   * Ask about AI agents and patents with the research team\n   * Write a poem to disk with the writing team\n   * Run a full task that produces an 800 word semiconductor whitepaper, includes patent links and sources, and saves it to `semiconductor_whitepaper.txt`\n\n## How it works\n\n* **Supervisors**: Small LLM routers with structured output select the next worker from a fixed set or return FINISH.\n* **Workers**: ReAct style agents bound to a specific tool set and prompt. Each worker returns a single concise message which is fed back to the supervisor.\n* **State**: Uses `MessagesState` plus a simple `next` field. Messages flow across teams so the top level supervisor can coordinate.\n* **Routing**: Implemented through `Command(goto=..., update=...)` to move between nodes while appending results to state.\n* **Persistence**: File tools read and write under `WORKING_DIRECTORY`. The final task writes a complete report to disk.\n\n## Why this pattern\n\n* Clear separation of concerns makes behaviors predictable and testable.\n* Supervisors keep control flow explicit and auditable.\n* Tool use is bounded per worker which reduces prompt sprawl and improves reliability.\n* The top level graph composes teams without coupling their internal details.\n\n## Extend and adapt\n\n* Add a citation validator between research and writing.\n* Swap or add search providers.\n* Replace Python REPL with a sandboxed executor.\n* Persist checkpoints and traces with LangSmith for debugging and evaluation.\n\n## Requirements and notes\n\n* Required keys: `OPENAI_API_KEY`, `TAVILY_API_KEY`, `SERPAPI_API_KEY`, `EXA_API_KEY`.\n* Web results and patent listings change over time. Outputs will vary run to run.\n* File system tools write to the working directory. Use a sandbox for untrusted content or use it within a Docker setup.\n* Streaming prints intermediate updates that help you trace decisions and tool calls.\n"
-        },
-        {
           "cell_index": 5,
           "cell_id": "7L1Gp9opxkjm",
           "cell_type": "code_comments",
           "comments": [
-            "# Option 1 (preferred): create a `.env` file in your project folder with:",
             "# OPENAI_API_KEY=your_openai_key_here",
             "# TAVILY_API_KEY=your_tavily_key_here",
             "# SERPAPI_API_KEY=your_serpapi_key_here",
             "# EXA_API_KEY=your_exa_key_here",
-            "# Option 2: set directly in the notebook with magic:",
             "# %env OPENAI_API_KEY=your_openai_key_here",
             "# %env TAVILY_API_KEY=your_tavily_key_here",
             "# %env SERPAPI_API_KEY=your_serpapi_key_here",
-            "# %env EXA_API_KEY=your_exa_key_here",
-            "# Load from .env if available",
-            "# Fallback: ask if still missing"
+            "# %env EXA_API_KEY=your_exa_key_here"
           ]
-        },
-        {
-          "cell_index": 6,
-          "cell_id": "J6VrKUlVfkCH",
-          "cell_type": "markdown",
-          "source": "<div class=\"admonition tip\">\n    <p class=\"admonition-title\">Set up <a href=\"https://smith.langchain.com\">LangSmith</a> for LangGraph development</p>\n    <p style=\"padding-top: 5px;\">\n        Sign up for LangSmith to quickly spot issues and improve the performance of your LangGraph projects. LangSmith lets you use trace data to debug, test, and monitor your LLM apps built with LangGraph — read more about how to get started <a href=\"https://docs.smith.langchain.com\">here</a>.\n    </p>\n</div>"
-        },
-        {
-          "cell_index": 9,
-          "cell_id": "354568e2-aef0-4af9-8a79-e64d3eea752f",
-          "cell_type": "markdown",
-          "source": "# Create Tools\n\nEach team will be composed of one or more agents each with one or more tools. Below, define all the tools to be used by your different teams.\n\nWe'll start with the research team.\n\n**ResearchTeam tools**\n\nThe research team can use a search engine and url scraper to find information on the web. Feel free to add additional functionality below to boost the team performance!"
         },
         {
           "cell_index": 10,
@@ -146,12 +124,6 @@
             "# Load Tavily Search Wrapper from LangChain",
             "# Warning: This executes code locally, which can be unsafe when not sandboxed"
           ]
-        },
-        {
-          "cell_index": 12,
-          "cell_id": "504ee1c6-2b6a-439d-9046-df54e1e15698",
-          "cell_type": "markdown",
-          "source": "# Helper Utilities\n\nWe are going to create a few utility functions to make it more concise when we want to:\n\n1. Create a worker agent.\n2. Create a supervisor for the sub-graph.\n\nThese will simplify the graph compositional code at the end for us so it's easier to see what's going on."
         },
         {
           "cell_index": 15,
