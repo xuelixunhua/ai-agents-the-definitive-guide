@@ -2,7 +2,7 @@
   "purpose": "Inventory of potentially untranslated reader-facing English. Review before translating behavior-sensitive strings.",
   "notebook_count_scanned": 35,
   "notebooks_with_candidates": 28,
-  "candidate_entry_count": 129,
+  "candidate_entry_count": 120,
   "notebooks": [
     {
       "notebook": "CH01/ch01_code_examples.ipynb",
@@ -109,42 +109,11 @@
           ]
         },
         {
-          "cell_index": 10,
-          "cell_id": "1c427982-fadf-4721-a77e-2465df9fc6bc",
-          "cell_type": "markdown",
-          "source": "**Document writing team tools**\n\nNext up, we will give some tools for the doc writing team to use.\nWe define some bare-bones file-access tools below.\n\nNote that this gives the agents access to your file-system, which can be unsafe. We also haven't optimized the tool descriptions for performance."
-        },
-        {
           "cell_index": 11,
           "cell_id": "f20a18ca-2709-4c12-84f3-88678591a9fa",
           "cell_type": "code_comments",
           "comments": [
-            "# Define a persistent working directory",
-            "# Ensure the working directory exists",
-            "# Load Tavily Search Wrapper from LangChain",
-            "# Warning: This executes code locally, which can be unsafe when not sandboxed"
-          ]
-        },
-        {
-          "cell_index": 15,
-          "cell_id": "00282b1f-bb4d-4ee7-9bae-e8e6f586f12e",
-          "cell_type": "markdown",
-          "source": "## Define Agent Teams\n\nNow we can get to define our hierarchical teams. \"Choose your player!\"\n\n### Research Team\n\nThe research team will have a search agent and a web scraping \"research_agent\" as the two worker nodes. Let's create those, as well as the team supervisor."
-        },
-        {
-          "cell_index": 16,
-          "cell_id": "b01c6ee8-a461-4081-8a97-a3a06ec0f994",
-          "cell_type": "markdown",
-          "source": "Now that we've created the necessary components, defining their interactions is easy. Add the nodes to the team graph, and define the edges, which determine the transition criteria."
-        },
-        {
-          "cell_index": 19,
-          "cell_id": "tpHYWLKibEcK",
-          "cell_type": "code_comments",
-          "comments": [
-            "# Prompts help to keep roles sharp",
-            "# Add workers to specs list",
-            "# Supervisor that can coordinate all four"
+            "# 从 LangChain 加载 Tavily Search Wrapper"
           ]
         },
         {
@@ -154,46 +123,11 @@
           "source": "We can give this team work directly. Try it out below."
         },
         {
-          "cell_index": 24,
-          "cell_id": "749b99ab-f6f0-4c5d-a90b-10102465d186",
-          "cell_type": "markdown",
-          "source": "### Document Writing Team\n\nCreate the document writing team below using a similar approach. This time, we will give each agent access to different file-writing tools.\n\nNote that we are giving file-system access to our agent here, which is not safe in all cases."
-        },
-        {
-          "cell_index": 25,
-          "cell_id": "aee2cd9b-29aa-458e-903d-4e49179e5d59",
-          "cell_type": "markdown",
-          "source": "With the objects themselves created, we can form the graph."
-        },
-        {
-          "cell_index": 27,
-          "cell_id": "9c5c644f-8966-4d2e-98d2-80d73520e9fe",
-          "cell_type": "code_comments",
-          "comments": [
-            "# Create the graph here"
-          ]
-        },
-        {
-          "cell_index": 30,
-          "cell_id": "f4b5b08d-9a9a-474a-94b4-f7aaa8ff19e6",
-          "cell_type": "markdown",
-          "source": "## Add Layers\n\nIn this design, we are enforcing a top-down planning policy. We've created two graphs already, but we have to decide how to route work between the two.\n\nWe'll create a _third_ graph to orchestrate the previous two, and add some connectors to define how this top-level state is shared between the different graphs."
-        },
-        {
-          "cell_index": 32,
-          "cell_id": "4880e573-612f-4d24-97c1-2079382a4a2f",
-          "cell_type": "code_comments",
-          "comments": [
-            "# Define the graph."
-          ]
-        },
-        {
           "cell_index": 34,
           "cell_id": "6b8badbf-d728-44bd-a2a7-5b4e587c92fe",
           "cell_type": "code_comments",
           "comments": [
-            "# Tell the agents exactly what to do, including file name for persistence",
-            "# Stream the graph with the new instruction"
+            "# Tell the agents exactly what to do, including file name for persistence"
           ]
         }
       ]
