@@ -1,0 +1,83 @@
+{
+  "notebook": "CH02/ch02_hierarchical_agent_teams.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "1c427982-fadf-4721-a77e-2465df9fc6bc": "**Document writing team tools（文档写作团队工具）**\n\n接下来，为文档写作团队提供一组可调用工具。\n下面先定义几个最基础的文件访问工具。\n\n需要注意：这会让智能体直接访问文件系统，在某些场景下并不安全；这里的工具描述也还没有针对性能做专门优化。",
+    "00282b1f-bb4d-4ee7-9bae-e8e6f586f12e": "## 定义 Agent Teams（智能体团队）\n\n现在可以开始定义真正的 hierarchical teams（分层团队）了——也就是“选择你的队员”。\n\n### Research Team（研究团队）\n\n研究团队包含搜索智能体和网页抓取 `research_agent`，它们作为两个 worker nodes（工作节点）。下面会创建这些节点以及团队 supervisor（监督者）。",
+    "b01c6ee8-a461-4081-8a97-a3a06ec0f994": "必要组件创建完成后，定义它们之间的交互就很直接了：把节点加入团队图，再定义 edges（边），由边决定节点之间如何转换。",
+    "-pcKEXHd1hM8": "## LLM 配置",
+    "749b99ab-f6f0-4c5d-a90b-10102465d186": "### Document Writing Team（文档写作团队）\n\n下面用类似的方法创建文档写作团队。不同之处在于，这一次会给每个智能体分配不同的文件写入工具。\n\n需要注意：这里给智能体开放了文件系统访问权限，并非在所有场景下都安全。",
+    "aee2cd9b-29aa-458e-903d-4e49179e5d59": "各个对象创建完成后，就可以把它们组合成图。",
+    "f4b5b08d-9a9a-474a-94b4-f7aaa8ff19e6": "## 增加层级（Add Layers）\n\n这个设计采用 top-down planning policy（自顶向下的规划策略）。前面已经创建了两个图，现在还需要决定工作如何在这两个图之间路由。\n\n因此，我们再创建**第三个图**来编排前两个图，并加入连接逻辑，明确顶层 state（状态）如何在不同图之间共享。"
+  },
+  "code_comment_replacements": {
+    "f20a18ca-2709-4c12-84f3-88678591a9fa": [
+      {
+        "old": "# Define a persistent working directory",
+        "new": "# 定义持久化工作目录"
+      },
+      {
+        "old": "# Ensure the working directory exists",
+        "new": "# 确保工作目录已经存在"
+      },
+      {
+        "old": "# Load Tavily Search Wrapper from LangChain",
+        "new": "# 从 LangChain 加载 Tavily Search Wrapper"
+      },
+      {
+        "old": "# Warning: This executes code locally, which can be unsafe when not sandboxed",
+        "new": "# 警告：这里会在本地执行代码；未使用沙箱时可能存在安全风险"
+      }
+    ],
+    "tpHYWLKibEcK": [
+      {
+        "old": "# Prompts help to keep roles sharp",
+        "new": "# Prompt 用于保持各角色职责清晰"
+      },
+      {
+        "old": "# Add workers to specs list",
+        "new": "# 把各 worker 加入 specs 列表"
+      },
+      {
+        "old": "# Supervisor that can coordinate all four",
+        "new": "# 能够协调四个 worker 的 supervisor"
+      }
+    ],
+    "1a7a1260-d9f6-4011-b2b1-13fab5126997": [
+      {
+        "old": "# register nodes",
+        "new": "# 注册节点"
+      },
+      {
+        "old": "# edges",
+        "new": "# 定义边"
+      }
+    ],
+    "9c5c644f-8966-4d2e-98d2-80d73520e9fe": [
+      {
+        "old": "# Create the graph here",
+        "new": "# 在这里创建图"
+      }
+    ],
+    "4880e573-612f-4d24-97c1-2079382a4a2f": [
+      {
+        "old": "# Define the graph.",
+        "new": "# 定义顶层图。"
+      }
+    ],
+    "6b8badbf-d728-44bd-a2a7-5b4e587c92fe": [
+      {
+        "old": "# Stream the graph with the new instruction",
+        "new": "# 使用新的指令流式运行图"
+      }
+    ]
+  }
+}
