@@ -1,0 +1,94 @@
+{
+  "notebook": "CH02/ch02_react.ipynb",
+  "translation": "zh-CN",
+  "policy": {
+    "preserve_code_logic": true,
+    "preserve_api_names": true,
+    "preserve_class_and_function_names": true,
+    "preserve_prompts": true,
+    "preserve_saved_outputs": true,
+    "first_term_occurrence_bilingual": true
+  },
+  "markdown_cells": {
+    "QTxbfXN88Jjb": "# 在 Colab 中打开\n<a target=\"_blank\" href=\"https://colab.research.google.com/github/Nicolepcx/ai-agents-the-definitive-guide/blob/main/CH02/ch02_react.ipynb\">\n  <img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/>\n</a>\n\n<a target=\"_blank\" href=\"https://learning.oreilly.com/library/view/ai-agents-the/0642572247775/\">\n  <img src=\"https://img.shields.io/badge/AI%20Agents%20Book-Read%20on%20O'Reilly-d40101?style=flat\" alt=\"AI Agents Book – Read on O'Reilly\"/>\n</a>\n",
+    "R3pwlizxPcVf": "# 关于这个 Notebook\n\n这个 Notebook 集中演示如何使用 **LangGraph** 和 **LangChain OpenAI** 构建一个最小可用的 ReAct-style agent（ReAct 风格智能体），其中包含一个紧凑的互联网搜索工具和一条易读的 execution trace（执行轨迹）。你会看到如何把工具绑定到模型、如何在模型与工具之间路由，以及如何打印一份符合 ReAct action-observation-final answer（行动—观察—最终答案）模式的清晰执行记录。\n\n## 它展示了什么\n\n* **Typed agent state（类型化智能体状态）**：使用 `add_messages` reducer（归约器）累积 `messages`。\n* **Tool binding（工具绑定）**：把一个由 SerpAPI 支持、返回紧凑 JSON 的 `internet_search` 工具绑定到模型。\n* **双节点图（two-node graph）**\n\n  1. `agent` 节点：调用带 system prompt 的模型\n  2. `tools` 节点：执行待处理的工具调用，并返回 `ToolMessage` 输出。\n* **Conditional routing（条件路由）**：模型 → 工具 → 模型循环执行，直到不再存在工具调用，然后结束。\n* **ReAct-style tracing（ReAct 风格轨迹）**：`print_react_trace(question)` 会打印简短的推理摘要、工具动作、观察结果和最终答案。\n* **可选图预览**：使用 Mermaid PNG 渲染图结构。\n\n## 你将运行什么\n\n1. 安装一个小型依赖栈：`langgraph`、`langchain-openai`、`python-dotenv` 和 `google-search-results`。\n2. 从 `.env` 加载环境变量并验证 `OPENAI_API_KEY`；实时搜索使用 `SERPAPI_API_KEY`。\n3. 定义 `internet_search` 工具，通过 SerpAPI 查询 Google，并以 JSON 返回排名靠前的结果。\n4. 构建并编译包含 `agent` 与 `tools` 两个节点、以 `END` 为终止条件的 **StateGraph**。\n5. 调用 `print_react_trace(\"What is the weather in Zurich today?\")`，观察完整循环和最终回复。\n6. 可选地使用 Mermaid 渲染图结构。\n\n## 它如何工作\n\n* **System prompt（系统提示词）**要求助手保持工具调用简洁，并在结束时给出清晰的最终答案。\n* **Agent node（智能体节点）**在 `[SYSTEM_PROMPT] + state[\"messages\"]` 上调用模型。\n* **Tools node（工具节点）**检查 `last.tool_calls`，按名称执行每个工具，并把 JSON payload（载荷）封装为 `ToolMessage`。\n* **Router（路由器）**函数 `should_continue`：存在工具调用时返回 `\"continue\"`，否则返回 `\"end\"`。\n\n## 为什么采用这种模式\n\n* ReAct 风格智能体的控制逻辑容易理解。Notebook 展示的是可读执行轨迹，而不是暴露 chain of thought（思维链）。\n* LangGraph 让控制流保持显式，因此 transition function（转换函数）非常容易阅读和测试。\n* 工具输出统一规范为 JSON，使模型能解析结构一致的观察结果。\n\n## 如何扩展与调整\n\n* 增加更多工具，并将它们加入 `TOOLS` 和 `TOOLS_BY_NAME`。\n* 用其他返回 JSON 的搜索后端替换 SerpAPI。\n* 用 checkpointer（检查点保存器）替换默认的内存行为，实现持久化记忆。\n* 如果需要更可靠的 grounded outputs（有依据输出），可在最终答案之前增加验证或摘要节点。\n\n## 运行要求与说明\n\n* 必须提供 `OPENAI_API_KEY`；实时搜索还需要 `SERPAPI_API_KEY`。\n* 互联网结果会随时间变化，不同日期运行可能得到不同摘要与答案。\n* Mermaid 渲染可能需要额外依赖；图预览是可选功能。\n",
+    "yBobNsHK0o1Y": "# 依赖项",
+    "TFtqNSMaQqab": "# 导入依赖",
+    "4fLfSvvMSXcy": "# API 配置",
+    "iNvAD4N4QvgE": "# Graph State（图状态）",
+    "ZkkZIpTsSdbI": "# LLM 配置",
+    "aFfbYp4PSmLi": "# 工具",
+    "Hipi3Id3SqLn": "# Nodes（节点）",
+    "KqOgBpg7SvfQ": "# Graph（图结构）",
+    "mVtE4r3bSy6l": "# ReAct-style trace（ReAct 风格执行轨迹）",
+    "E4_qY3YBS4lW": "# 运行图",
+    "T5vv9iEwS9km": "# 绘制图结构",
+    "wyyot7TITJqj": "### 注意：有时 Mermaid 在线渲染不可用\n\n这种情况下可以运行：`print(hier.get_graph().draw_ascii())`\n或：`print(hier.get_graph().draw_mermaid())`\n然后前往 [Mermaid Live Editor](https://mermaid.live/edit#pako:eNp1kmFrgzAQhv9KuMFoQZ3a1bRp6Zf1J-zTliGpJiqkicS4rSv974ux2PXDEOLd8d77HJecodAlBwJhGFJVaCWailCFkJD6q6iZsT5DqOjNJydINoozQ5WXV4a1NXrdb6iiNs876-R5Pnvftrsp2z61u485IUQ0prOD8NCfuJn5cz7kHZfSFcafr7gxrNG-egvnI4SrckL4eAJINvpPaBSGO-Q5m4nrayNqc49CYYQe1aFrN6VWfIxQ5NRXzr9yqXX7R34DjhhPvPWNNm7Wbs8FKrlgvbRINFKSB5GKWIhg2HFY86aqLUmi9K7Bb9HLQ92yorEnEt8Jhi1c7Q7ikImCKgigMk0JRDDZ8QCO3BzZkMN5uFsKtuZHToG48DoQBaourq9l6k3rIxBretdpdF_Vk0_flszyfcPcO7hJ3LK4edG9skCS2FsAOcO3yxY4wqslXiySZJk9JzgL4AQkfY6jeJllGcZr963SSwA_HhpH2TJJsjRe4XWCFyleX34BzNfoqQ)，粘贴 Mermaid 源码以生成图结构。"
+  },
+  "code_comment_replacements": {
+    "lUIyjhSCn3wN": [
+      {
+        "old": "# --- API Key Setup ---",
+        "new": "# --- API Key 配置 ---"
+      },
+      {
+        "old": "# Option 1 (preferred): create a `.env` file in your project folder with:",
+        "new": "# 方案 1（推荐）：在项目目录中创建 `.env` 文件，并写入："
+      },
+      {
+        "old": "# Option 2: set it directly in the notebook with magic:",
+        "new": "# 方案 2：直接通过 Notebook magic 命令设置："
+      },
+      {
+        "old": "# Load from .env if available",
+        "new": "# 如果存在 `.env`，则从中加载。"
+      },
+      {
+        "old": "# Fallback: ask if still missing",
+        "new": "# Fallback（回退方案）：如果仍缺少密钥，则交互式询问。"
+      }
+    ],
+    "7fx-7jsznK_l": [
+      {
+        "old": "\"\"\"The state of the agent.\"\"\"",
+        "new": "\"\"\"智能体的状态。\"\"\""
+      },
+      {
+        "old": "# add_messages is a reducer",
+        "new": "# `add_messages` 是一个 reducer（归约器）"
+      },
+      {
+        "old": "# See https://langchain-ai.github.io/langgraph/concepts/low_level/#reducers",
+        "new": "# 详见：https://langchain-ai.github.io/langgraph/concepts/low_level/#reducers"
+      }
+    ],
+    "PHRXRXvXS17J": [
+      {
+        "old": "# AI proposes one or more tool calls",
+        "new": "# AI 提出一个或多个工具调用"
+      },
+      {
+        "old": "# Tool result",
+        "new": "# 工具返回结果"
+      },
+      {
+        "old": "# Final AI reply: a genuine AIMessage with no pending tool calls.",
+        "new": "# 最终 AI 回复：一个不再包含待处理工具调用的真正 AIMessage。"
+      },
+      {
+        "old": "# Anything else (the initial HumanMessage that values-mode emits first) is skipped.",
+        "new": "# 其他消息（例如 values-mode 最先发出的初始 HumanMessage）会被跳过。"
+      },
+      {
+        "old": "# make sure AIMessage is imported",
+        "new": "# 确保已导入 AIMessage"
+      }
+    ],
+    "ItqtXE88tdOk": [
+      {
+        "old": "# This requires some extra dependencies and is optional",
+        "new": "# 这里需要额外依赖，因此属于可选步骤"
+      }
+    ]
+  }
+}
