@@ -6,6 +6,15 @@
 
 [English README](README_EN.md) · [中文学习路线](LEARNING_PATH_ZH.md)
 
+
+## 社区翻译状态与使用说明
+
+本仓库是 **AI Agents - The Definitive Guide** 配套代码仓库的社区维护简体中文翻译。
+
+原作者 Nicolepcx 已在上游 [Issue #1](https://github.com/Nicolepcx/ai-agents-the-definitive-guide/issues/1) 中确认：在与中文出版方和 O’Reilly 沟通后，社区可以继续维护这份中文翻译，前提是 **不用于商业用途，也不作为独立的可下载产品进行发布**。完整中文翻译将继续维护在本 Fork 中。
+
+这不是官方中文版或出版社发行版本。代码与原项目内容的使用仍应同时遵守上游仓库的 LICENSE 及相关权利方的要求。
+
 ![OReilly_logo_rgb.png](resources%2FOReilly_logo_rgb.png)
 
 ## 目录
